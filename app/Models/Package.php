@@ -47,4 +47,8 @@ class Package extends Model
 
         return $builder;
     }
+
+    public function audio(){
+        return $this->belongsToMany(Audio::class, 'package_audio');
+    }
 }

@@ -5,6 +5,24 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
           点读包列表
         </h2>
+        <Link
+          id="add-package"
+          :href="route('package.create')"
+          class="
+            inline-flex
+            items-center
+            px-3
+            h-11
+            font-medium
+            text-gray-700
+            bg-white
+            rounded
+            shadow-sm
+            lg:h-7 lg:text-sm
+          "
+        >
+          新增点读包
+        </Link>
       </div>
     </template>
 
@@ -20,19 +38,14 @@
               bg-white
               shadow
               sm:rounded
-              lg:flex-row
-              lg:items-center
-              lg:justify-between
-              lg:space-y-0
-              lg:p-2
+              lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:p-2
             "
           >
             <div
               class="
                 flex flex-col
                 space-y-4
-                sm:flex-row
-                sm:space-y-0 sm:space-x-2
+                sm:flex-row sm:space-y-0 sm:space-x-2
               "
             >
               <select
@@ -47,12 +60,9 @@
                   rounded
                   border-gray-300
                   shadow-sm
-                  lg:h-9
-                  lg:text-sm
+                  lg:h-9 lg:text-sm
                   sm:w-44
-                  focus:outline-none
-                  focus:ring-blue-500
-                  focus:border-blue-500
+                  focus:outline-none focus:ring-blue-500 focus:border-blue-500
                 "
               >
                 <option
@@ -76,12 +86,9 @@
                   rounded
                   border-gray-300
                   shadow-sm
-                  lg:h-9
-                  lg:text-sm
+                  lg:h-9 lg:text-sm
                   sm:w-44
-                  focus:outline-none
-                  focus:ring-blue-500
-                  focus:border-blue-500
+                  focus:outline-none focus:ring-blue-500 focus:border-blue-500
                 "
               >
                 <option
@@ -135,11 +142,8 @@
                   rounded
                   border-gray-300
                   shadow-sm
-                  lg:h-9
-                  lg:text-sm
-                  lg:w-64
-                  focus:ring-blue-500
-                  focus:border-blue-500
+                  lg:h-9 lg:text-sm lg:w-64
+                  focus:ring-blue-500 focus:border-blue-500
                 "
                 placeholder="Search for..."
                 autocomplete="off"
@@ -166,8 +170,7 @@
                             text-blue-600
                             break-all
                             rounded
-                            focus:outline-none
-                            focus:ring-2 focus:ring-blue-500
+                            focus:outline-none focus:ring-2 focus:ring-blue-500
                           "
                         >
                           {{ item.title }}
@@ -185,8 +188,7 @@
                         text-blue-600
                         rounded
                         lg:text-sm
-                        focus:outline-none
-                        focus:ring-2 focus:ring-blue-500
+                        focus:outline-none focus:ring-2 focus:ring-blue-500
                       "
                     >
                       {{ item.author.name }}
@@ -261,12 +263,12 @@ export default defineComponent({
     },
   },
   watch: {
-      'query.category': function(){
-          this.filter();
-      },
-      'query.month': function(){
-          this.filter();
-      }
-  }
+    "query.category": function () {
+      this.filter();
+    },
+    "query.month": function () {
+      this.filter();
+    },
+  },
 });
 </script>

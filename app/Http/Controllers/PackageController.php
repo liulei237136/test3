@@ -6,6 +6,8 @@ use App\Http\Resources\PackageResource;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class PackageController extends Controller
@@ -42,5 +44,28 @@ class PackageController extends Controller
             'queryParams' => request()->all(['category', 'month', 'term'])
         ]);
     }
+
+    public function create(){
+        return Inertia::render(('Package/Create'));
+    }
+
+    public function store(Request $request){
+        $input = $request->all();
+        Validator::make($input, [
+            'name' => ['required', 'string', 'max:255'],
+            'category' => Rule::in(['毛毛虫', '小达人', '卷之友']),
+            'description' => ['required', 'string', 'max:3000'],
+        ])->validate();
+
+        $package = Package::create([
+            'name' => $input['name'],
+            'category' => $input['category'],
+            'description' => $input['description'],
+            'author_id' => auth()->id(),
+        ]);
+
+        return redirect()->route('package.audio.edit', $package);
+    }
+
 
 }

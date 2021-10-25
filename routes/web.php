@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PackageAudioController;
 use App\Http\Controllers\PackageController;
+use App\Models\Package;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -38,6 +40,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');
     Route::post('/media', [MediaController::class, 'store'])->name('media.store');
 
-    Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
+    Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
+    Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
+    Route::get('/packages/{package}/audio/edit', [PackageAudioController::class, 'edit'])->name('package.audio.edit');
+    Route::post('/packages/{package}/audio', [PackageAudioController::class, 'store'])->name('package.audio.store');
+
 });
+    Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
 

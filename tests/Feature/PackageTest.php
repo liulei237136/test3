@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Package;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+
+use function PHPUnit\Framework\assertEquals;
 
 class PackageTest extends TestCase
 {
@@ -24,5 +27,43 @@ class PackageTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee($package->title);
+    }
+
+    public function test_unauthenticated_user_can_not_view_package_create_page(){
+        $response = $this->get("/packages/create");
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_user_can_view_package_create_page(){
+        $this->actingAs(User::factory()->create());
+
+        $response = $this->get(route('package.create'));
+
+        $response->assertStatus(200);
+    }
+
+    public function test_authenticated_user_can_create_package(){
+        $this->actingAs(User::factory()->create());
+
+        $package = Package::factory()->make()->toArray();
+
+        $response = $this->post(route('package.store'), $package);
+
+        $response->assertRedirect(route('package.audio.edit', ['package' => '1']));
+
+        $this->assertEquals(1, Package::all()->count());
+    }
+
+    public function test_authenticated_user_can_add_audio_when_he_new_create_the_package(){
+        $this->actingAs(User::factory()->create());
+
+        $package = Package::factory()->create();
+
+        $response = $this->get(route('package.audio.edit', $package));
+
+        $response->assertStatus(200);
+
+        $response->assertSee('编辑点读包包含的音频');
     }
 }
