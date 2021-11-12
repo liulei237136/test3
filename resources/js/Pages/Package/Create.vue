@@ -24,6 +24,7 @@
                 class="mt-2 block w-full max-w-lg"
                 v-model="form.name"
                 autocomplete="name"
+                required
               />
               <jet-input-error :message="form.errors.name" class="mt-2" />
             </div>
@@ -77,22 +78,21 @@
                     border-gray-300
                     rounded-md
                   "
+                  required
                 >
                 </textarea>
+                    <jet-input-error :message="form.errors.description" class="mt-2" />
               </div>
             </div>
 
             <div class="col-span-6 sm:col-span-4 ">
-              <jet-action-message :on="form.recentlySuccessful" class="mr-3">
-                Saved.
-              </jet-action-message>
 
               <jet-button
                 :class="{ 'opacity-25': form.processing }"
                 class="mt-3"
                 :disabled="form.processing"
               >
-                Save
+                新建
               </jet-button>
             </div>
           </form>
@@ -137,14 +137,8 @@ export default defineComponent({
   methods: {
     createPackage() {
       this.form.post(route("package.store"), {
-        errorBag: "createPackage",
         preserveScroll: true,
-        onSuccess: () => this.reset(),
       });
-    },
-
-    reset() {
-      this.form.reset();
     },
   },
 });

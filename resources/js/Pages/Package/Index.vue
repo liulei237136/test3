@@ -173,7 +173,7 @@
                             focus:outline-none focus:ring-2 focus:ring-blue-500
                           "
                         >
-                          {{ item.title }}
+                          {{ item.name }}
                         </Link>
                         <!-- <p class="text-xs text-gray-500 break-all">
                           {{ item.file_name }}

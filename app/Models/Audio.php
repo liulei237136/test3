@@ -11,6 +11,8 @@ class Audio extends Model
 
     protected $guarded = [];
 
+    protected $appends = ['url'];
+
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
@@ -23,6 +25,6 @@ class Audio extends Model
 
     public function getUrlAttribute()
     {
-        return url("audio/{$this->created_at->format('Y/m/d')}/{$this->id}/{$this->file_name}");
+        return url("storage/{$this->file_name}");
     }
 }

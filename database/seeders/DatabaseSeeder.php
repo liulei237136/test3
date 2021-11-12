@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        Package::factory()->count(100)->create();
+        // Package::factory()->count(100)->create();
 
     }
 }

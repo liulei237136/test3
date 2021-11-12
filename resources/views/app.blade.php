@@ -11,10 +11,10 @@
 
         <!-- Styles -->
         <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+        <link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">
 
         <!-- Scripts -->
         @routes
-        <script src="{{ mix('js/app.js') }}" defer></script>
     </head>
     <body class="font-sans antialiased">
         @inertia
@@ -22,5 +22,6 @@
         @env ('local')
             {{-- <script src="http://localhost:3000/browser-sync/browser-sync-client.js"></script> --}}
         @endenv
+        <script src="{{ mix('js/app.js') }}" ></script>
     </body>
 </html>

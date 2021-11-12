@@ -18,7 +18,7 @@ mix.js('resources/js/app.js', 'public/js').vue()
     ])
     .webpackConfig(require('./webpack.config'))
     .version();
-
+mix.sass('resources/sass/style.scss', 'public/css');
 if (mix.inProduction()) {
     mix.version();
 }

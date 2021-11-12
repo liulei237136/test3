@@ -46,7 +46,11 @@ class PackageController extends Controller
     }
 
     public function create(){
-        return Inertia::render(('Package/Create'));
+        return Inertia::render('Package/Create');
+    }
+
+    public function init(Package $package){
+        return Inertia::render('Package/Init', ['package' => $package]);
     }
 
     public function store(Request $request){
@@ -64,7 +68,11 @@ class PackageController extends Controller
             'author_id' => auth()->id(),
         ]);
 
-        return redirect()->route('package.audio.edit', $package);
+        return redirect()->route('package.init',['package' => $package]);
+    }
+
+    public function edit($package){
+        return Inertia::render('Package/Edit', ['package' => Package::with('audio')->findOrFail($package)]);
     }
 
 
