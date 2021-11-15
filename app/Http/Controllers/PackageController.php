@@ -68,7 +68,9 @@ class PackageController extends Controller
             'author_id' => auth()->id(),
         ]);
 
-        return redirect()->route('package.init',['package' => $package]);
+        // return redirect()->route('package.init',['package' => $package]);
+        // return Inertia::render('Package/Init', ['package' => $package]);
+        return $package;
     }
 
     public function edit($package){

@@ -31,9 +31,7 @@
       <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent"
         >保存</vxe-button
       >
-      <vxe-button icon="fa fa-mail-reply" status="perfect" @click="revertEvent"
-        >还原</vxe-button
-      >
+      <vxe-button icon="fa fa-mail-reply" status="perfect">还原</vxe-button>
     </template>
   </vxe-toolbar>
   <vxe-table
@@ -298,6 +296,7 @@ export default defineComponent({
         }, 2000);
       }, 1000);
     },
+
     saveEvent() {
       this.showModal = true;
       this.modalContent = "正在计算需要保存的内容...";
@@ -306,13 +305,14 @@ export default defineComponent({
 
     save({ inserted, deleted, updated }) {
       const results = [];
+      const that = this;
 
       //insert
       inserted.forEach((row) => {
         const data = new FormData();
         //录音或者上传mp3
-        if(row.blob || row.file){
-            data.append("file", row.blob || row.file);
+        if (row.blob || row.file) {
+          data.append("file", row.blob || row.file);
         }
         //name
         if (row.name) {
@@ -361,8 +361,8 @@ export default defineComponent({
       updated.forEach((row) => {
         const data = new FormData();
         //file
-        if(row.blob || row.file){
-            data.append("file", row.blob || row.file);
+        if (row.blob || row.file) {
+          data.append("file", row.blob || row.file);
         }
         //name
         if (row.name) {
@@ -392,11 +392,12 @@ export default defineComponent({
       });
 
       Promise.all(results)
-        .then((result) => {
-          console.log(result);
+        .then((result)=>{
+          that.modalContent = "保存成功!";
+        //   location.reload();
         })
         .catch((err) => {
-          console.log(err);
+            console.log(err);
         });
     },
 

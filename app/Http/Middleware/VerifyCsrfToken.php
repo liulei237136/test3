@@ -13,5 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         //
+        // 'packages/*/audio/create_from_upload'
     ];
 }

@@ -7,8 +7,11 @@ use App\Models\Package;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use function Psy\debug;
+
 class PackageAudioController extends Controller
 {
+
     public function edit($package){
         return Inertia::render('Package/Audio/Edit', ['package' => Package::with('audio')->findOrFail($package)]);
     }
@@ -22,6 +25,8 @@ class PackageAudioController extends Controller
         ], [
             'max' => 'File cannot be larger than 512MB.'
         ]);
+        $file = null;
+        $file_name = null;
 
         $file = request()->file('file');
         if($file){
@@ -60,6 +65,37 @@ class PackageAudioController extends Controller
         return $audio;
     }
 
+    public function createFromUpload(Package $package)
+    {
+        debug([]);
+        request()->validate([
+            'file' => ['file', 'max:512000']
+        ], [
+            'max' => 'File cannot be larger than 512MB.'
+        ]);
+
+        $file = request()->file('file');
+        debug([]);
+        if(!$file) return;
+        $directory = "audio/" . date('Y/m/d');
+        // "audio/2021/11/12/jkdfksf"
+        $file_name = $file->store($directory, 'public');
+
+        debug([]);
+        $audio = Audio::create([
+            'name' => $file->getClientOriginalName(),
+            'file_name' => $file_name,
+            'size' => $file->getSize(),
+            'author_id' => auth()->id(),
+        ]);
+
+        //relation
+        $package->audio()->attach($audio->id);
+
+        debug([]);
+        return $audio;
+    }
+
     public function destroy(Package $package, Audio $audio){
         //todo  check if the current user is the author of the audio
 
@@ -79,11 +115,11 @@ class PackageAudioController extends Controller
         $file = request()->file('file');
         if($file){
             $directory = "audio/" . date('Y/m/d');
-            // "audio/2021/11/12/jkdfksf.mp3"
+            // "audio/2021/11/12/jkdfksf"
             $file_name = $file->store($directory, 'public');
-            if($file_name){
-                $audio->file_name = $file_name;
-            }
+            //todo can not store ?
+            if(!$file_name) return;
+            $audio->file_name = $file_name;
         }
 
         //name
@@ -94,8 +130,11 @@ class PackageAudioController extends Controller
             $audio->size = $file->getSize();
         }
 
-        //author_id
-        $audio->author_id = auth()->id();
+        //audio_text
+        $audio->audio_text = request()->audio_text;
+
+        //book_name
+        $audio->book_name = request()->book_name;
 
         return $audio->save();
     }

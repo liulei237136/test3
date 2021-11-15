@@ -2,15 +2,16 @@
   <app-layout title="编辑点读包的音频">
     <template #header>
       <div class="flex items-center space-x-2">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <button class="font-semibold text-xl text-gray-800 leading-tight">
           编辑点读包
-        </h2>
+        </button>
       </div>
     </template>
 
     <div class="py-12">
       <div class="mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+
           <form @submit.prevent="updatePackage" class=" ml-2">
             <!-- Name -->
             <div class="mb-5">
@@ -85,7 +86,7 @@
               </div>
             </div>
 
-            <audio-table :package="package"></audio-table>
+            <audio-table :package="p"></audio-table>
 
             <div class="col-span-6 sm:col-span-4">
               <jet-button
