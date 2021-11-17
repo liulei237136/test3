@@ -1086,6 +1086,9 @@ select {
 	white-space: nowrap;
 	border-width: 0;
 }
+.visible {
+	visibility: visible;
+}
 .fixed {
 	position: fixed;
 }
@@ -1209,6 +1212,12 @@ select {
 }
 .mb-1 {
 	margin-bottom: 0.25rem;
+}
+.ml-5 {
+	margin-left: 1.25rem;
+}
+.mr-5 {
+	margin-right: 1.25rem;
 }
 .block {
 	display: block;
@@ -1615,6 +1624,14 @@ select {
 	--tw-bg-opacity: 1;
 	background-color: rgba(139, 92, 246, var(--tw-bg-opacity));
 }
+.bg-purple-800 {
+	--tw-bg-opacity: 1;
+	background-color: rgba(91, 33, 182, var(--tw-bg-opacity));
+}
+.bg-purple-700 {
+	--tw-bg-opacity: 1;
+	background-color: rgba(109, 40, 217, var(--tw-bg-opacity));
+}
 .bg-opacity-25 {
 	--tw-bg-opacity: 0.25;
 }
@@ -1988,6 +2005,44 @@ select {
 }
 .ease-linear {
 	transition-timing-function: linear;
+}
+.purpleButton {
+	margin-right: 0.25rem;
+	margin-bottom: 0.25rem;
+	border-radius: 0.25rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	font-size: 1.25rem;
+	line-height: 1.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	--tw-text-opacity: 1;
+	color: rgba(255, 255, 255, var(--tw-text-opacity));
+	--tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+	transition-duration: 150ms;
+	transition-timing-function: linear;
+}
+.purpleButton:hover {
+	--tw-bg-opacity: 1;
+	background-color: rgba(91, 33, 182, var(--tw-bg-opacity));
+	--tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.purpleButton:focus {
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
+.purpleButton:active {
+	--tw-bg-opacity: 1;
+	background-color: rgba(91, 33, 182, var(--tw-bg-opacity));
 }
 .hover\:border-gray-300:hover {
 	--tw-border-opacity: 1;
@@ -2589,7 +2644,4 @@ select {
 		line-height: 1.25rem;
 	}
 }
-
-
-
 

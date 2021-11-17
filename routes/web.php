@@ -43,7 +43,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
-    Route::get('/packages/{package}/edit', [PackageController::class, 'edit'])->name('package.edit');
+    Route::get('/packages/{package}/edit_info', [PackageController::class, 'editInfo'])->name('package.editInfo');
+    Route::get('/packages/{package}/edit_audio', [PackageController::class, 'editAudio'])->name('package.editAudio');
+    Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');
     Route::post('/packages/{package}/audio', [PackageAudioController::class, 'store'])->name('package.audio.store');
     Route::post('/packages/{package}/audio/create_from_upload', [PackageAudioController::class, 'createFromUpload'])->name('package.audio.create_from_upload');
     Route::delete('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'destroy'])->name('package.audio.destroy');
@@ -51,5 +53,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
 });
     Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
+    Route::get('/test', function(){
+        return view('test');
+    });
 
 

@@ -70,8 +70,6 @@
       </div>
     </div>
 
-    <audio-table :package="p"></audio-table>
-
     <div class="col-span-6 sm:col-span-4">
       <jet-button
         :class="{ 'opacity-25': form.processing }"
@@ -106,7 +104,6 @@ export default defineComponent({
   },
   data() {
     return {
-      p: this.package,
       form: this.$inertia.form({
         _method: "PATCH",
         name: this.package.name,
@@ -114,6 +111,13 @@ export default defineComponent({
         description: this.package.description,
       }),
     };
+  },
+  methods: {
+    updatePackage() {
+      this.form.post(route("package.update", { package: this.package.id }), {
+        preserveScroll: true,
+      });
+    },
   },
 });
 </script>

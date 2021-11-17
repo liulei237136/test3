@@ -6,6 +6,7 @@ use App\Http\Resources\PackageResource;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -73,9 +74,21 @@ class PackageController extends Controller
         return $package;
     }
 
-    public function edit($package){
-        return Inertia::render('Package/Edit', ['package' => Package::with('audio')->findOrFail($package)]);
+    public function editInfo(Package $package){
+        return Inertia::render('Package/Edit', ['package' => $package, 'tab' => 'EditPackageInfo']);
     }
 
+    public function editAudio($package){
+        return Inertia::render('Package/Edit', ['package' => Package::with('audio')->findOrFail($package), 'tab' => 'EditPackageAudio']);
+    }
+
+    public function update(Package $package){
+        //todo validate
+        $package->name = request()->name;
+        $package->category = request()->category;
+        $package->description = request()->description;
+        $package->save();
+        return Redirect::route('package.editInfo', ['package' => $package]);
+    }
 
 }

@@ -42,7 +42,7 @@ class Package extends Model
     public function scopeSearch(Builder $builder, $term)
     {
         if (!is_null($term)) {
-            $builder->where('title', 'LIKE', "%$term%");
+            $builder->where('name', 'LIKE', "%$term%");
         }
 
         return $builder;

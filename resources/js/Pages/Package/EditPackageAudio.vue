@@ -10,6 +10,13 @@
   </vxe-modal>
   <vxe-toolbar perfect>
     <template #buttons>
+      <vxe-button icon="fa fa-plus" status="perfect" @click="hideColumn"
+        >隐藏</vxe-button
+      >
+      <vxe-button icon="fa fa-plus" status="perfect" @click="showColumn"
+        >显示</vxe-button
+      >
+
       <vxe-button icon="fa fa-plus" status="perfect" @click="insertEvent()"
         >新增空白行</vxe-button
       >
@@ -34,9 +41,27 @@
       <vxe-button icon="fa fa-mail-reply" status="perfect">还原</vxe-button>
     </template>
   </vxe-toolbar>
+
+  <vxe-pager
+    background
+    size="small"
+    :loading="loading"
+    :current-page="tablePage.currentPage"
+    :page-size="tablePage.pageSize"
+    :total="tablePage.totalResult"
+    :page-sizes="[10, 20, 100, 1000, { label: '全量数据', value: -1 }]"
+    :layouts="[
+      'PrevPage',
+      'JumpNumber',
+      'NextPage',
+      'FullJump',
+      'Sizes',
+      'Total',
+    ]"
+    @page-change="handlePageChange"
+  >
+  </vxe-pager>
   <vxe-table
-    keep-source
-    :row-key="true"
     :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
     empty-text="还没有添加音频哦！"
     show-overflow
@@ -48,8 +73,8 @@
     resizable
     :sort-config="{
       trigger: 'cell',
-      defaultSort: { field: 'name', order: 'asc' },
-      orders: ['desc', 'asc'],
+      defaultSort: { field: 'name', order: null },
+      orders: ['desc', 'asc', null],
     }"
     ref="xTable"
   >
@@ -63,7 +88,7 @@
         attrs: { type: 'text' },
       }"
     ></vxe-column>
-    <vxe-column title="播放和重录" width="520">
+    <vxe-column :visible="showHideColumn" title="播放和重录" width="520">
       <template #default="{ row }">
         <audio-recorder :row="row"></audio-recorder>
       </template>
@@ -102,11 +127,12 @@
       :sort-by="sortUpdatedAt"
       sortable
     ></vxe-column>
+    -->
     <vxe-column title="操作" width="100" show-overflow>
       <template #default="{ row }">
-        <button type="button" @click="deleteRow(row)">
-          <icon name="edit"></icon>
-        </button>
+        <!-- <vxe-button icon="fa fa-trash" status="perfect" @click="deleteRow(row)"
+          >删除</vxe-button> -->
+        <!-- <button type="button" @click="deleteRow(row)">删除</button> -->
       </template>
     </vxe-column>
   </vxe-table>
@@ -118,13 +144,7 @@
     :current-page="tablePage.currentPage"
     :page-size="tablePage.pageSize"
     :total="tablePage.totalResult"
-    :page-sizes="[
-      10,
-      20,
-      100,
-      { label: '大量数据', value: 1000 },
-      { label: '全量数据', value: -1 },
-    ]"
+    :page-sizes="[10, 20, 100, 1000, { label: '全量数据', value: -1 }]"
     :layouts="[
       'PrevPage',
       'JumpNumber',
@@ -141,14 +161,15 @@
 <script>
 import { defineComponent } from "vue";
 
-import VXETable from "vxe-table";
 import Icon from "@/Components/Icon";
-import AudioRecorder from "./AudioRecorder";
+import AudioRecorder from "./Audio/AudioRecorder";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/zh-cn";
 dayjs.extend(relativeTime).locale("zh-cn");
+
+import { v4 as uuidv4 } from "uuid";
 
 export default defineComponent({
   props: {
@@ -174,6 +195,18 @@ export default defineComponent({
     };
   },
   methods: {
+    showColumn() {
+        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('audio_text'))
+        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('book_name'))
+        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('created_at'))
+        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('updated_at'))
+    },
+    hideColumn() {
+        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('audio_text'))
+        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('book_name'))
+        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('created_at'))
+        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('updated_at'))
+    },
     loadLocal() {
       this.tablePage.totalResult = this.audioList.length;
       this.tableData = this.audioList.slice(
@@ -195,7 +228,9 @@ export default defineComponent({
       return "";
     },
     insertEvent(row) {
-      const record = {};
+      const record = {
+        uuid: uuidv4(),
+      };
       this.audioList.unshift(record);
       this.loadLocal();
     },
@@ -212,6 +247,7 @@ export default defineComponent({
             name: file.name,
             url: url,
             file: file,
+            uuid: uuidv4(),
           };
           this.audioList.unshift(record);
           count++;
@@ -250,7 +286,7 @@ export default defineComponent({
         for (const row of this.audioList) {
           if (!row.id) {
             //避免空行
-            const normalized = this.normalize(row);
+            const normalized = this.normalizeNew(row);
             if (
               normalized.name ||
               normalized.audio_text ||
@@ -258,25 +294,27 @@ export default defineComponent({
               normalized.url
             ) {
               inserted.push(row);
-              continue;
             }
           }
         }
 
-        for (const oldRow of old) {
+        for (let oldRow of old) {
           let newRow = this.audioList.find((row) => row.id === oldRow.id);
           //deleted
           if (!newRow) {
             deleted.push(oldRow);
             continue;
           }
-          // not change,so skip
-          newRow = this.normalize(newRow);
+
+          //统一标准
+          oldRow = this.normalizeNew(oldRow);
+          newRow = this.normalizeNew(newRow);
+
           if (
-            oldRow.name == newRow.name &&
-            oldRow.url == newRow.url &&
-            oldRow.book_name == newRow.book_name &&
-            oldRow.audio_text == newRow.audio_text
+            oldRow.name === newRow.name &&
+            oldRow.url === newRow.url &&
+            oldRow.book_name === newRow.book_name &&
+            oldRow.audio_text === newRow.audio_text
           ) {
             continue;
           } else {
@@ -310,22 +348,12 @@ export default defineComponent({
       //insert
       inserted.forEach((row) => {
         const data = new FormData();
-        //录音或者上传mp3
-        if (row.blob || row.file) {
-          data.append("file", row.blob || row.file);
-        }
-        //name
-        if (row.name) {
-          data.append("name", row.name);
-        }
-        //book_name
-        if (row.book_name) {
-          data.append("book_name", row.book_name);
-        }
-        //audio_text
-        if (row.audio_text) {
-          data.append("audio_text", row.audio_text);
-        }
+
+        (row.blob || row.file) && data.append("file", row.blob || row.file);
+        row.name && data.append("name", row.name);
+        row.book_name && data.append("book_name", row.book_name);
+        row.audio_text && data.append("audio_text", row.audio_text);
+        data.append("uuid", row["uuid"]);
 
         results.push(
           axios.post(
@@ -334,7 +362,6 @@ export default defineComponent({
             {
               headers: {
                 "Content-Type": "multipart/form-data",
-                _method: "PATCH",
               },
             }
           )
@@ -344,47 +371,35 @@ export default defineComponent({
       //delete
       deleted.forEach((row) => {
         results.push(
-          axios.post(
+          axios.delete(
             route("package.audio.destroy", {
               audio: row.id,
               package: this.package.id,
-            }),
-            {
-              headers: {
-                _method: "DELETE",
-              },
-            }
+            })
           )
         );
       });
 
       updated.forEach((row) => {
         const data = new FormData();
-        //file
-        if (row.blob || row.file) {
-          data.append("file", row.blob || row.file);
-        }
-        //name
-        if (row.name) {
-          data.append("name", row.name);
-        }
-        //book_name
-        if (row.book_name) {
-          data.append("book_name", row.book_name);
-        }
-        //audio_text
-        if (row.audio_text) {
-          data.append("audio_text", row.audio_text);
-        }
+
+        (row.blob || row.file) && data.append("file", row.blob || row.file);
+        data.append("name", row.name);
+        data.append("book_name", row.book_name);
+        data.append("audio_text", row.audio_text);
+        data.append("_method", "patch");
+        data.append("uuid", row["uuid"]);
 
         results.push(
           axios.post(
-            route("package.audio.store", { package: this.package.id }),
+            route("package.audio.update", {
+              package: this.package.id,
+              audio: row.id,
+            }),
             data,
             {
               headers: {
                 "Content-Type": "multipart/form-data",
-                _method: "PATCH",
               },
             }
           )
@@ -392,24 +407,74 @@ export default defineComponent({
       });
 
       Promise.all(results)
-        .then((result)=>{
-          that.modalContent = "保存成功!";
-        //   location.reload();
+        .then((results) => {
+          that.saveUpdateData(results);
+          that.modalContent = "";
+          that.showModal = false;
+          //   that.$inertia.reload({
+          //       onSuccess: function(){
+          //           that.audioList = window._.cloneDeep(that.package.audio);
+          //           that.loadLocal();
+          //       }
+          //   });
         })
         .catch((err) => {
-            console.log(err);
+          console.log(err);
         });
     },
 
-    normalize(row) {
+    saveUpdateData(results) {
+      for (let result of results) {
+        const item = result.data;
+        const success = item.success;
+        const type = item.type;
+        const newItem = item.data;
+        const uuid = item.uuid;
+        //todo  error handling
+        if (!success) continue;
+        let index, foundItem;
+
+        switch (type) {
+          case "insert":
+            this.package.audio.push(newItem);
+            foundItem = this.audioList.find((item) => item.uuid === uuid);
+
+            foundItem.id = newItem.id;
+            if (newItem.url) {
+              foundItem.url = newItem.url;
+              delete foundItem["file"];
+              delete foundItem["blob"];
+            }
+
+            break;
+          case "delete":
+            index = this.package.audio.findIndex(
+              (item) => item.id === newItem.id
+            );
+            this.package.audio.splice(index, 1);
+
+            break;
+          case "update":
+            index = this.package.audio.findIndex(
+              (item) => item.id === newItem.id
+            );
+            this.package.audio.splice(index, 1, newItem);
+
+            foundItem = this.audioList.find((item) => item.uuid === uuid);
+            if ((foundItem.blob || foundItem.file) && newItem.url) {
+              foundItem.url = newItem.url;
+              delete foundItem["file"];
+              delete foundItem["blob"];
+            }
+            break;
+        }
+      }
+    },
+
+    normalizeNew(row) {
       const fields = ["name", "book_name", "audio_text"];
       for (const field of fields) {
-        if (typeof row[field] == "string") {
-          row[field] = row[field].trim();
-          if (row[field].length === 0) {
-            row[field] = null;
-          }
-        }
+        row[field] = _.trim(row[field]);
       }
       return row;
     },

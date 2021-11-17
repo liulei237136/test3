@@ -17,66 +17,29 @@
             shadow-xl
             sm:rounded-lg
             p-5
-            flex flex-col
-            justify-between
           "
         >
-          <div>
             <button
               type="button"
               id="select-audio"
               class="
                 bg-purple-500
-                text-white
-                active:bg-purple-600
-                font-bold
-                uppercase
-                text-xl
-                px-4
-                py-2
-                rounded
-                shadow
-                hover:shadow-md
-                outline-none
-                focus:outline-none
-                mr-1
-                mb-1
-                ease-linear
-                transition-all
-                duration-150
+                purpleButton
+                mr-2
               "
             >
-              上传mp3完成初始化
+              上传mp3来初始化
             </button>
-          </div>
-          <div class="mb-4">或者</div>
-          <div>
+          或者
             <Link
-              :href="route('package.edit', { package: p.id })"
+              :href="route('package.editAudio', { package: p.id })"
               class="
                 mt-5
+                ml-2
                 bg-purple-500
-                text-white
-                active:bg-purple-600
-                font-bold
-                uppercase
-                text-xl
-                px-4
-                py-2
-                rounded
-                shadow
-                hover:shadow-md
-                outline-none
-                focus:outline-none
-                mr-1
-                mb-1
-                ease-linear
-                transition-all
-                duration-150
+                purpleButton
               "
-              >直接开始编辑</Link
-            >
-          </div>
+              >直接编辑</Link>
         </div>
       </div>
     </div>
@@ -137,7 +100,7 @@ export default defineComponent({
       });
 
     uppy.on("complete", (result) => {
-      location = route("package.edit", { package: this.p });
+      location = route("package.editAudio", { package: this.p });
     });
   },
 });

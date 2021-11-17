@@ -22,9 +22,6 @@
                                 <jet-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </jet-nav-link>
-                                <jet-nav-link :href="route('media.index')" :active="route().current('media.index')">
-                                    Media Library
-                                </jet-nav-link>
                                 <jet-nav-link :href="route('package.index')" :active="route().current('package.index')">
                                     点读包
                                 </jet-nav-link>
@@ -150,9 +147,6 @@
                     <div class="pt-2 pb-3 space-y-1">
                         <jet-responsive-nav-link :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
-                        </jet-responsive-nav-link>
-                        <jet-responsive-nav-link :href="route('media.index')" :active="route().current('media.index')">
-                            Media Libray
                         </jet-responsive-nav-link>
                         <jet-responsive-nav-link :href="route('package.index')" :active="route().current('package.index')">
                             点读包

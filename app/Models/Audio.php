@@ -25,6 +25,10 @@ class Audio extends Model
 
     public function getUrlAttribute()
     {
-        return url("storage/{$this->file_name}");
+        if($this->file_name){
+            return url("storage/{$this->file_name}");
+        }else{
+            return;
+        }
     }
 }
