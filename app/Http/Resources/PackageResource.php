@@ -24,6 +24,7 @@ class PackageResource extends JsonResource
                 'name' => $this->author->name,
             ],
             'created_at' => $this->created_at->format('d/m/Y'),
+            'updated_at' => $this->created_at->format('d/m/Y'),
         ];
     }
 }

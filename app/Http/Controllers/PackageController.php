@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AudioResource;
 use App\Http\Resources\PackageResource;
+use App\Models\Audio;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Mockery\Generator\StringManipulation\Pass\Pass;
 
 class PackageController extends Controller
 {
@@ -78,8 +81,9 @@ class PackageController extends Controller
         return Inertia::render('Package/Edit', ['package' => $package, 'tab' => 'EditPackageInfo']);
     }
 
-    public function editAudio($package){
-        return Inertia::render('Package/Edit', ['package' => Package::with('audio')->findOrFail($package), 'tab' => 'EditPackageAudio']);
+    public function editAudio(Package $package){
+        $audio = AudioResource::collection($package->audio)->toArray([]);
+        return Inertia::render('Package/Edit', ['package' => ['id'=>$package->id], 'audio'=> $audio, 'tab' => 'EditPackageAudio']);
     }
 
     public function update(Package $package){

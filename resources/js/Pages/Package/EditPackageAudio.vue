@@ -10,13 +10,6 @@
   </vxe-modal>
   <vxe-toolbar perfect>
     <template #buttons>
-      <vxe-button icon="fa fa-plus" status="perfect" @click="hideColumn"
-        >隐藏</vxe-button
-      >
-      <vxe-button icon="fa fa-plus" status="perfect" @click="showColumn"
-        >显示</vxe-button
-      >
-
       <vxe-button icon="fa fa-plus" status="perfect" @click="insertEvent()"
         >新增空白行</vxe-button
       >
@@ -38,10 +31,10 @@
       <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent"
         >保存</vxe-button
       >
+
       <vxe-button icon="fa fa-mail-reply" status="perfect">还原</vxe-button>
     </template>
   </vxe-toolbar>
-
   <vxe-pager
     background
     size="small"
@@ -61,8 +54,9 @@
     @page-change="handlePageChange"
   >
   </vxe-pager>
+
+  <!-- :edit-config="{ trigger: 'click', mode: 'cell', showStatus: false }" -->
   <vxe-table
-    :edit-config="{ trigger: 'click', mode: 'cell', showStatus: true }"
     empty-text="还没有添加音频哦！"
     show-overflow
     :loading="loading"
@@ -71,12 +65,14 @@
     highlight-hover-column
     :data="tableData"
     resizable
+    height="600"
     :sort-config="{
       trigger: 'cell',
       defaultSort: { field: 'name', order: null },
       orders: ['desc', 'asc', null],
     }"
     ref="xTable"
+    @cell-dblclick="cellDBLClickEvent"
   >
     <vxe-column type="checkbox" width="60"></vxe-column>
     <vxe-column
@@ -88,11 +84,11 @@
         attrs: { type: 'text' },
       }"
     ></vxe-column>
-    <vxe-column :visible="showHideColumn" title="播放和重录" width="520">
+    <!-- <vxe-column title="播放和重录" width="520">
       <template #default="{ row }">
         <audio-recorder :row="row"></audio-recorder>
       </template>
-    </vxe-column>
+    </vxe-column> -->
     <vxe-column
       field="book_name"
       title="所属书名"
@@ -113,30 +109,16 @@
         autoselect: true,
       }"
     ></vxe-column>
-    <vxe-column
-      field="created_at"
-      title="创建时间"
-      :formatter="formatTime"
-      :sort-by="sortCreatedAt"
-      sortable
-    ></vxe-column>
-    <vxe-column
-      field="updated_at"
-      title="更新时间"
-      :formatter="formatTime"
-      :sort-by="sortUpdatedAt"
-      sortable
-    ></vxe-column>
-    -->
     <vxe-column title="操作" width="100" show-overflow>
       <template #default="{ row }">
-        <!-- <vxe-button icon="fa fa-trash" status="perfect" @click="deleteRow(row)"
-          >删除</vxe-button> -->
-        <!-- <button type="button" @click="deleteRow(row)">删除</button> -->
+        <vxe-button
+          type="text"
+          icon="fa fa-edit"
+          @click="editIconClickEvent(row)"
+        ></vxe-button>
       </template>
     </vxe-column>
   </vxe-table>
-
   <vxe-pager
     background
     size="small"
@@ -156,6 +138,47 @@
     @page-change="handlePageChange"
   >
   </vxe-pager>
+
+  <vxe-modal
+    :esc-closable="true"
+    v-model="showEdit"
+    :title="selectRow ? '编辑&保存' : '新增&保存'"
+    width="800"
+    min-width="600"
+    min-height="300"
+    :loading="submitLoading"
+    resize
+    destroy-on-close
+  >
+    <template #default>
+      <vxe-form
+        :data="formData"
+        :rules="formRules"
+        title-align="right"
+        title-width="100"
+        @submit.prevent="editFormSubmitEvent"
+      >
+        <vxe-form-item field="name" title="文件名" :span="24">
+          <template #default="{ data }">
+            <vxe-input v-model="data.name" placeholder="文件名"></vxe-input>
+          </template>
+        </vxe-form-item>
+        <vxe-form-item field="book_name" title="书名" :span="24">
+          <template #default="{ data }">
+            <vxe-input v-model="data.book_name" placeholder="书名"></vxe-input>
+          </template>
+        </vxe-form-item>
+        <vxe-form-item field="audio_text" title="音频文字描述" :span="24">
+          <template #default="{ data }">
+            <vxe-input
+              v-model="data.audio_text"
+              placeholder="音频文字描述"
+            ></vxe-input>
+          </template>
+        </vxe-form-item>
+      </vxe-form>
+    </template>
+  </vxe-modal>
 </template>
 
 <script>
@@ -174,6 +197,7 @@ import { v4 as uuidv4 } from "uuid";
 export default defineComponent({
   props: {
     package: Object,
+    audio: Array,
   },
   components: {
     Icon,
@@ -181,7 +205,7 @@ export default defineComponent({
   },
   data() {
     return {
-      audioList: window._.cloneDeep(this.package.audio),
+      audioList: window._.cloneDeep(this.audio),
       tableData: [],
       tablePage: {
         currentPage: 1,
@@ -192,20 +216,56 @@ export default defineComponent({
       loading: false,
       showModal: false,
       modalContent: "",
+      formData: {
+        name: "",
+        book_name: "",
+        audio_text: "",
+      },
+      selectRow: null,
+      showEdit: false,
+      submitLoading: false,
+      formRules: {
+        name: [{ min: 1, max: 30, message: "文件名介于1到15个字之间" }],
+        book_name: [{ min: 1, max: 100, message: "书名不能超过50个字" }],
+        audio_text: [
+          { min: 1, max: 2000, message: "音频文字内容不能超过1000个字" },
+        ],
+      },
     };
   },
   methods: {
-    showColumn() {
-        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('audio_text'))
-        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('book_name'))
-        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('created_at'))
-        this.$refs.xTable.showColumn(this.$refs.xTable.getColumnByField('updated_at'))
+    editIconClickEvent(row) {
+        this.formData = {
+            name: row.name,
+            book_name: row.book_name,
+            audio_text: row.audio_text,
+        };
+    //   this.formData.name = row.name;
+    //   this.formData.book_name = row.book_name;
+    //   this.formData.audio_text = row.audio_text;
+      this.selectRow = row;
+      this.showEdit = true;
     },
-    hideColumn() {
-        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('audio_text'))
-        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('book_name'))
-        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('created_at'))
-        this.$refs.xTable.hideColumn(this.$refs.xTable.getColumnByField('updated_at'))
+    editFormSubmitEvent() {
+      //     that = this;
+      //   this.submitLoading = true;
+      //   setTimeout(() => {
+      //     that.submitLoading = false;
+      //     that.showEdit = false;
+      //     if (that.selectRow) {
+      //       VXETable.modal.message({ content: "保存成功", status: "success" });
+      //       Object.assign(that.selectRow, that.formData);
+      //     } else {
+      //       VXETable.modal.message({ content: "新增成功", status: "success" });
+      //       $table.insert(demo1.formData);
+      //     }
+      //   }, 500);
+    },
+    cellDBLClickEvent({ row }) {
+      this.editIconClickEvent(row);
+    },
+    onChange(e) {
+      console.log(e.target.tagName);
     },
     loadLocal() {
       this.tablePage.totalResult = this.audioList.length;
@@ -281,7 +341,7 @@ export default defineComponent({
         const inserted = [];
         const updated = [];
         const deleted = [];
-        const old = this.package.audio;
+        const old = this.audio;
 
         for (const row of this.audioList) {
           if (!row.id) {
@@ -411,12 +471,6 @@ export default defineComponent({
           that.saveUpdateData(results);
           that.modalContent = "";
           that.showModal = false;
-          //   that.$inertia.reload({
-          //       onSuccess: function(){
-          //           that.audioList = window._.cloneDeep(that.package.audio);
-          //           that.loadLocal();
-          //       }
-          //   });
         })
         .catch((err) => {
           console.log(err);
@@ -436,7 +490,7 @@ export default defineComponent({
 
         switch (type) {
           case "insert":
-            this.package.audio.push(newItem);
+            this.audio.push(newItem);
             foundItem = this.audioList.find((item) => item.uuid === uuid);
 
             foundItem.id = newItem.id;
@@ -448,17 +502,13 @@ export default defineComponent({
 
             break;
           case "delete":
-            index = this.package.audio.findIndex(
-              (item) => item.id === newItem.id
-            );
-            this.package.audio.splice(index, 1);
+            index = this.audio.findIndex((item) => item.id === newItem.id);
+            this.audio.splice(index, 1);
 
             break;
           case "update":
-            index = this.package.audio.findIndex(
-              (item) => item.id === newItem.id
-            );
-            this.package.audio.splice(index, 1, newItem);
+            index = this.audio.findIndex((item) => item.id === newItem.id);
+            this.audio.splice(index, 1, newItem);
 
             foundItem = this.audioList.find((item) => item.uuid === uuid);
             if ((foundItem.blob || foundItem.file) && newItem.url) {

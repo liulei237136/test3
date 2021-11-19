@@ -17,7 +17,7 @@ mix.js('resources/js/app.js', 'public/js').vue()
         require('tailwindcss'),
     ])
     .webpackConfig(require('./webpack.config'))
-    .version();
+    .sourceMaps();
 mix.sass('resources/sass/style.scss', 'public/css');
 if (mix.inProduction()) {
     mix.version();

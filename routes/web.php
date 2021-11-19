@@ -3,6 +3,7 @@
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageAudioController;
 use App\Http\Controllers\PackageController;
+use App\Http\Resources\AudioResource;
 use App\Models\Package;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -53,8 +54,13 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
 });
     Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
-    Route::get('/test', function(){
-        return view('test');
+    Route::get('/test/{package}', function($package){
+        $p = Package::without('audio')->findOrFail($package);
+        $audio = AudioResource::collection($p->audio);
+        return ['package' => $p, 'audio'=>$audio];
+        // $audio = Package::find(2)->audio;
+        // return AudioResource::collection($audio)->first();
+        // return $package;
     });
 
 

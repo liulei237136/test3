@@ -3,30 +3,28 @@
     <template #header>
       <div class="flex items-center space-x-2">
         <Link
-          :href="route('package.editInfo', {'package': package.id})"
+          :href="route('package.editInfo', {'package':package.id})"
           class="purpleButton"
           :class="[
             'bg-purple-500',
             { 'bg-purple-800': currentTab === 'EditPackageInfo' },
           ]"
-          >编辑源信息</Link
-        >
+          >编辑源信息</Link>
         <Link
-          :href="route('package.editAudio', {'package': package.id})"
+          :href="route('package.editAudio', {'package':package.id})"
           class="purpleButton"
           :class="[
             'bg-purple-500',
             { 'bg-purple-800': currentTab === 'EditPackageAudio' },
           ]"
-          >编辑音频</Link
-        >
+          >编辑音频</Link>
       </div>
     </template>
 
     <div class="py-12">
       <div class="mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-          <component :is="currentTab" :package="package"> </component>
+          <component :is="currentTab" :package="package" :audio="audio"> </component>
         </div>
       </div>
     </div>
@@ -44,6 +42,7 @@ export default defineComponent({
   props: {
     package: Object,
     tab: String,
+    audio: Array,
   },
   components: {
     AppLayout,
@@ -53,6 +52,8 @@ export default defineComponent({
   },
   data() {
     return {
+        // p: this.package,
+        // a: this.audio,
       currentTab: this.tab || "EditPackageInfo",
     };
   },

@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 class Package extends Model
 {
 
-    protected $guarded = [];
 
     use HasFactory;
+
+    protected $guarded = [];
+
 
     public function author(){
         return $this->belongsTo(User::class, 'author_id');

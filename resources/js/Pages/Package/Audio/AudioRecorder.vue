@@ -1,7 +1,11 @@
 <template >
   <div class="flex items-center">
     <div style="width:320px;">
-      <audio v-if="url" :src="url" controls ref="audio" class="mr-1"></audio>
+
+      <!-- <audio v-if="url" :src="url" controls ref="audio" class="mr-1"></audio> -->
+      <button class="purpleButton bg-purple-300">播放</button>
+      <button class="purpleButton bg-purple-300">暂停</button>
+      <button class="purpleButton bg-purple-300">停止</button>
     </div>
     <vxe-button size="mini" :content="content" @click="record"></vxe-button>
     <span class="w-16 inline-flex justify-end align-middle mr-1">
