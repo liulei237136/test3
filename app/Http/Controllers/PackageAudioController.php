@@ -13,16 +13,24 @@ class PackageAudioController extends Controller
 {
 
     public function edit($package){
+        //todo 只有作者能编辑包
         return Inertia::render('Package/Audio/Edit', ['package' => Package::with('audio')->findOrFail($package)]);
     }
 
     public function store(Package $package, Audio $audio)
     {
-
         request()->validate([
-            'file' => ['file', 'max:512000']
+            'file' => ['file', 'max:512000'],
+            'name' => ['string', 'max:100'],
+            'book_name' => ['string', 'max:200'],
+            'audio_text' => ['string', 'max:2000'],
+            'uuid' => ['string', 'max:50'] //"d36dd07a-afda-49d5-a480-bff97a0c2bb3"
         ], [
-            'max' => 'File cannot be larger than 512MB.'
+            'max' => '上传的音频文件不能大于512m',
+            'name' => '文件名不能长于50个字',
+            'book_name' => '所属书名不能长于100个字',
+            'audio_text' => '音频的文字内容不能长于1000个字',
+            'uuid' => 'xxx'
         ]);
 
         $file = request()->file('file');
@@ -38,13 +46,12 @@ class PackageAudioController extends Controller
         request()->name && $audio->name = request()->name;
         request()->book_name && $audio->book_name = request()->book_name;
         request()->audio_text && $audio->audio_text = request()->audio_text;
-        $audio->author_id= auth()->id();
+        $audio->author_id = auth()->id();
+        $audio->package_id = $package->id;
 
         $result = $audio->save();
 
         if($result){
-            $package->audio()->attach($audio->id);
-
             return [
                 'type' => 'insert',
                 'success' => true,
@@ -52,6 +59,7 @@ class PackageAudioController extends Controller
                 'uuid' => request()->uuid,
             ];
         }
+
         return [
             'type' => 'insert',
             'success' => false,
@@ -66,7 +74,7 @@ class PackageAudioController extends Controller
         request()->validate([
             'file' => ['file', 'max:512000']
         ], [
-            'max' => 'File cannot be larger than 512MB.'
+            'max' => '上传的音频文件不能大于512m.'
         ]);
 
         $file = request()->file('file');
@@ -80,16 +88,14 @@ class PackageAudioController extends Controller
             'file_name' => $file_name,
             'size' => $file->getSize(),
             'author_id' => auth()->id(),
+            'package_id' => $package->id,
         ]);
-
-        //relation
-        $package->audio()->attach($audio->id);
 
         return $audio;
     }
 
     public function destroy(Package $package, Audio $audio){
-        //todo  check if the current user is the author of the audio
+        if($package->author->id != auth()->id()) return;
 
         $result = $audio->delete();
         if($result){
@@ -106,12 +112,20 @@ class PackageAudioController extends Controller
     }
 
     public function update(Package $package, Audio $audio){
-        //todo  check if the current user is the author of the audio
+        if($package->author->id != auth()->id()) return;
 
         request()->validate([
-            'file' => ['file', 'max:512000']
+            'file' => ['file', 'max:512000'],
+            'name' => ['string', 'max:100'],
+            'book_name' => ['string', 'max:200'],
+            'audio_text' => ['string', 'max:2000'],
+            'uuid' => ['string', 'max:100'],
         ], [
-            'max' => 'File cannot be larger than 512MB.'
+            'max' => '上传的音频文件不能大于512m',
+            'name' => '文件名不能长于50个字',
+            'book_name' => '所属书名不能长于100个字',
+            'audio_text' => '音频的文字内容不能长于1000个字',
+            'uuid' => 'xxx',
         ]);
 
         //file_name && size

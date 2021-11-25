@@ -9,16 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Package extends Model
 {
-
-
     use HasFactory;
 
     protected $guarded = [];
 
-
-    public function author(){
-        return $this->belongsTo(User::class, 'author_id');
-    }
 
     public function scopeCategory(Builder $builder, $category)
     {
@@ -50,7 +44,16 @@ class Package extends Model
         return $builder;
     }
 
+    public function author(){
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
+
     public function audio(){
-        return $this->belongsToMany(Audio::class, 'package_audio');
+        return $this->hasMany(Audio::class);
+    }
+
+    public function clonedFrom(){
+        return $this->belongTo(Package::class, 'cloned_from');
     }
 }

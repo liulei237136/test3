@@ -3,28 +3,39 @@
     <template #header>
       <div class="flex items-center space-x-2">
         <Link
-          :href="route('package.editInfo', {'package':package.id})"
-          class="purpleButton"
+          :href="route('package.editInfo', { package: package.id })"
+          class="purpleButton text-xl px-4 py-2"
           :class="[
-            'bg-purple-500',
-            { 'bg-purple-800': currentTab === 'EditPackageInfo' },
+            {
+              'bg-purple-800': currentTab === 'EditPackageInfo',
+              'text-white' : currentTab === 'EditPackageInfo',
+            'text-black' : currentTab !== 'EditPackageInfo',
+            'bg-white' : currentTab !== 'EditPackageInfo',
+            },
           ]"
-          >编辑源信息</Link>
+          >编辑基础信息</Link
+        >
         <Link
-          :href="route('package.editAudio', {'package':package.id})"
-          class="purpleButton"
+          :href="route('package.editAudio', { package: package.id })"
+          class="purpleButton text-xl px-4 py-2"
           :class="[
-            'bg-purple-500',
-            { 'bg-purple-800': currentTab === 'EditPackageAudio' },
+            {
+              'bg-purple-800': currentTab === 'EditPackageAudio',
+              'text-white' : currentTab === 'EditPackageAudio',
+            'text-black' : currentTab !== 'EditPackageAudio',
+            'bg-white' : currentTab !== 'EditPackageAudio',
+            },
           ]"
-          >编辑音频</Link>
+          >编辑包含音频</Link
+        >
       </div>
     </template>
 
     <div class="py-12">
       <div class="mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-          <component :is="currentTab" :package="package" :audio="audio"> </component>
+          <component :is="currentTab" :package="package" :audio="audio">
+          </component>
         </div>
       </div>
     </div>
@@ -52,8 +63,8 @@ export default defineComponent({
   },
   data() {
     return {
-        // p: this.package,
-        // a: this.audio,
+      // p: this.package,
+      // a: this.audio,
       currentTab: this.tab || "EditPackageInfo",
     };
   },

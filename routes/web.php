@@ -20,18 +20,18 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// Route::get('/', function () {
+//     return Inertia::render('Welcome', [
+//         'canLogin' => Route::has('login'),
+//         'canRegister' => Route::has('register'),
+//         'laravelVersion' => Application::VERSION,
+//         'phpVersion' => PHP_VERSION,
+//     ]);
+// });
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+Route::get('/', [PackageController::class, 'index'])->name('package.index');
+Route::get('/packages/{package}/show_info', [PackageController::class, 'showInfo'])->name('package.showInfo');
+Route::get('/packages/{package}/show_audio', [PackageController::class, 'showAudio'])->name('package.showAudio');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function(){
@@ -52,15 +52,12 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::delete('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'destroy'])->name('package.audio.destroy');
     Route::patch('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'update'])->name('package.audio.update');
 
+    Route::post('/packages/{package}/clone', [PackageController::class, 'clone'] )->name('package.clone');
 });
-    Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
     Route::get('/test/{package}', function($package){
         $p = Package::without('audio')->findOrFail($package);
         $audio = AudioResource::collection($p->audio);
         return ['package' => $p, 'audio'=>$audio];
-        // $audio = Package::find(2)->audio;
-        // return AudioResource::collection($audio)->first();
-        // return $package;
     });
 
 

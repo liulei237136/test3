@@ -10,53 +10,54 @@
   </vxe-modal>
   <vxe-toolbar perfect>
     <template #buttons>
-      <vxe-button icon="fa fa-plus" status="perfect" @click="insertEvent()"
+      <vxe-button icon="fa fa-plus" status="perfect" @click="insertEmptyRow"
         >新增空白行</vxe-button
       >
       <vxe-button
         icon="fa fa-plus"
         status="perfect"
-        @click="$refs.insertFromAudio.click()"
+        @click="insertEmptyRowAtIndex"
+        >新增空白行(在勾选行前)</vxe-button
+      >
+      <vxe-button
+        icon="fa fa-plus"
+        status="perfect"
+        @click="$refs.insertAudio.click()"
         >添加MP3来新增</vxe-button
+      >
+      <vxe-button
+        icon="fa fa-plus"
+        status="perfect"
+        @click="onClickInsertAudioAtIndex"
+        >添加MP3来新增(在勾选行前)</vxe-button
       >
       <input
         type="file"
-        ref="insertFromAudio"
+        ref="insertAudio"
         accept=".mp3"
         hidden
         multiple
-        @change="insertFromAudioEvent"
+        @change="insertAudio"
       />
-      <vxe-button icon="fa fa-trash-o" status="perfect">移除</vxe-button>
+      <input
+        type="file"
+        ref="insertAudioAtIndex"
+        accept=".mp3"
+        hidden
+        multiple
+        @change="insertAudioAtIndex"
+      />
+      <vxe-button icon="fa fa-trash-o" status="perfect" @click="deleteChecked"
+        >批量删除</vxe-button
+      >
       <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent"
         >保存</vxe-button
       >
-
-      <vxe-button icon="fa fa-mail-reply" status="perfect">还原</vxe-button>
     </template>
   </vxe-toolbar>
-  <vxe-pager
-    background
-    size="small"
-    :loading="loading"
-    :current-page="tablePage.currentPage"
-    :page-size="tablePage.pageSize"
-    :total="tablePage.totalResult"
-    :page-sizes="[10, 20, 100, 1000, { label: '全量数据', value: -1 }]"
-    :layouts="[
-      'PrevPage',
-      'JumpNumber',
-      'NextPage',
-      'FullJump',
-      'Sizes',
-      'Total',
-    ]"
-    @page-change="handlePageChange"
-  >
-  </vxe-pager>
 
-  <!-- :edit-config="{ trigger: 'click', mode: 'cell', showStatus: false }" -->
   <vxe-table
+    row-key="true"
     empty-text="还没有添加音频哦！"
     show-overflow
     :loading="loading"
@@ -66,13 +67,17 @@
     :data="tableData"
     resizable
     height="600"
-    :sort-config="{
+    sort-config="{
       trigger: 'cell',
-      defaultSort: { field: 'name', order: null },
+      defaultSort: { field: 'name', order: 'asc' },
       orders: ['desc', 'asc', null],
     }"
     ref="xTable"
-    @cell-dblclick="cellDBLClickEvent"
+    :edit-config="{
+      trigger: 'click',
+      mode: 'cell',
+      showStatus: false,
+    }"
   >
     <vxe-column type="checkbox" width="60"></vxe-column>
     <vxe-column
@@ -82,13 +87,16 @@
       :edit-render="{
         name: 'input',
         attrs: { type: 'text' },
+        events: {
+          change: onInputChange,
+        },
       }"
     ></vxe-column>
-    <!-- <vxe-column title="播放和重录" width="520">
+    <vxe-column title="播放和重录" width="520">
       <template #default="{ row }">
         <audio-recorder :row="row"></audio-recorder>
       </template>
-    </vxe-column> -->
+    </vxe-column>
     <vxe-column
       field="book_name"
       title="所属书名"
@@ -96,7 +104,9 @@
       :edit-render="{
         name: 'input',
         attrs: { type: 'text' },
-        autoselect: true,
+        events: {
+          change: onInputChange,
+        },
       }"
     ></vxe-column>
     <vxe-column
@@ -106,16 +116,16 @@
       :edit-render="{
         name: 'input',
         attrs: { type: 'text' },
-        autoselect: true,
+        events: {
+          change: onInputChange,
+        },
       }"
     ></vxe-column>
     <vxe-column title="操作" width="100" show-overflow>
       <template #default="{ row }">
-        <vxe-button
-          type="text"
-          icon="fa fa-edit"
-          @click="editIconClickEvent(row)"
-        ></vxe-button>
+        <vxe-button icon="fa fa-trash" status="perfect" @click="deleteRow(row)">
+          删除
+        </vxe-button>
       </template>
     </vxe-column>
   </vxe-table>
@@ -126,7 +136,7 @@
     :current-page="tablePage.currentPage"
     :page-size="tablePage.pageSize"
     :total="tablePage.totalResult"
-    :page-sizes="[10, 20, 100, 1000, { label: '全量数据', value: -1 }]"
+    :page-sizes="[10, 20, 100, 1000, { label: '全部数据', value: -1 }]"
     :layouts="[
       'PrevPage',
       'JumpNumber',
@@ -138,47 +148,6 @@
     @page-change="handlePageChange"
   >
   </vxe-pager>
-
-  <vxe-modal
-    :esc-closable="true"
-    v-model="showEdit"
-    :title="selectRow ? '编辑&保存' : '新增&保存'"
-    width="800"
-    min-width="600"
-    min-height="300"
-    :loading="submitLoading"
-    resize
-    destroy-on-close
-  >
-    <template #default>
-      <vxe-form
-        :data="formData"
-        :rules="formRules"
-        title-align="right"
-        title-width="100"
-        @submit.prevent="editFormSubmitEvent"
-      >
-        <vxe-form-item field="name" title="文件名" :span="24">
-          <template #default="{ data }">
-            <vxe-input v-model="data.name" placeholder="文件名"></vxe-input>
-          </template>
-        </vxe-form-item>
-        <vxe-form-item field="book_name" title="书名" :span="24">
-          <template #default="{ data }">
-            <vxe-input v-model="data.book_name" placeholder="书名"></vxe-input>
-          </template>
-        </vxe-form-item>
-        <vxe-form-item field="audio_text" title="音频文字描述" :span="24">
-          <template #default="{ data }">
-            <vxe-input
-              v-model="data.audio_text"
-              placeholder="音频文字描述"
-            ></vxe-input>
-          </template>
-        </vxe-form-item>
-      </vxe-form>
-    </template>
-  </vxe-modal>
 </template>
 
 <script>
@@ -186,11 +155,6 @@ import { defineComponent } from "vue";
 
 import Icon from "@/Components/Icon";
 import AudioRecorder from "./Audio/AudioRecorder";
-
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import "dayjs/locale/zh-cn";
-dayjs.extend(relativeTime).locale("zh-cn");
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -216,56 +180,21 @@ export default defineComponent({
       loading: false,
       showModal: false,
       modalContent: "",
-      formData: {
-        name: "",
-        book_name: "",
-        audio_text: "",
-      },
       selectRow: null,
-      showEdit: false,
-      submitLoading: false,
-      formRules: {
-        name: [{ min: 1, max: 30, message: "文件名介于1到15个字之间" }],
-        book_name: [{ min: 1, max: 100, message: "书名不能超过50个字" }],
-        audio_text: [
-          { min: 1, max: 2000, message: "音频文字内容不能超过1000个字" },
-        ],
-      },
+      deletedRow: [], //监控被删除的原生行
     };
   },
   methods: {
-    editIconClickEvent(row) {
-        this.formData = {
-            name: row.name,
-            book_name: row.book_name,
-            audio_text: row.audio_text,
-        };
-    //   this.formData.name = row.name;
-    //   this.formData.book_name = row.book_name;
-    //   this.formData.audio_text = row.audio_text;
-      this.selectRow = row;
-      this.showEdit = true;
+    deleteChecked() {
+      const selectRecords = this.$refs.xTable.getCheckboxRecords();
+      selectRecords.forEach((row) => this.deleteRow(row));
     },
-    editFormSubmitEvent() {
-      //     that = this;
-      //   this.submitLoading = true;
-      //   setTimeout(() => {
-      //     that.submitLoading = false;
-      //     that.showEdit = false;
-      //     if (that.selectRow) {
-      //       VXETable.modal.message({ content: "保存成功", status: "success" });
-      //       Object.assign(that.selectRow, that.formData);
-      //     } else {
-      //       VXETable.modal.message({ content: "新增成功", status: "success" });
-      //       $table.insert(demo1.formData);
-      //     }
-      //   }, 500);
-    },
-    cellDBLClickEvent({ row }) {
-      this.editIconClickEvent(row);
-    },
-    onChange(e) {
-      console.log(e.target.tagName);
+    //监控是否非新增row内容发生改变
+    onInputChange({ row }) {
+      //新增行不用监控，用uuid来分辨
+      if (row.id) {
+        row.updated = true;
+      }
     },
     loadLocal() {
       this.tablePage.totalResult = this.audioList.length;
@@ -287,29 +216,59 @@ export default defineComponent({
       }
       return "";
     },
-    insertEvent(row) {
-      const record = {
-        uuid: uuidv4(),
-      };
-      this.audioList.unshift(record);
+    //确保只有一行被选中，并返回它在audioList的索引
+    getCheckedOnelineIndex() {
+      const selectRecords = this.$refs.xTable.getCheckboxRecords();
+      if (!selectRecords || selectRecords.length < 1) {
+        alert("请勾选一行");
+        return;
+      }
+      if (selectRecords.length > 1) {
+        alert("请只勾选一行");
+        return;
+      }
+
+      const selectedRow = selectRecords[0];
+      let index;
+      //如果是源行
+      if (selectedRow.id) {
+        index = this.audioList.findIndex((item) => item.id === selectedRow.id);
+        //如果是新加的
+      } else if (selectedRow.uuid) {
+        index = this.audioList.findIndex(
+          (item) => item.uuid === selectedRow.uuid
+        );
+      }
+
+      return index;
+    },
+
+    insertEmptyRow() {
+      this.audioList.unshift({ uuid: uuidv4() });
       this.loadLocal();
     },
-    insertFromAudioEvent(e) {
-      const files = e.target.files;
+
+    insertEmptyRowAtIndex() {
+      const index = this.getCheckedOnelineIndex();
+
+      if (index >= 0) {
+        this.audioList.splice(index, 0, { uuid: uuidv4() });
+        this.loadLocal();
+      }
+    },
+    insertAudioFileAtIndex(files, index = 0) {
       let count = 0;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      for (let file of files) {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async (e) => {
-          const url = e.target.result;
           const record = {
             name: file.name,
-            url: url,
+            url: e.target.result,
             file: file,
             uuid: uuidv4(),
           };
-          this.audioList.unshift(record);
+          this.audioList.splice(index, 0, record);
           count++;
           if (count === files.length) {
             this.loadLocal();
@@ -317,82 +276,70 @@ export default defineComponent({
         };
       }
     },
+    insertAudio(e) {
+      const files = e.target.files;
+      this.insertAudioFileAtIndex(files, 0);
+    },
+
+    onClickInsertAudioAtIndex() {
+      const index = this.getCheckedOnelineIndex();
+      if (index >= 0) this.$refs.insertAudioAtIndex.click();
+    },
+
+    insertAudioAtIndex(e) {
+      const files = e.target.files;
+      const index = this.getCheckedOnelineIndex();
+      this.insertAudioFileAtIndex(files, index);
+    },
 
     deleteRow(row) {
+      if (row.id) this.deletedRow.push(_.cloneDeep(row));
+
       const index = this.audioList.findIndex((item) => item.id === row.id);
       this.audioList.splice(index, 1);
       this.loadLocal();
     },
     sortCreatedAt({ row }) {
-      if (row.created_at) {
-        return new Date(row.created_at).valueOf();
-      }
+      if (row.created_at) return new Date(row.created_at).valueOf();
+
       return -1;
     },
     sortUpdatedAt({ row }) {
-      if (row.created_at) {
-        return new Date(row.updated_at).valueOf();
-      }
+      if (row.created_at) return new Date(row.updated_at).valueOf();
+
       return -1;
     },
     onModalShow() {
       //计算 diff setTimeout 是为了给显示'计算'一个间隔
+      const inserted = [];
+      const updated = [];
+      let deleted = [];
+
+      for (const row of this.audioList) {
+        //是新添加的行
+        if (!row.id) {
+          inserted.push(row);
+          //是源行或者说载入的行
+        } else {
+          //如果更新过
+          if (row.updated) {
+            updated.push(row);
+          }
+        }
+      }
+
+      deleted = this.deletedRow;
+
+      if (inserted.length || deleted.length || updated.length) {
+        this.modalContent = "正在上传保存...";
+        this.save({ inserted, deleted, updated });
+        return;
+      }
+      this.modalContent = "没有需要保存的内容.";
       setTimeout(() => {
-        const inserted = [];
-        const updated = [];
-        const deleted = [];
-        const old = this.audio;
-
-        for (const row of this.audioList) {
-          if (!row.id) {
-            //避免空行
-            const normalized = this.normalizeNew(row);
-            if (
-              normalized.name ||
-              normalized.audio_text ||
-              normalized.book_name ||
-              normalized.url
-            ) {
-              inserted.push(row);
-            }
-          }
-        }
-
-        for (let oldRow of old) {
-          let newRow = this.audioList.find((row) => row.id === oldRow.id);
-          //deleted
-          if (!newRow) {
-            deleted.push(oldRow);
-            continue;
-          }
-
-          //统一标准
-          oldRow = this.normalizeNew(oldRow);
-          newRow = this.normalizeNew(newRow);
-
-          if (
-            oldRow.name === newRow.name &&
-            oldRow.url === newRow.url &&
-            oldRow.book_name === newRow.book_name &&
-            oldRow.audio_text === newRow.audio_text
-          ) {
-            continue;
-          } else {
-            //else it changed
-            updated.push(newRow);
-          }
-        }
-        if (inserted.length || deleted.length || updated.length) {
-          this.modalContent = "正在上传保存...";
-          this.save({ inserted, deleted, updated });
-          return;
-        }
-        this.modalContent = "没有需要保存的内容.";
-        setTimeout(() => {
-          this.modalContent = "";
-          this.showModal = false;
-        }, 2000);
-      }, 1000);
+        this.modalContent = "";
+        this.showModal = false;
+      }, 500);
     },
 
     saveEvent() {
@@ -504,24 +451,29 @@ export default defineComponent({
           case "delete":
             index = this.audio.findIndex((item) => item.id === newItem.id);
             this.audio.splice(index, 1);
+            let indexForDeleted = this.deletedRow.findIndex(
+              (item) => item.id === newItem.id
+            );
+            this.deletedRow.splice(indexForDeleted, 1);
 
             break;
           case "update":
             index = this.audio.findIndex((item) => item.id === newItem.id);
             this.audio.splice(index, 1, newItem);
 
-            foundItem = this.audioList.find((item) => item.uuid === uuid);
+            foundItem = this.audioList.find((item) => item.id === newItem.id);
             if ((foundItem.blob || foundItem.file) && newItem.url) {
               foundItem.url = newItem.url;
               delete foundItem["file"];
               delete foundItem["blob"];
             }
+            delete foundItem["updated"];
             break;
         }
       }
     },
 
-    normalizeNew(row) {
+    normalize(row) {
       const fields = ["name", "book_name", "audio_text"];
       for (const field of fields) {
         row[field] = _.trim(row[field]);

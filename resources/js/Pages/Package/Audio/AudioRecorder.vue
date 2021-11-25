@@ -1,11 +1,10 @@
 <template >
   <div class="flex items-center">
     <div style="width:320px;">
-
-      <!-- <audio v-if="url" :src="url" controls ref="audio" class="mr-1"></audio> -->
-      <button class="purpleButton bg-purple-300">播放</button>
-      <button class="purpleButton bg-purple-300">暂停</button>
-      <button class="purpleButton bg-purple-300">停止</button>
+      <audio v-if="url" :src="url" controls ref="audio" class="mr-1"></audio>
+      <!-- <button v-if="showPlay" onClick="onPlayClick" class="purpleButton bg-purple-400 p-2 mr-1">播放</button>
+      <button v-if="showPause" onClick="onPauseClick" class="purpleButton bg-purple-400 p-2 mr-1">暂停</button>
+      <button v-if="showStop" onClick="on" class="purpleButton bg-purple-400 p-2 mr-1">停止</button> -->
     </div>
     <vxe-button size="mini" :content="content" @click="record"></vxe-button>
     <span class="w-16 inline-flex justify-end align-middle mr-1">
@@ -42,7 +41,7 @@ export default defineComponent({
       content: "录音", //录音，暂停，恢复
       duration: 0,
       blob: null,
-      url: this.row.url || null,
+      url: this.row.url,
     };
   },
   components: {},

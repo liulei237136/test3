@@ -1,26 +1,15 @@
 <template>
   <app-layout title="Package">
     <template #header>
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center justify-between ">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
           点读包列表
         </h2>
         <Link
           id="add-package"
           :href="route('package.create')"
-          class="
-            inline-flex
-            items-center
-            px-3
-            h-11
-            font-medium
-            text-gray-700
-            bg-white
-            rounded
-            shadow-sm
-            lg:h-7 lg:text-sm
-          "
-        >
+          class="purpleButton px-4 py-2 bg-purple-500"
+          >
           新增点读包
         </Link>
       </div>
@@ -163,7 +152,7 @@
                     <div class="flex space-x-4">
                       <div>
                         <Link
-                          href="#"
+                          :href="route('package.showInfo', {package: item.id})"
                           class="
                             text-sm
                             font-semibold
@@ -175,9 +164,6 @@
                         >
                           {{ item.name }}
                         </Link>
-                        <!-- <p class="text-xs text-gray-500 break-all">
-                          {{ item.file_name }}
-                        </p> -->
                       </div>
                     </div>
                   </td>

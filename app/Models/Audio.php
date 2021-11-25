@@ -20,7 +20,7 @@ class Audio extends Model
 
     public function package()
     {
-        return $this->belongsToMany(Package::class, 'package_audio');
+        return $this->belongsTo(Package::class, 'package_id');
     }
 
     public function getUrlAttribute()

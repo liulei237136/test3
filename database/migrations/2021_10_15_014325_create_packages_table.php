@@ -19,9 +19,11 @@ class CreatePackagesTable extends Migration
             $table->string('description');
             $table->string('category');
             $table->unsignedBigInteger('author_id');
+            $table->unsignedBigInteger('cloned_from')->nullable();
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('users');
+            $table->foreign('cloned_from')->references('id')->on('packages');
         });
     }
 
