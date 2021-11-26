@@ -13,6 +13,7 @@ class Package extends Model
 
     protected $guarded = [];
 
+    protected $with = ['author','parent'];
 
     public function scopeCategory(Builder $builder, $category)
     {
@@ -53,7 +54,7 @@ class Package extends Model
         return $this->hasMany(Audio::class);
     }
 
-    public function clonedFrom(){
-        return $this->belongTo(Package::class, 'cloned_from');
+    public function parent(){
+        return $this->belongsTo(Package::class, 'parent_id');
     }
 }

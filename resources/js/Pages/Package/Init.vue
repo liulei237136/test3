@@ -32,7 +32,7 @@
             </button>
           或者
             <Link
-              :href="route('package.editAudio', { package: p.id })"
+              :href="route('package.audio', { package: p.id })"
               class="
                 mt-5
                 ml-2
@@ -100,7 +100,7 @@ export default defineComponent({
       });
 
     uppy.on("complete", (result) => {
-      location = route("package.editAudio", { package: this.p });
+      location = route("package.audio", { package: this.p });
     });
   },
 });

@@ -71,14 +71,7 @@ class PackageController extends Controller
         return $package;
     }
 
-    public function editInfo(Package $package){
-        return Inertia::render('Package/Edit', ['package' => $package, 'tab' => 'EditPackageInfo']);
-    }
 
-    public function editAudio(Package $package){
-        $audio = AudioResource::collection($package->audio)->toArray([]);
-        return Inertia::render('Package/Edit', ['package' => ['id'=>$package->id], 'audio'=> $audio, 'tab' => 'EditPackageAudio']);
-    }
 
     public function update(Request $request ,Package $package){
         if($package->author_id != auth()->id()) return;
@@ -92,30 +85,40 @@ class PackageController extends Controller
         $success = $package->update($validated);
         //todo error handling
 
-        return Redirect::route('package.editInfo', ['package' => $package->id]);
+        return Redirect::route('package.info', ['package' => $package->id]);
     }
 
-    public function showInfo($package){
-        $modal = Package::with('author')->findOrFail($package);
-        return Inertia::render('Package/Show', ['package' => $modal, 'tab' => 'ShowInfo']);
+    // public function editInfo(Package $package){
+    //     return Inertia::render('Package/Edit', ['package' => $package, 'tab' => 'EditPackageInfo']);
+    // }
+
+    // public function editAudio(Package $package){
+    //     $audio = AudioResource::collection($package->audio)->toArray([]);
+    //     return Inertia::render('Package/Edit', ['package' => ['id'=>$package->id], 'audio'=> $audio, 'tab' => 'EditPackageAudio']);
+    // }
+
+    public function info(Package $package){
+        return Inertia::render('Package/Show', ['package' => $package, 'tab' => 'Info']);
     }
 
-    public function showAudio(Package $package){
-        $audio = AudioResource::collection($package->audio)->toArray([]);
-        return Inertia::render('Package/Show', ['package' => ['id'=>$package->id], 'audio'=> $audio, 'tab' => 'ShowAudio']);
+    public function audio(Package $package){
+        // $audio = AudioResource::collection($package->audio)->toArray([]);
+        $package->load('audio');
+        return Inertia::render('Package/Show', ['package' => $package, 'tab' => 'Audio']);
     }
 
     public function clone(Package $package){
         //todo  该包是public的可以克隆,
-        $package_id = null;
-        DB::transaction(function () use($package, &$package_id) {
+        $clonedPackageId = null;
+
+        DB::transaction(function () use($package, &$clonedPackageId) {
             // clone package
-            $clonedPackageId = DB::table('packages')->insertGetId([
-                'name' => '"' . $package->name . '"的克隆',
+            $id = DB::table('packages')->insertGetId([
+                'name' => $package->name,
                 'category' => $package->category,
                 'description' => $package->description,
                 'author_id' => auth()->id(),
-                'cloned_from' => $package->id,
+                'parent_id' => $package->id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -134,7 +137,7 @@ class PackageController extends Controller
                     'audio_text' => $audio->audio_text,
                     'size' => $audio->size,
                     'author_id' => $audio->author_id,
-                    'package_id' => $clonedPackageId,
+                    'package_id' => $id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -142,14 +145,15 @@ class PackageController extends Controller
 
             DB::table('audio')->insert($audioClonedAll);
 
-            $package_id = $clonedPackageId;
-
+            $clonedPackageId = $id;
         });
 
-        return [
-            'success' => true,
-            'package_id' => $package_id,
-        ];
+        // return [
+        //     'success' => true,
+        //     'package_id' => $package_id,
+        // ];
+        info($clonedPackageId);
+        return Redirect::route('package.info', ['package' => $clonedPackageId]);
 
     }
 }

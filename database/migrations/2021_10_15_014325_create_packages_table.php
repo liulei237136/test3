@@ -17,13 +17,13 @@ class CreatePackagesTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
+            $table->boolean('private')->nullable();
             $table->string('category');
             $table->unsignedBigInteger('author_id');
-            $table->unsignedBigInteger('cloned_from')->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
-
             $table->foreign('author_id')->references('id')->on('users');
-            $table->foreign('cloned_from')->references('id')->on('packages');
+            $table->foreign('parent_id')->references('id')->on('packages');
         });
     }
 

@@ -30,8 +30,8 @@ use Inertia\Inertia;
 // });
 
 Route::get('/', [PackageController::class, 'index'])->name('package.index');
-Route::get('/packages/{package}/show_info', [PackageController::class, 'showInfo'])->name('package.showInfo');
-Route::get('/packages/{package}/show_audio', [PackageController::class, 'showAudio'])->name('package.showAudio');
+Route::get('/packages/{package}/info', [PackageController::class, 'info'])->name('package.info');
+Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function(){
@@ -44,8 +44,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
-    Route::get('/packages/{package}/edit_info', [PackageController::class, 'editInfo'])->name('package.editInfo');
-    Route::get('/packages/{package}/edit_audio', [PackageController::class, 'editAudio'])->name('package.editAudio');
+    // Route::get('/packages/{package}/edit_info', [PackageController::class, 'editInfo'])->name('package.editInfo');
+    // Route::get('/packages/{package}/edit_audio', [PackageController::class, 'editAudio'])->name('package.editAudio');
     Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');
     Route::post('/packages/{package}/audio', [PackageAudioController::class, 'store'])->name('package.audio.store');
     Route::post('/packages/{package}/audio/create_from_upload', [PackageAudioController::class, 'createFromUpload'])->name('package.audio.create_from_upload');
