@@ -18,7 +18,6 @@ class CreatePackagesTable extends Migration
             $table->string('name');
             $table->string('description');
             $table->boolean('private')->default(false);
-            $table->string('category');
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();

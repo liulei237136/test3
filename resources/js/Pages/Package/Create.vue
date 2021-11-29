@@ -61,35 +61,6 @@
               </div>
             </div>
 
-            <!-- category -->
-            <div>
-              <jet-label for="category" value="分类" />
-              <div>
-                <select
-                  id="category"
-                  name="category"
-                  v-model="category"
-                  ref="category"
-                  autocomplete="country"
-                  class="
-                    mt-2
-                    max-w-md
-                    block
-                    focus:ring-indigo-500 focus:border-indigo-500
-                    w-full
-                    shadow-sm
-                    sm:max-w-xs sm:text-sm
-                    border-gray-300
-                    rounded-md
-                  "
-                >
-                  <option value="小达人">小达人</option>
-                  <option value="毛毛虫">毛毛虫</option>
-                  <option value="卷之友">卷之友</option>
-                </select>
-              </div>
-            </div>
-
             <!-- description -->
             <div>
               <jet-label for="description" value="描述" />
@@ -156,7 +127,6 @@ export default defineComponent({
   data() {
     return {
       name: "",
-      category: "小达人",
       description: "",
       isPrivate: false,
       showModal: false,
@@ -174,7 +144,6 @@ export default defineComponent({
       axios
         .post(route("package.store"), {
           name: this.name,
-          category: this.category,
           description: this.description,
         })
         .then((response) => {

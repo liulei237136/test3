@@ -20,21 +20,11 @@ class PackageController extends Controller
     {
         $package = PackageResource::collection(
             Package::with('author')
-            ->category(request('category'))
             ->month(request('month'))
             ->search(request('term'))
             ->paginate()
         );
 
-        $categories = DB::table('packages')
-            ->selectRaw('distinct category')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'value' => $item->category,
-                    'label' => $item->category,
-                ];
-            })->unique('value')->values();
 
         $months = DB::table('packages')
         ->selectRaw('distinct DATE_FORMAT(created_at, "01-%m-%Y") as value, DATE_FORMAT(created_at, "%M %Y") as label, created_at as sort')
@@ -43,9 +33,8 @@ class PackageController extends Controller
 
         return Inertia::render('Package/Index', [
             'package' => $package,
-            'categories' => $categories,
             'months' => $months,
-            'queryParams' => request()->all(['category', 'month', 'term'])
+            'queryParams' => request()->all(['month', 'term'])
         ]);
     }
 
@@ -60,7 +49,6 @@ class PackageController extends Controller
     public function store(Request $request){
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'category' => Rule::in(['毛毛虫', '小达人', '卷之友']),
             'description' => ['required', 'string', 'max:3000'],
         ]);
 
@@ -78,7 +66,6 @@ class PackageController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'category' => Rule::in(['毛毛虫', '小达人', '卷之友']),
             'description' => ['required', 'string', 'max:3000'],
         ]);
 
@@ -88,14 +75,6 @@ class PackageController extends Controller
         return Redirect::route('package.info', ['package' => $package->id]);
     }
 
-    // public function editInfo(Package $package){
-    //     return Inertia::render('Package/Edit', ['package' => $package, 'tab' => 'EditPackageInfo']);
-    // }
-
-    // public function editAudio(Package $package){
-    //     $audio = AudioResource::collection($package->audio)->toArray([]);
-    //     return Inertia::render('Package/Edit', ['package' => ['id'=>$package->id], 'audio'=> $audio, 'tab' => 'EditPackageAudio']);
-    // }
 
     public function info(Package $package){
         return Inertia::render('Package/Show', ['package' => $package, 'tab' => 'Info']);
@@ -115,7 +94,6 @@ class PackageController extends Controller
             // clone package
             $id = DB::table('packages')->insertGetId([
                 'name' => $package->name,
-                'category' => $package->category,
                 'description' => $package->description,
                 'author_id' => auth()->id(),
                 'parent_id' => $package->id,
@@ -148,11 +126,6 @@ class PackageController extends Controller
             $clonedPackageId = $id;
         });
 
-        // return [
-        //     'success' => true,
-        //     'package_id' => $package_id,
-        // ];
-        info($clonedPackageId);
         return Redirect::route('package.info', ['package' => $clonedPackageId]);
 
     }

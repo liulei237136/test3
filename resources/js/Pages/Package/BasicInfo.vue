@@ -29,34 +29,6 @@
       <jet-input-error :message="form.errors.name" class="mt-2" />
     </div>
 
-    <!-- category -->
-    <div class="mb-5">
-      <jet-label for="category" value="分类" />
-      <div>
-        <select
-          id="category"
-          name="category"
-          v-model="form.category"
-          autocomplete="country"
-          class="
-            mt-2
-            max-w-md
-            block
-            focus:ring-indigo-500 focus:border-indigo-500
-            w-full
-            shadow-sm
-            sm:max-w-xs sm:text-sm
-            border-gray-300
-            rounded-md
-          "
-        >
-          <option value="小达人">小达人</option>
-          <option value="毛毛虫">毛毛虫</option>
-          <option value="卷之友">卷之友</option>
-        </select>
-      </div>
-    </div>
-
     <!-- description -->
     <div class="mb-5">
       <jet-label for="description" value="描述" />

@@ -15,15 +15,6 @@ class Package extends Model
 
     protected $with = ['author','parent'];
 
-    public function scopeCategory(Builder $builder, $category)
-    {
-        if (!is_null($category)) {
-            $builder->where('category', $category);
-        }
-
-        return $builder;
-    }
-
     public function scopeMonth(Builder $builder, $date)
     {
         if (!is_null($date)) {
