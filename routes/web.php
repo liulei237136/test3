@@ -26,12 +26,7 @@ Route::get('/', function () {
     if(auth()->user()){
         return Redirect::route('dashboard');
     }
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return Inertia::render('Index');
 });
 
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');

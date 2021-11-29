@@ -5,10 +5,10 @@
     <jet-banner />
 
     <div>
-      <nav class="bg-white border-b border-gray-100">
+      <nav class="bg-white border-b border-gray-100 ">
         <!-- Primary Navigation Menu -->
-        <div class="mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between items-center h-16">
+        <div class="mx-auto py-2 px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-12">
             <div class="flex items-center">
               <!-- Logo -->
               <div class="flex-shrink-0 flex items-center">
@@ -46,7 +46,7 @@
                 lg:h-9 lg:text-sm lg:w-96
                 focus:ring-blue-500 focus:border-blue-500
               "
-              placeholder="Search for..."
+              placeholder="搜索"
               autocomplete="off"
             />
 
@@ -287,7 +287,7 @@
 
       <!-- Page Heading -->
       <header class="bg-white shadow" v-if="$slots.header">
-        <div class="pt-4 pb-2 px-4 sm:px-6 lg:px-8">
+        <div class="py-4 px-4 sm:px-6 lg:px-8">
           <slot name="header"></slot>
         </div>
       </header>
