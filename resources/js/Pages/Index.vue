@@ -1,7 +1,7 @@
 <template>
   <app-layout title="Index">
     <div class="px-4 bg-white overflow-hidden">
-        Home
+        {{ $t('test')}}
     </div>
   </app-layout>
 </template>

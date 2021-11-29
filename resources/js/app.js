@@ -3,6 +3,18 @@ require('./bootstrap');
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/inertia-vue3';
 import { InertiaProgress } from '@inertiajs/progress';
+import { createI18n } from 'vue-i18n';
+import zh_CN from '../js/locales/zh_CN';
+
+//i18n
+const i18n = createI18n({
+    locale: 'zh_CN',
+    fallbackLocale: 'en',
+    messages: {
+        zh_CN
+    }
+});
+
 
 //vxe
 import { useTable } from './plugins/vxe-table';
@@ -19,6 +31,7 @@ createInertiaApp({
         return createApp({ render: () => h(app, props) })
             .use(plugin)
             .use(useTable)
+            .use(i18n)
             .mixin({ methods: { route } })
             .mount(el);
     },
