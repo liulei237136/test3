@@ -2334,6 +2334,10 @@ select {
 	--tw-text-opacity: 1;
 	color: rgba(31, 41, 55, var(--tw-text-opacity));
 }
+.active\:outline-none:active {
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
 .disabled\:opacity-25:disabled {
 	opacity: 0.25;
 }

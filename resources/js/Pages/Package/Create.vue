@@ -34,6 +34,32 @@
               />
               <!-- <jet-input-error :message="form.errors.name" class="mt-2" /> -->
             </div>
+            <!-- private -->
+            <div>
+              <div class="mb-2">
+                <label for="public">
+                  <input
+                    id="public"
+                    type="radio"
+                    v-model="isPrivate"
+                    :value="false"
+                  />
+                  <span class="ml-2">公开<span class="text-sm text-gray-600">(任何人都可以看到这个点读包,您可以选择谁可以向它提交)</span></span>
+
+                </label>
+              </div>
+              <div>
+                <label for="private">
+                  <input
+                    id="private"
+                    type="radio"
+                    v-model="isPrivate"
+                    :value="true"
+                  />
+                  <span class="ml-2">私有<span class="text-sm text-gray-600">(您可以选择谁可以查看并提交到这个点读包)</span></span>
+                </label>
+              </div>
+            </div>
 
             <!-- category -->
             <div>
@@ -97,11 +123,7 @@
             </div>
 
             <div class="col-span-6 sm:col-span-4">
-              <jet-button
-                class="mt-3"
-              >
-                新建
-              </jet-button>
+              <jet-button class="mt-3"> 创建 </jet-button>
             </div>
           </form>
         </div>
@@ -136,6 +158,7 @@ export default defineComponent({
       name: "",
       category: "小达人",
       description: "",
+      isPrivate: false,
       showModal: false,
       modalContent: "",
     };
