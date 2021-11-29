@@ -8,11 +8,11 @@
       <nav class="bg-white border-b border-gray-100">
         <!-- Primary Navigation Menu -->
         <div class="mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between h-16">
+          <div class="flex justify-between items-center h-16">
             <div class="flex items-center">
               <!-- Logo -->
               <div class="flex-shrink-0 flex items-center">
-                <Link :href="route('package.index')">
+                <Link :href="'/'">
                   <jet-application-mark class="block h-9 w-auto" />
                 </Link>
               </div>
@@ -28,21 +28,40 @@
                 >
                   Dashboard
                 </jet-nav-link>
-                <jet-nav-link
-                  :href="route('package.index')"
-                  :active="route().current('package.index')"
-                >
-                  点读包列表
-                </jet-nav-link>
               </div>
             </div>
+
+            <input
+              v-model="term"
+              @keydown.enter="search()"
+              type="search"
+              id="search"
+              class="
+                ml-2
+                w-full
+                h-11
+                rounded
+                border-gray-300
+                shadow-sm
+                lg:h-9 lg:text-sm lg:w-96
+                focus:ring-blue-500 focus:border-blue-500
+              "
+              placeholder="Search for..."
+              autocomplete="off"
+            />
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">
               <!-- Settings Dropdown -->
               <div>
                 <Link
                   :href="route('package.create')"
-                  class="px-4 py-2 rounded hover:rounded-lg hover:shadow-md hover:bg-gray-50 text-sm"
+                  class="
+                    px-4
+                    py-2
+                    rounded
+                    hover:rounded-lg hover:shadow-md hover:bg-gray-50
+                    text-sm
+                  "
                 >
                   创建点读包
                 </Link>
@@ -208,12 +227,6 @@
             >
               Dashboard
             </jet-responsive-nav-link>
-            <jet-responsive-nav-link
-              :href="route('package.index')"
-              :active="route().current('package.index')"
-            >
-              点读包列表
-            </jet-responsive-nav-link>
           </div>
           <div v-else class="pt-2 pb-3 space-y-1">
             <jet-responsive-nav-link :href="route('login')">
@@ -317,10 +330,14 @@ export default defineComponent({
     return {
       showingNavigationDropdown: false,
       // loggedIn: this.$page.props.user,
+      term: this.$page.props.query ? this.$page.props.query.term : '',
     };
   },
 
   methods: {
+      search(){
+          this.$inertia.get(route('search'), {'term': this.term});
+      },
     switchToTeam(team) {
       this.$inertia.put(
         route("current-team.update"),

@@ -5,7 +5,6 @@
   <div v-if="!canEdit" class="space-y-5">
     <h1>包名: &nbsp;&nbsp;{{ package.name }}</h1>
     <div>作者: &nbsp;&nbsp;{{ package.author.name }}</div>
-    <div>分类: &nbsp;&nbsp;{{ package.category }}</div>
     <div>描述:</div>
     <p>
       {{ package.description }}
@@ -92,7 +91,6 @@ export default defineComponent({
       form: this.$inertia.form({
         _method: "PATCH",
         name: this.package.name,
-        category: this.package.category,
         description: this.package.description,
       }),
     };

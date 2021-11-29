@@ -23,14 +23,12 @@ class PackageFactory extends Factory
      */
     public function definition()
     {
-        $category = collect(['小达人', '毛毛虫', '卷之友'])->random();
-        $name = $category . '------' . $this->faker->sentence();
-        $description = $category . '-----------' . $this->faker->text();
+        $name = $this->faker->sentence();
+        $description = $this->faker->text();
         $updated_at = $created_at = Carbon::now()->subDay(random_int(1,1000))->subHour(random_int(1,100))->subMinute(random_int(1,100));
         return [
             'name' => $name,
             'description' => $description,
-            'category' => $category,
             'author_id' => User::factory()->create(),
             'created_at' => $created_at,
             'updated_at' => $updated_at,

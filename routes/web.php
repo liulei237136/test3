@@ -3,9 +3,11 @@
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageAudioController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\SearchController;
 use App\Http\Resources\AudioResource;
 use App\Models\Package;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,18 +22,22 @@ use Inertia\Inertia;
 |
 */
 
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canLogin' => Route::has('login'),
-//         'canRegister' => Route::has('register'),
-//         'laravelVersion' => Application::VERSION,
-//         'phpVersion' => PHP_VERSION,
-//     ]);
-// });
+Route::get('/', function () {
+    if(auth()->user()){
+        return Redirect::route('dashboard');
+    }
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
 
-Route::get('/', [PackageController::class, 'index'])->name('package.index');
+// Route::get('/', [SearchController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}/info', [PackageController::class, 'info'])->name('package.info');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
+Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function(){
@@ -44,8 +50,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
-    // Route::get('/packages/{package}/edit_info', [PackageController::class, 'editInfo'])->name('package.editInfo');
-    // Route::get('/packages/{package}/edit_audio', [PackageController::class, 'editAudio'])->name('package.editAudio');
     Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');
     Route::post('/packages/{package}/audio', [PackageAudioController::class, 'store'])->name('package.audio.store');
     Route::post('/packages/{package}/audio/create_from_upload', [PackageAudioController::class, 'createFromUpload'])->name('package.audio.create_from_upload');
