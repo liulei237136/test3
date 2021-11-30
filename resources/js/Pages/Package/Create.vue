@@ -44,8 +44,11 @@
                     v-model="isPrivate"
                     :value="false"
                   />
-                  <span class="ml-2">公开<span class="text-sm text-gray-600">(任何人都可以看到这个点读包,您可以选择谁可以向它提交)</span></span>
-
+                  <span class="ml-2"
+                    >公开<span class="text-sm text-gray-600"
+                      >(任何人都可以看到这个点读包,您可以选择谁可以向它提交)</span
+                    ></span
+                  >
                 </label>
               </div>
               <div>
@@ -56,7 +59,11 @@
                     v-model="isPrivate"
                     :value="true"
                   />
-                  <span class="ml-2">私有<span class="text-sm text-gray-600">(您可以选择谁可以查看并提交到这个点读包)</span></span>
+                  <span class="ml-2"
+                    >私有<span class="text-sm text-gray-600"
+                      >(您可以选择谁可以查看并提交到这个点读包)</span
+                    ></span
+                  >
                 </label>
               </div>
             </div>
@@ -94,7 +101,13 @@
             </div>
 
             <div class="col-span-6 sm:col-span-4">
-              <jet-button class="mt-3"> 创建 </jet-button>
+              <jet-button
+                class="mt-3"
+                :disable="processing"
+                :class="{ 'opacity-25': processing }"
+              >
+                创建
+              </jet-button>
             </div>
           </form>
         </div>
@@ -129,8 +142,6 @@ export default defineComponent({
       name: "",
       description: "",
       isPrivate: false,
-      showModal: false,
-      modalContent: "",
     };
   },
 
@@ -138,13 +149,12 @@ export default defineComponent({
     onSubmit() {
       this.modalContent = "正在创建点读包...";
       this.showModal = true;
-    },
-    onModalShow() {
       const that = this;
       axios
         .post(route("package.store"), {
           name: this.name,
           description: this.description,
+          isPrivate: this.isPrivate,
         })
         .then((response) => {
           that.modalContent = "创建成功，准备进入编辑...";

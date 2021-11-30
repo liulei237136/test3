@@ -17,29 +17,30 @@
             shadow-xl
             sm:rounded-lg
             p-5
+            flex flex-col
+            space-y-4
+            md:flex-row md:space-x-4 md:items-center md:space-y-0
           "
         >
-            <button
-              type="button"
-              id="select-audio"
-              class="
-                bg-purple-500
-                purpleButton
-                mr-2
-              "
-            >
+          <!-- <progress
+            :value="50"
+            max="100"
+          >
+            50%
+          </progress> -->
+          <div>
+            <button type="button" id="select-audio" class="whiteButton">
               上传mp3来初始化
             </button>
-          或者
+          </div>
+          <div class="hidden md:block">|</div>
+          <div>
             <Link
               :href="route('package.audio', { package: p.id })"
-              class="
-                mt-5
-                ml-2
-                bg-purple-500
-                purpleButton
-              "
-              >直接编辑</Link>
+              class="whiteButton"
+              >直接编辑</Link
+            >
+          </div>
         </div>
       </div>
     </div>

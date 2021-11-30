@@ -10,7 +10,7 @@
       {{ package.description }}
     </p>
     <div>
-        <clone-button :package="package" class=""></clone-button>
+      <clone-button :package="package" class=""></clone-button>
     </div>
   </div>
   <form v-if="canEdit" @submit.prevent="updatePackage" class="ml-2">
@@ -27,7 +27,29 @@
       />
       <jet-input-error :message="form.errors.name" class="mt-2" />
     </div>
-
+    <!-- private -->
+    <div>
+      <div class="mb-2">
+        <label for="public">
+          <input id="public" type="radio" v-model="form.isPrivate" :value="false" />
+          <span class="ml-2"
+            >公开<span class="text-sm text-gray-600"
+              >(任何人都可以看到这个点读包,您可以选择谁可以向它提交)</span
+            ></span
+          >
+        </label>
+      </div>
+      <div>
+        <label for="private">
+          <input id="private" type="radio" v-model="form.isPrivate" :value="true" />
+          <span class="ml-2"
+            >私有<span class="text-sm text-gray-600"
+              >(您可以选择谁可以查看并提交到这个点读包)</span
+            ></span
+          >
+        </label>
+      </div>
+    </div>
     <!-- description -->
     <div class="mb-5">
       <jet-label for="description" value="描述" />
@@ -91,6 +113,7 @@ export default defineComponent({
       form: this.$inertia.form({
         _method: "PATCH",
         name: this.package.name,
+        private: this.package.private,
         description: this.package.description,
       }),
     };

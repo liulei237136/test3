@@ -50,6 +50,7 @@ class PackageController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:3000'],
+            'private' => Rule::in([true, false]),
         ]);
 
         $validated['author_id'] = auth()->id();
