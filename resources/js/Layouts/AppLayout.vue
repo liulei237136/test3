@@ -5,7 +5,7 @@
     <jet-banner />
 
     <div>
-      <nav class="bg-white border-b border-gray-100 ">
+      <nav class="bg-white border-b border-gray-100">
         <!-- Primary Navigation Menu -->
         <div class="mx-auto py-2 px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-12">
@@ -26,7 +26,7 @@
                   :href="route('dashboard')"
                   :active="route().current('dashboard')"
                 >
-                  Dashboard
+                  {{ $t("Dashboard") }}
                 </jet-nav-link>
               </div>
             </div>
@@ -38,6 +38,7 @@
               id="search"
               class="
                 ml-2
+                mr-2
                 w-full
                 h-11
                 rounded
@@ -46,7 +47,7 @@
                 lg:h-9 lg:text-sm lg:w-96
                 focus:ring-blue-500 focus:border-blue-500
               "
-              placeholder="搜索"
+              :placeholder="$t('Search')"
               autocomplete="off"
             />
 
@@ -63,7 +64,7 @@
                     text-sm
                   "
                 >
-                  创建点读包
+                  {{ $t("Create ClickRead Package") }}
                 </Link>
               </div>
               <div v-if="$page.props.user" class="ml-3 relative">
@@ -128,11 +129,11 @@
                   <template #content>
                     <!-- Account Management -->
                     <div class="block px-4 py-2 text-xs text-gray-400">
-                      Manage Account
+                      {{ $t("Manage Account") }}
                     </div>
 
                     <jet-dropdown-link :href="route('profile.show')">
-                      Profile
+                      {{ $t("Profile") }}
                     </jet-dropdown-link>
 
                     <div class="border-t border-gray-100"></div>
@@ -140,7 +141,7 @@
                     <!-- Authentication -->
                     <form @submit.prevent="logout">
                       <jet-dropdown-link as="button">
-                        Log Out
+                        {{ $t("Log Out") }}
                       </jet-dropdown-link>
                     </form>
                   </template>
@@ -152,14 +153,14 @@
                   :href="route('login')"
                   class="text-sm text-gray-700 underline"
                 >
-                  Log in
+                  {{ $t("Log in") }}
                 </Link>
 
                 <Link
                   :href="route('register')"
                   class="ml-4 text-sm text-gray-700 underline"
                 >
-                  Register
+                  {{ $t("Register") }}
                 </Link>
               </tempalte>
             </div>
@@ -222,21 +223,39 @@
         >
           <div v-if="$page.props.user" class="pt-2 pb-3 space-y-1">
             <jet-responsive-nav-link
+              :href="route('package.create')"
+              :active="route().current('package.create')"
+            >
+              {{ $t("Create ClickRead Package") }}
+            </jet-responsive-nav-link>
+
+            <div class="border-t border-gray-100"></div>
+
+            <jet-responsive-nav-link
               :href="route('dashboard')"
               :active="route().current('dashboard')"
             >
-              Dashboard
+              {{ $t("Dashboard") }}
             </jet-responsive-nav-link>
           </div>
           <div v-else class="pt-2 pb-3 space-y-1">
+            <jet-responsive-nav-link
+              :href="route('package.create')"
+              :active="route().current('package.create')"
+            >
+              {{ $t("Create ClickRead Package") }}
+            </jet-responsive-nav-link>
+
+            <div class="border-t border-gray-100"></div>
+
             <jet-responsive-nav-link :href="route('login')">
-              Log in
+              {{ $t("Log in") }}
             </jet-responsive-nav-link>
 
             <div class="border-t border-gray-100"></div>
 
             <jet-responsive-nav-link :href="route('register')">
-              Register
+              {{ $t("Register") }}
             </jet-responsive-nav-link>
           </div>
 
@@ -269,7 +288,7 @@
                 :href="route('profile.show')"
                 :active="route().current('profile.show')"
               >
-                Profile
+                {{ $t("Profile") }}
               </jet-responsive-nav-link>
 
               <div class="border-t border-gray-100"></div>
@@ -277,7 +296,7 @@
               <!-- Authentication -->
               <form method="POST" @submit.prevent="logout">
                 <jet-responsive-nav-link as="button">
-                  Log Out
+                  {{ $t("Log Out") }}
                 </jet-responsive-nav-link>
               </form>
             </div>
@@ -330,14 +349,14 @@ export default defineComponent({
     return {
       showingNavigationDropdown: false,
       // loggedIn: this.$page.props.user,
-      term: this.$page.props.query ? this.$page.props.query.term : '',
+      term: this.$page.props.query ? this.$page.props.query.term : "",
     };
   },
 
   methods: {
-      search(){
-          this.$inertia.get(route('search'), {'term': this.term});
-      },
+    search() {
+      this.$inertia.get(route("search"), { term: this.term });
+    },
     switchToTeam(team) {
       this.$inertia.put(
         route("current-team.update"),

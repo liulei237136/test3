@@ -1,4 +1,7 @@
 export default {
+    //liulei
+    'Create ClickRead Package': '创建点读包',
+    //liulei
     "30 Days": "30天",
     "60 Days": "60天",
     "90 Days": "90天",
@@ -260,7 +263,7 @@ export default {
     "Hong Kong": "香港",
     "Hungary": "匈牙利",
     "I accept the terms of service": "I accept the terms of service",
-    "I agree to the :terms_of_service and :privacy_policy": "我同意 :terms_of_service 和 :privacy_policy",
+    "I agree to the :terms_of_service and :privacy_policy": "我同意 {terms_of_service} 和 {privacy_policy}",
     "Iceland": "冰岛",
     "ID": "ID",
     "If necessary, you may log out of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.": "如有必要，您可以注销您其他设备上所有的浏览器会话。下面列出了您最近的一些会话，但是，这个列表可能并不详尽。如果您认为您的账户已被入侵，您还应该更新您的密码。",
