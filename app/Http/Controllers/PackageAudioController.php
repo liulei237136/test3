@@ -38,7 +38,13 @@ class PackageAudioController extends Controller
             $directory = "audio/" . date('Y/m/d');
             // "audio/2021/11/12/jkdfksf.mp3"
             $file_name = $file->store($directory, 'public');
-            if(!$file_name) return;
+            if(!$file_name) {
+                return [
+                    'type' => 'insert',
+                    'success' => false,
+                    'uuid' => request()->uuid,
+                ];
+            }
             $audio->file_name = $file_name;
             $audio->size = $file->getSize();
         }
@@ -63,13 +69,13 @@ class PackageAudioController extends Controller
         return [
             'type' => 'insert',
             'success' => false,
-            'xid' => request()->uuid,
+            'uuid' => request()->uuid,
         ];
 
 
     }
 
-    public function createFromUpload(Package $package)
+    public function initUpload(Package $package)
     {
         request()->validate([
             'file' => ['file', 'max:512000']

@@ -22,19 +22,31 @@
             md:flex-row md:space-x-4 md:items-center md:space-y-0
           "
         >
-          <!-- <progress
-            :value="50"
-            max="100"
-          >
-            50%
-          </progress> -->
-          <div>
-            <button type="button" id="select-audio" class="whiteButton">
-              上传mp3来初始化
-            </button>
+          <div v-show="isUploading" class="w-full flex">
+            <progress :value="percent" class="w-full" max="100">
+              {{ percent }}%
+            </progress>
+            &nbsp;{{ percent }}%
           </div>
-          <div class="hidden md:block">|</div>
           <div>
+            <vxe-button
+              v-show="!isUploading"
+              icon="fa fa-plus"
+              status="perfect"
+              @click="$refs.input.click()"
+              >上传MP3来初始化</vxe-button
+            >
+            <input
+              type="file"
+              ref="input"
+              accept=".mp3"
+              hidden
+              multiple
+              @change="uploadAudio"
+            />
+          </div>
+          <div v-show="!isUploading" class="hidden md:block">|</div>
+          <div v-show="!isUploading">
             <Link
               :href="route('package.audio', { package: p.id })"
               class="whiteButton"
@@ -46,22 +58,10 @@
     </div>
   </app-layout>
 </template>
-
 <script>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { defineComponent } from "vue";
 import { Link } from "@inertiajs/inertia-vue3";
-
-// Import the plugins
-import Uppy from "@uppy/core";
-import XHRUpload from "@uppy/xhr-upload";
-import Dashboard from "@uppy/dashboard";
-import zh from "@uppy/locales/lib/zh_CN";
-
-// And their styles (for UI plugins)
-// With webpack and `style-loader`, you can import them like this:
-import "@uppy/core/dist/style.css";
-import "@uppy/dashboard/dist/style.css";
 
 export default defineComponent({
   components: {
@@ -74,35 +74,42 @@ export default defineComponent({
   data() {
     return {
       p: this.package,
+      isUploading: false,
+      percent: 0,
     };
   },
-  mounted() {
-    const csrf = document
-      .querySelector('meta[name="csrf-token"]')
-      .getAttribute("content");
-    const uppy = new Uppy({
-      id: "audioUploader",
-      locale: zh,
-      autoProceed: true,
-      restrictions: {
-        allowedFileTypes: [".mp3"],
-      },
-    })
-      .use(Dashboard, {
-        trigger: "#select-audio",
-      })
-      .use(XHRUpload, {
-        endpoint: `/packages/${this.p.id}/audio/create_from_upload`,
-        formData: true,
-        fieldName: "file",
-        headers: {
-          "X-CSRF-TOKEN": csrf,
-        },
-      });
-
-    uppy.on("complete", (result) => {
-      location = route("package.audio", { package: this.p });
-    });
+  methods: {
+    uploadAudio(e) {
+      const files = e.target.files;
+      const lengthOfFiles = files.length;
+      let count = 0;
+      if (!lengthOfFiles) return;
+      this.isUploading = true;
+      for (let file of files) {
+        const data = new FormData();
+        data.append("file", file);
+        axios
+          .post(
+            route("package.audio.init_upload", { package: this.p.id }),
+            data,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          )
+          .then((res) => {})
+          .catch((err) => console.log(err))
+          //todo error handle
+          .finally(() => {
+            count++;
+            this.percent = Math.ceil((count / lengthOfFiles) * 100);
+            if (count === lengthOfFiles) {
+              this.$inertia.get(route("package.audio", { package: this.p }));
+            }
+          });
+      }
+    },
   },
 });
 </script>

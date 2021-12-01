@@ -11,25 +11,25 @@
   <vxe-toolbar v-if="canEdit" perfect>
     <template #buttons>
       <vxe-button icon="fa fa-plus" status="perfect" @click="insertEmptyRow"
-        >新增空白行</vxe-button
+        >添加空白行</vxe-button
       >
       <vxe-button
         icon="fa fa-plus"
         status="perfect"
         @click="insertEmptyRowAtIndex"
-        >新增空白行(在勾选行前)</vxe-button
+        >添加空白行(在勾选行前)</vxe-button
       >
       <vxe-button
         icon="fa fa-plus"
         status="perfect"
         @click="$refs.insertAudio.click()"
-        >添加MP3来新增</vxe-button
+        >添加MP3</vxe-button
       >
       <vxe-button
         icon="fa fa-plus"
         status="perfect"
         @click="onClickInsertAudioAtIndex"
-        >添加MP3来新增(在勾选行前)</vxe-button
+        >添加MP3(在勾选行前)</vxe-button
       >
       <input
         type="file"
