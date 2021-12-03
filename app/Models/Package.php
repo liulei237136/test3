@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
+
 class Package extends Model
 {
     use HasFactory;
+    use Favoriteable;
 
     protected $guarded = [];
 

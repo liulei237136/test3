@@ -10,6 +10,8 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
+use ChristianKuri\LaravelFavorite\Traits\Favoriteability;
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
@@ -17,6 +19,8 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+
+    use Favoriteability;
 
     /**
      * The attributes that are mass assignable.

@@ -79,13 +79,22 @@ class PackageController extends Controller
 
 
     public function info(Package $package){
-        return Inertia::render('Package/Show', ['package' => $package, 'tab' => 'Info']);
+        $data =['package' => $package, 'tab' => 'Info', 'favoritesCount'=> $package->favoritesCount];
+
+        if(auth()->check()) $data['isFavorited'] = $package->isFavorited();
+
+
+        return Inertia::render('Package/Show', $data);
     }
 
     public function audio(Package $package){
-        // $audio = AudioResource::collection($package->audio)->toArray([]);
         $package->load('audio');
-        return Inertia::render('Package/Show', ['package' => $package, 'tab' => 'Audio']);
+
+        $data =['package' => $package, 'tab' => 'Audio', 'favoritesCount'=> $package->favoritesCount];
+
+        if(auth()->check()) $data['isFavorited'] = $package->isFavorited();
+
+        return Inertia::render('Package/Show', $data);
     }
 
     public function clone(Package $package){
@@ -130,5 +139,10 @@ class PackageController extends Controller
 
         return Redirect::route('package.info', ['package' => $clonedPackageId]);
 
+    }
+
+    public function toggleFavorite(Package $package){
+        $package->toggleFavorite();
+        return Redirect::back();
     }
 }

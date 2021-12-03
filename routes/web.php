@@ -52,7 +52,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::patch('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'update'])->name('package.audio.update');
 
     Route::post('/packages/{package}/clone', [PackageController::class, 'clone'] )->name('package.clone');
+
+    Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
 });
+
     Route::get('/test/{package}', function($package){
         $p = Package::without('audio')->findOrFail($package);
         $audio = AudioResource::collection($p->audio);
