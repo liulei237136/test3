@@ -23,13 +23,11 @@ class PackageFactory extends Factory
      */
     public function definition()
     {
-        $name = $this->faker->sentence();
-        $description = $this->faker->text();
         $updated_at = $created_at = Carbon::now()->subDay(random_int(1,1000))->subHour(random_int(1,100))->subMinute(random_int(1,100));
         return [
-            'name' => $name,
-            'description' => $description,
-            'author_id' => User::factory()->create(),
+            'name' => $this->faker->sentence(),
+            'description' => $this->faker->paragraph(30),
+            'author_id' => User::factory()->create()->id,
             'created_at' => $created_at,
             'updated_at' => $updated_at,
         ];

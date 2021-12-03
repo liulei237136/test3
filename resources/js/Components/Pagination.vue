@@ -1,6 +1,6 @@
 <template>
   <div class="inline-flex justify-center items-center">
-    <div class="hidden mr-2 text-sm text-gray-600 lg:block">{{ pagination.total }} items</div>
+    <div class="hidden mr-2 text-sm text-gray-600 lg:block">{{ pagination.total }} 条结果</div>
 
     <div class="flex space-x-1 items-top" v-if="pagination.last_page > 1">
       <button
@@ -25,8 +25,9 @@
       </button>
 
       <div class="flex flex-col space-y-2 md:flex-row md:space-y-0 md:items-center md:space-x-1">
+        <div class="pl-2 text-gray-600 lg:text-sm">第</div>
         <input type="number" @keydown.enter="loadPage(page)"  @change="loadPage(page)" v-model="page" class="px-2 w-16 h-11 text-center rounded border border-gray-400 shadow-sm lg:h-9 lg:text-sm focus:ring-blue-500 focus:border-blue-500"/>
-        <div class="px-2 text-gray-600 lg:text-sm">of {{ pagination.last_page }}</div>
+        <div class="pr-2 text-gray-600 lg:text-sm">页，总共{{ pagination.last_page }}页</div>
       </div>
 
       <button

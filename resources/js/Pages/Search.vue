@@ -1,19 +1,51 @@
 <template>
   <app-layout title="Package">
-    <template #header>
+    <!-- <template #header>
       <div class="flex items-center justify-between">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-         搜索结果:
+          搜索结果:
         </h2>
       </div>
-    </template>
+    </template> -->
 
-    <div class="px-4 bg-white overflow-hidden">
-      <section
+    <div class="max-w-3xl mt-1 mx-auto bg-white overflow-hidden">
+      <section class="flex items-center justify-between border-b py-4">
+        <div class="text-lg font-bold">
+          {{ package ? package.total : 0 }}条结果
+        </div>
+        <div>
+          <select
+            @change="filter"
+            aria-label="package sort"
+            v-model="query"
+            class="
+              h-11
+              rounded
+              border-gray-300
+              shadow-sm
+              lg:h-9 lg:text-sm
+              sm:w-44
+              focus:outline-none focus:ring-blue-500 focus:border-blue-500
+            "
+          >
+            <option disabled value="">请选择排序方法</option>
+            <option :value="{ s: 'match', o: 'desc' }">最匹配</option>
+            <option :value="{ s: 'stars', o: 'desc' }">最多收藏</option>
+            <option :value="{ s: 'stars', o: 'asc' }">最少收藏</option>
+            <option :value="{ s: 'clones', o: 'desc' }">最多克隆</option>
+            <option :value="{ s: 'clones', o: 'asc' }">最少克隆</option>
+            <option :value="{ s: 'updated', o: 'desc' }">
+              最近更新
+            </option>
+            <option :value="{ s: 'updated', o: 'asc' }">
+              最少更新
+            </option>
+          </select>
+        </div>
+      </section>
+      <!-- <section
         class="
           flex flex-col
-          p-4
-          mb-4
           space-y-4
           bg-white
           shadow
@@ -24,7 +56,7 @@
         <div
           class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-2"
         >
-          <!-- <select
+          <select
             aria-label="package date"
             id="date"
             v-model="query.month"
@@ -48,69 +80,26 @@
             >
               {{ month.label }}
             </option>
-          </select> -->
+          </select>
         </div>
-      </section>
-
-      <section class="mb-4">
-        <table class="min-w-full bg-white shadow table-fixed sm:rounded">
-          <tbody class="divide-y divide-gray-100">
-            <tr
-              class="align-top group"
-              v-for="(item, index) in package.data"
-              :key="item.id"
-            >
-              <td class="p-2 text-left">
-                <div class="flex space-x-4">
-                  <div>
-                    <Link
-                      :href="route('package.info', { package: item.id })"
-                      class="
-                        text-sm
-                        font-semibold
-                        text-blue-600
-                        break-all
-                        rounded
-                        focus:outline-none focus:ring-2 focus:ring-blue-500
-                      "
-                    >
-                      {{ item.name }}
-                    </Link>
-                  </div>
-                </div>
-              </td>
-              <td class="hidden p-2 text-left lg:table-cell">
-                <a
-                  href="#"
-                  class="
-                    text-blue-600
-                    rounded
-                    lg:text-sm
-                    focus:outline-none focus:ring-2 focus:ring-blue-500
-                  "
-                >
-                  {{ item.author.name }}
-                </a>
-              </td>
-              <td class="hidden p-2 text-left lg:table-cell">
-                <span class="text-gray-600 lg:text-sm">{{
-                  item.created_at
-                }}</span>
-              </td>
-            </tr>
-
-            <tr class="align-top" v-if="!package.data.length">
-              <td colspan="4" class="p-2 text-sm text-gray-700">
-                No package files found.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- <section class="flex flex-col mb-4 lg:flex-row lg:justify-between">
-        <pagination :pagination="package"></pagination>
       </section> -->
+
+      <section v-if="package" class="mt-2">
+        <search-item
+          class="mb-4"
+          v-for="p in package.data"
+          v-bind:key="p.id"
+          :package="p"
+        ></search-item>
+      </section>
+      <section v-if="!package" class="pt-4">请输入查询关键词</section>
+
+      <section
+        v-if="package"
+        class="flex flex-col mt-8 mb-4 lg:flex-row lg:justify-between"
+      >
+        <pagination :pagination="package"></pagination>
+      </section>
     </div>
   </app-layout>
 </template>
@@ -121,31 +110,34 @@ import { Link } from "@inertiajs/inertia-vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { pickBy } from "lodash";
 import Pagination from "@/Components/Pagination";
+import SearchItem from "./SearchItem.vue";
 
 export default defineComponent({
   props: {
     package: Object,
-    query: Object,
+    queryParams: Object,
   },
   components: {
     AppLayout,
     Link,
+    SearchItem,
     Pagination,
   },
   data() {
     return {
       query: {
-        term: this.query.term,
+        s: this.queryParams.s,
+        o: this.queryParams.o,
       },
     };
   },
   methods: {
     filter() {
-      this.$inertia.get(route("search"), pickBy(this.query), {
+      this.query.q = this.queryParams.q;
+      this.$inertia.get(route("search"), this.query, {
         preserveState: true,
       });
     },
   },
-
 });
 </script>

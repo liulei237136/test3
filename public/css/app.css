@@ -1129,6 +1129,10 @@ select {
 	margin-left: auto;
 	margin-right: auto;
 }
+.my-4 {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
 .ml-3 {
 	margin-left: 0.75rem;
 }
@@ -1213,6 +1217,12 @@ select {
 .mb-1 {
 	margin-bottom: 0.25rem;
 }
+.mb-3 {
+	margin-bottom: 0.75rem;
+}
+.mt-16 {
+	margin-top: 4rem;
+}
 .block {
 	display: block;
 }
@@ -1263,6 +1273,12 @@ select {
 }
 .h-11 {
 	height: 2.75rem;
+}
+.max-h-8 {
+	max-height: 2rem;
+}
+.max-h-10 {
+	max-height: 2.5rem;
 }
 .min-h-screen {
 	min-height: 100vh;
@@ -1344,6 +1360,12 @@ select {
 }
 .max-w-lg {
 	max-width: 32rem;
+}
+.max-w-5xl {
+	max-width: 64rem;
+}
+.max-w-3xl {
+	max-width: 48rem;
 }
 .flex-1 {
 	flex: 1 1 0%;
@@ -1496,6 +1518,9 @@ select {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+.overflow-ellipsis {
+	text-overflow: ellipsis;
 }
 .break-all {
 	word-break: break-all;
@@ -1751,6 +1776,12 @@ select {
 .pt-8 {
 	padding-top: 2rem;
 }
+.pl-2 {
+	padding-left: 0.5rem;
+}
+.pr-2 {
+	padding-right: 0.5rem;
+}
 .text-left {
 	text-align: left;
 }
@@ -1822,6 +1853,9 @@ select {
 }
 .leading-4 {
 	line-height: 1rem;
+}
+.leading-3 {
+	line-height: .75rem;
 }
 .tracking-widest {
 	letter-spacing: 0.1em;
@@ -1904,6 +1938,10 @@ select {
 .text-gray-200 {
 	--tw-text-opacity: 1;
 	color: rgba(229, 231, 235, var(--tw-text-opacity));
+}
+.text-blue-700 {
+	--tw-text-opacity: 1;
+	color: rgba(29, 78, 216, var(--tw-text-opacity));
 }
 .underline {
 	text-decoration: underline;

@@ -16,7 +16,7 @@ class CreatePackagesTable extends Migration
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('description');
+            $table->text('description');
             $table->boolean('private')->default(false);
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('parent_id')->nullable();

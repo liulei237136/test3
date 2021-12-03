@@ -1,13 +1,5 @@
 <template>
   <app-layout title="Package">
-    <vxe-modal
-      v-model="showModal"
-      @show="onModalShow"
-      :show-header="false"
-      width="200"
-      height="60"
-      :content="modalContent"
-    ></vxe-modal>
     <template #header>
       <div class="flex items-center space-x-2">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -19,7 +11,7 @@
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-5">
-          <form @submit.prevent="onSubmit" class="space-y-5">
+          <form @submit.prevent="form.post(route('package.store'),{replace:true})" class="space-y-5">
             <!-- Name -->
             <div>
               <jet-label for="name" value="名称" />
@@ -27,7 +19,7 @@
                 id="name"
                 type="text"
                 class="mt-2 block w-full max-w-lg"
-                v-model="name"
+                v-model="form.name"
                 ref="name"
                 autocomplete="name"
                 required
@@ -41,7 +33,7 @@
                   <input
                     id="public"
                     type="radio"
-                    v-model="isPrivate"
+                    v-model="form.isPrivate"
                     :value="false"
                   />
                   <span class="ml-2"
@@ -56,7 +48,7 @@
                   <input
                     id="private"
                     type="radio"
-                    v-model="isPrivate"
+                    v-model="form.isPrivate"
                     :value="true"
                   />
                   <span class="ml-2"
@@ -75,7 +67,7 @@
                 <textarea
                   id="description"
                   name="description"
-                  v-model="description"
+                  v-model="form.description"
                   autocomplete="description"
                   rows="3"
                   ref="description"
@@ -103,8 +95,8 @@
             <div class="col-span-6 sm:col-span-4">
               <jet-button
                 class="mt-3"
-                :disable="processing"
-                :class="{ 'opacity-25': processing }"
+                :disable="form.processing"
+                :class="{ 'opacity-25': form.processing }"
               >
                 创建
               </jet-button>
@@ -139,35 +131,13 @@ export default defineComponent({
 
   data() {
     return {
-      name: "",
-      description: "",
-      isPrivate: false,
+        form: this.$inertia.form({
+            name: '',
+            description: '',
+            isPrivate: false,
+        })
     };
   },
 
-  methods: {
-    onSubmit() {
-      this.modalContent = "正在创建点读包...";
-      this.showModal = true;
-      const that = this;
-      axios
-        .post(route("package.store"), {
-          name: this.name,
-          description: this.description,
-          isPrivate: this.isPrivate,
-        })
-        .then((response) => {
-          that.modalContent = "创建成功，准备进入编辑...";
-          location.href = route("package.init", { package: response.data.id });
-        })
-        .catch((err) => {
-          console.log(err);
-          that.modalContent = "创建失败，请检查输入是否正确";
-          setTimeout(() => {
-            that.showModal = false;
-          }, 2000);
-        });
-    },
-  },
 });
 </script>

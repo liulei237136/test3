@@ -3,7 +3,7 @@
     <template #header>
       <div class="flex items-center space-x-2">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-          初始化点读包
+          点读包还没有音频，选择下面的方式来初始化
         </h2>
       </div>
     </template>
@@ -17,24 +17,22 @@
             shadow-xl
             sm:rounded-lg
             p-5
-            flex flex-col
-            space-y-4
-            md:flex-row md:space-x-4 md:items-center md:space-y-0
           "
         >
-          <div v-show="isUploading" class="w-full flex">
+          <div v-show="processing" class="w-full flex">
             <progress :value="percent" class="w-full" max="100">
               {{ percent }}%
             </progress>
             &nbsp;{{ percent }}%
           </div>
-          <div>
+          <div v-show="!processing" class="md:flex-row md:space-x-4 md:items-center md:space-y-0 w-full flex flex-col text-left
+            space-y-4">
             <vxe-button
-              v-show="!isUploading"
-              icon="fa fa-plus"
+              icon="fa fa-upload"
               status="perfect"
+              size="medium"
               @click="$refs.input.click()"
-              >上传MP3来初始化</vxe-button
+              >上传MP3</vxe-button
             >
             <input
               type="file"
@@ -44,14 +42,23 @@
               multiple
               @change="uploadAudio"
             />
-          </div>
-          <div v-show="!isUploading" class="hidden md:block">|</div>
-          <div v-show="!isUploading">
-            <Link
-              :href="route('package.audio', { package: p.id })"
-              class="whiteButton"
-              >直接编辑</Link
-            >
+          <!-- <div class="hidden md:block">|</div>
+          <vxe-button icon="fa fa-copy" status="perfect" @click="copy"
+            >复制其他点读包音频</vxe-button
+          > -->
+          <div class="hidden md:block">|</div>
+          <vxe-button
+            icon="fa fa-edit"
+            status="perfect"
+            @click="
+              $inertia.get(
+                route('package.audio', { package: p.id }),
+                {},
+                { replace: true }
+              )
+            "
+            >直接编辑</vxe-button
+          >
           </div>
         </div>
       </div>
@@ -74,7 +81,7 @@ export default defineComponent({
   data() {
     return {
       p: this.package,
-      isUploading: false,
+      processing: false,
       percent: 0,
     };
   },
@@ -84,7 +91,7 @@ export default defineComponent({
       const lengthOfFiles = files.length;
       let count = 0;
       if (!lengthOfFiles) return;
-      this.isUploading = true;
+      this.processing = true;
       for (let file of files) {
         const data = new FormData();
         data.append("file", file);
@@ -105,7 +112,11 @@ export default defineComponent({
             count++;
             this.percent = Math.ceil((count / lengthOfFiles) * 100);
             if (count === lengthOfFiles) {
-              this.$inertia.get(route("package.audio", { package: this.p }));
+              this.$inertia.get(
+                route("package.audio", { package: this.p }),
+                {},
+                { replace: true }
+              );
             }
           });
       }

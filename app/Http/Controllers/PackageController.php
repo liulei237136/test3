@@ -57,7 +57,8 @@ class PackageController extends Controller
 
         $package = Package::create($validated);
 
-        return $package;
+        // return $package;
+        return Redirect::route('package.init', ['package' => $package->id]);
     }
 
 

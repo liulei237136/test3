@@ -32,7 +32,7 @@
             </div>
 
             <input
-              v-model="term"
+              v-model="q"
               @keydown.enter="search()"
               type="search"
               id="search"
@@ -349,13 +349,13 @@ export default defineComponent({
     return {
       showingNavigationDropdown: false,
       // loggedIn: this.$page.props.user,
-      term: this.$page.props.query ? this.$page.props.query.term : "",
+      q: this.$page.props.queryParams ? this.$page.props.queryParams.q : "",
     };
   },
 
   methods: {
     search() {
-      this.$inertia.get(route("search"), { term: this.term });
+      this.$inertia.get(route("search"), { q: this.q });
     },
     switchToTeam(team) {
       this.$inertia.put(
