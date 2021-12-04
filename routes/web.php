@@ -54,6 +54,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/packages/{package}/clone', [PackageController::class, 'clone'] )->name('package.clone');
 
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
+    // Route::post('/packages/{package}/toggle_favorite_after_login', [PackageController::class, 'toggleFavoriteAfterLogin'])->name('package.toggle_favorite_after_login');
 });
 
     Route::get('/test/{package}', function($package){
