@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\AudioResource;
 use App\Http\Resources\PackageResource;
-use App\Models\Audio;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use Mockery\Generator\StringManipulation\Pass\Pass;
 
 class PackageController extends Controller
 {
@@ -20,16 +16,16 @@ class PackageController extends Controller
     {
         $package = PackageResource::collection(
             Package::with('author')
-            ->month(request('month'))
-            ->search(request('term'))
-            ->paginate()
+                ->month(request('month'))
+                ->search(request('term'))
+                ->paginate()
         );
 
 
         $months = DB::table('packages')
-        ->selectRaw('distinct DATE_FORMAT(created_at, "01-%m-%Y") as value, DATE_FORMAT(created_at, "%M %Y") as label, created_at as sort')
-        ->orderByDesc('sort')
-        ->get();
+            ->selectRaw('distinct DATE_FORMAT(created_at, "01-%m-%Y") as value, DATE_FORMAT(created_at, "%M %Y") as label, created_at as sort')
+            ->orderByDesc('sort')
+            ->get();
 
         return Inertia::render('Package/Index', [
             'package' => $package,
@@ -38,15 +34,18 @@ class PackageController extends Controller
         ]);
     }
 
-    public function create(){
+    public function create()
+    {
         return Inertia::render('Package/Create');
     }
 
-    public function init(Package $package){
+    public function init(Package $package)
+    {
         return Inertia::render('Package/Init', ['package' => $package]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:3000'],
@@ -57,14 +56,14 @@ class PackageController extends Controller
 
         $package = Package::create($validated);
 
-        // return $package;
         return Redirect::route('package.init', ['package' => $package->id]);
     }
 
 
 
-    public function update(Request $request ,Package $package){
-        if($package->author_id != auth()->id()) return;
+    public function update(Request $request, Package $package)
+    {
+        if ($package->author_id != auth()->id()) return;
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -74,34 +73,32 @@ class PackageController extends Controller
         $success = $package->update($validated);
         //todo error handling
 
-        return Redirect::route('package.info', ['package' => $package->id]);
+        return Redirect::route('package.show', ['package' => $package->id, 'tab' => 'info']);
     }
 
 
-    public function info(Package $package){
-        $data =['package' => $package, 'tab' => 'Info', 'favoritesCount'=> $package->favoritesCount];
+    public function show(Package $package)
+    {
+        $package->loadCount('children');
 
-        if(auth()->check()) $data['isFavorited'] = $package->isFavorited();
+        if (request()->tab === 'audio') $package->load('audio');
+
+        $data = ['package' => $package, 'tab' => request()->tab, 'favoritesCount' => $package->favoritesCount];
+
+        if (auth()->check()) $data['isFavorited'] = $package->isFavorited();
+
 
 
         return Inertia::render('Package/Show', $data);
     }
 
-    public function audio(Package $package){
-        $package->load('audio');
-
-        $data =['package' => $package, 'tab' => 'Audio', 'favoritesCount'=> $package->favoritesCount];
-
-        if(auth()->check()) $data['isFavorited'] = $package->isFavorited();
-
-        return Inertia::render('Package/Show', $data);
-    }
-
-    public function clone(Package $package){
+    public function clone(Package $package)
+    {
+        info('clone');
         //todo  该包是public的可以克隆,
         $clonedPackageId = null;
 
-        DB::transaction(function () use($package, &$clonedPackageId) {
+        DB::transaction(function () use ($package, &$clonedPackageId) {
             // clone package
             $id = DB::table('packages')->insertGetId([
                 'name' => $package->name,
@@ -118,7 +115,7 @@ class PackageController extends Controller
                 ->where('package_id', '=', $package->id)
                 ->get()
                 ->toArray();
-            foreach($audioCollection as $audio){
+            foreach ($audioCollection as $audio) {
                 array_push($audioClonedAll, [
                     'name' => $audio->name,
                     'file_name' => $audio->file_name,
@@ -137,11 +134,21 @@ class PackageController extends Controller
             $clonedPackageId = $id;
         });
 
-        return Redirect::route('package.info', ['package' => $clonedPackageId]);
-
+        return Redirect::route('package.show', ['package' => $clonedPackageId, 'tab'=> 'audio']);
     }
 
-    public function toggleFavorite(Package $package){
+    public function toggleFavorite(Package $package)
+    {
+        $package->toggleFavorite();
+
+        info('.....' . url()->previous());
+
+        //是未登录用户，没有previous url
+        if (!url()->previous()) return Redirect::back();
+    }
+
+    public function toggleFavoriteAfterLogin(Package $package)
+    {
         $package->toggleFavorite();
         return Redirect::back();
     }

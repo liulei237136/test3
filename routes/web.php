@@ -30,8 +30,8 @@ Route::get('/', function () {
 });
 
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');
-Route::get('/packages/{package}/info', [PackageController::class, 'info'])->name('package.info');
-Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
+Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
+// Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');
     Route::post('/media', [MediaController::class, 'store'])->name('media.store');
 
+    Route::post('/packages/{package}/clone', [PackageController::class, 'clone'] )->name('package.clone');
     Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
@@ -51,9 +52,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::delete('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'destroy'])->name('package.audio.destroy');
     Route::patch('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'update'])->name('package.audio.update');
 
-    Route::post('/packages/{package}/clone', [PackageController::class, 'clone'] )->name('package.clone');
 
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
+    // Route::post('/packages/{package}/toggle_favorite_after_login', [PackageController::class, 'toggleFavoriteAfterLogin'])->name('package.toggle_favorite_after_login');
 });
 
     Route::get('/test/{package}', function($package){

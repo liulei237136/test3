@@ -2,7 +2,7 @@
   <div>
     <header class="mb-1 text-lg font-bold text-blue-600">
       <h2 class="truncate">
-        <Link :href="route('package.info', { package: package.id })">{{
+        <Link :href="route('package.show', { package: package.id, tab: 'info' })">{{
           package.name
         }}</Link>
       </h2>

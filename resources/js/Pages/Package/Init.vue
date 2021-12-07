@@ -52,7 +52,7 @@
             status="perfect"
             @click="
               $inertia.get(
-                route('package.audio', { package: p.id }),
+                route('package.show', { package: p.id, tab:'audio' }),
                 {},
                 { replace: true }
               )
@@ -113,7 +113,7 @@ export default defineComponent({
             this.percent = Math.ceil((count / lengthOfFiles) * 100);
             if (count === lengthOfFiles) {
               this.$inertia.get(
-                route("package.audio", { package: this.p }),
+                route("package.show", { package: this.p , tab: 'audio'}),
                 {},
                 { replace: true }
               );
