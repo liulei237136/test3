@@ -13,22 +13,13 @@
       <vxe-button icon="fa fa-plus" status="perfect" @click="insertEmptyRow"
         >添加空白行</vxe-button
       >
-      <vxe-button
-        icon="fa fa-plus"
-        status="perfect"
-        @click="insertEmptyRowAtIndex"
+      <vxe-button icon="fa fa-plus" status="perfect" @click="insertEmptyRowAtIndex"
         >添加空白行(在勾选行前)</vxe-button
       >
-      <vxe-button
-        icon="fa fa-plus"
-        status="perfect"
-        @click="$refs.insertAudio.click()"
+      <vxe-button icon="fa fa-plus" status="perfect" @click="$refs.insertAudio.click()"
         >添加MP3</vxe-button
       >
-      <vxe-button
-        icon="fa fa-plus"
-        status="perfect"
-        @click="onClickInsertAudioAtIndex"
+      <vxe-button icon="fa fa-plus" status="perfect" @click="onClickInsertAudioAtIndex"
         >添加MP3(在勾选行前)</vxe-button
       >
       <input
@@ -50,9 +41,7 @@
       <vxe-button icon="fa fa-trash-o" status="perfect" @click="deleteChecked"
         >批量删除</vxe-button
       >
-      <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent"
-        >保存</vxe-button
-      >
+      <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent">保存</vxe-button>
     </template>
   </vxe-toolbar>
 
@@ -91,7 +80,19 @@
           change: onInputChange,
         },
       }"
-    ></vxe-column>
+      :filters="[{ data: '' }]"
+      :filter-method="filterNameMethod"
+    >
+      <template #filter="{ $panel, column }">
+        <input
+          type="type"
+          v-for="(option, index) in column.filters"
+          :key="index"
+          v-model="option.data"
+          @input="$panel.changeOption($event, !!option.data, option)"
+        />
+      </template>
+    </vxe-column>
     <vxe-column title="播放和重录" width="520">
       <template #default="{ row }">
         <audio-recorder :row="row"></audio-recorder>
@@ -108,7 +109,19 @@
           change: onInputChange,
         },
       }"
-    ></vxe-column>
+      :filters="[{ data: '' }]"
+      :filter-method="filterBookNameMethod"
+    >
+      <template #filter="{ $panel, column }">
+        <input
+          type="type"
+          v-for="(option, index) in column.filters"
+          :key="index"
+          v-model="option.data"
+          @input="$panel.changeOption($event, !!option.data, option)"
+        />
+      </template>
+    </vxe-column>
     <vxe-column
       field="audio_text"
       title="音频内容文字"
@@ -120,7 +133,19 @@
           change: onInputChange,
         },
       }"
-    ></vxe-column>
+      :filters="[{ data: '' }]"
+      :filter-method="filterAudioTextMethod"
+    >
+      <template #filter="{ $panel, column }">
+        <input
+          type="type"
+          v-for="(option, index) in column.filters"
+          :key="index"
+          v-model="option.data"
+          @input="$panel.changeOption($event, !!option.data, option)"
+        />
+      </template>
+    </vxe-column>
     <vxe-column title="操作" width="100" show-overflow>
       <template #default="{ row }">
         <vxe-button icon="fa fa-trash" status="perfect" @click="deleteRow(row)">
@@ -137,14 +162,7 @@
     :page-size="tablePage.pageSize"
     :total="tablePage.totalResult"
     :page-sizes="[10, 20, 100, 1000, { label: '全部数据', value: -1 }]"
-    :layouts="[
-      'PrevPage',
-      'JumpNumber',
-      'NextPage',
-      'FullJump',
-      'Sizes',
-      'Total',
-    ]"
+    :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
     @page-change="handlePageChange"
   >
   </vxe-pager>
@@ -158,6 +176,8 @@ import AudioRecorder from "./AudioRecorder";
 
 import { v4 as uuidv4 } from "uuid";
 
+import XEUtils from "xe-utils";
+
 export default defineComponent({
   props: {
     package: Object,
@@ -169,8 +189,7 @@ export default defineComponent({
   data() {
     return {
       canEdit:
-        this.$page.props.user &&
-        this.$page.props.user.id === this.package.author.id,
+        this.$page.props.user && this.$page.props.user.id === this.package.author.id,
       audioList: window._.cloneDeep(this.package.audio),
       tableData: [],
       tablePage: {
@@ -187,6 +206,15 @@ export default defineComponent({
     };
   },
   methods: {
+    filterNameMethod({ option, row }) {
+      return XEUtils.toValueString(row.name).toLowerCase().indexOf(option.value) > -1;
+    },
+    filterBookNameMethod({ option, row }) {
+      return XEUtils.toValueString(row.book_name).toLowerCase().indexOf(option.value) > -1;
+    },
+    filterAudioTextMethod({ option, row }) {
+      return XEUtils.toValueString(row.audio_text).toLowerCase().indexOf(option.value) > -1;
+    },
     deleteChecked() {
       const selectRecords = this.$refs.xTable.getCheckboxRecords();
       selectRecords.forEach((row) => this.deleteRow(row));
@@ -237,9 +265,7 @@ export default defineComponent({
         index = this.audioList.findIndex((item) => item.id === selectedRow.id);
         //如果是新加的
       } else if (selectedRow.uuid) {
-        index = this.audioList.findIndex(
-          (item) => item.uuid === selectedRow.uuid
-        );
+        index = this.audioList.findIndex((item) => item.uuid === selectedRow.uuid);
       }
 
       return index;
@@ -365,15 +391,11 @@ export default defineComponent({
         data.append("uuid", row["uuid"]);
 
         results.push(
-          axios.post(
-            route("package.audio.store", { package: this.package.id }),
-            data,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          )
+          axios.post(route("package.audio.store", { package: this.package.id }), data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
         );
       });
 
