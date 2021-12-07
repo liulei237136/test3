@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\AudioResource;
 use App\Http\Resources\PackageResource;
-use App\Models\Audio;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use Mockery\Generator\StringManipulation\Pass\Pass;
-use PharIo\Manifest\Url;
 
 class PackageController extends Controller
 {
@@ -61,7 +56,6 @@ class PackageController extends Controller
 
         $package = Package::create($validated);
 
-        // return $package;
         return Redirect::route('package.init', ['package' => $package->id]);
     }
 
@@ -79,33 +73,28 @@ class PackageController extends Controller
         $success = $package->update($validated);
         //todo error handling
 
-        return Redirect::route('package.info', ['package' => $package->id]);
+        return Redirect::route('package.show', ['package' => $package->id, 'tab' => 'info']);
     }
 
 
-    public function info(Package $package)
+    public function show(Package $package)
     {
-        $data = ['package' => $package, 'tab' => 'Info', 'favoritesCount' => $package->favoritesCount];
+        $package->loadCount('children');
+
+        if (request()->tab === 'audio') $package->load('audio');
+
+        $data = ['package' => $package, 'tab' => request()->tab, 'favoritesCount' => $package->favoritesCount];
 
         if (auth()->check()) $data['isFavorited'] = $package->isFavorited();
 
 
-        return Inertia::render('Package/Show', $data);
-    }
-
-    public function audio(Package $package)
-    {
-        $package->load('audio');
-
-        $data = ['package' => $package, 'tab' => 'Audio', 'favoritesCount' => $package->favoritesCount];
-
-        if (auth()->check()) $data['isFavorited'] = $package->isFavorited();
 
         return Inertia::render('Package/Show', $data);
     }
 
     public function clone(Package $package)
     {
+        info('clone');
         //todo  该包是public的可以克隆,
         $clonedPackageId = null;
 
@@ -145,7 +134,7 @@ class PackageController extends Controller
             $clonedPackageId = $id;
         });
 
-        return Redirect::route('package.info', ['package' => $clonedPackageId]);
+        return Redirect::route('package.show', ['package' => $clonedPackageId, 'tab'=> 'audio']);
     }
 
     public function toggleFavorite(Package $package)

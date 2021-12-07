@@ -1,7 +1,4 @@
 <template>
-  <!-- <div class="mb-2">
-    <clone-button :package="package"></clone-button>
-  </div> -->
   <div v-if="!canEdit" class="space-y-5">
     <h1>包名: &nbsp;&nbsp;{{ package.name }}</h1>
     <div>作者: &nbsp;&nbsp;{{ package.author.name }}</div>

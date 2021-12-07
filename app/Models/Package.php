@@ -51,4 +51,8 @@ class Package extends Model
     public function parent(){
         return $this->belongsTo(Package::class, 'parent_id');
     }
+
+    public function children(){
+        return $this->hasMany(Package::class, 'parent_id');
+    }
 }

@@ -22,12 +22,17 @@
             </a>
           </div>
           <div class="inline-flex shadow-sm rounded-md" role="group">
-            <button @click="onClone" class="buttonGroupLeftButton">
+            <button
+              @click="onClone"
+              :class="{'buttonGroupLeftButton': !myPackage, 'buttonGroupLeftButtonDisabled': myPackage}"
+              :title="myPackage ? '不能克隆自己的项目' : ''"
+                :disabled="myPackage"
+            >
               <Icon class="w-4 h-4 mr-1" name="clone"></Icon>
               <span>克隆</span>
             </button>
             <a href="#" class="buttonGroupRightLink">
-              {{ "30" }}
+              {{ package.children_count }}
             </a>
           </div>
         </div>
@@ -40,7 +45,7 @@
       <!-- tabs -->
       <div class="flex items-center space-x-2 mt-8 text-lg">
         <Link
-          :href="route('package.info', { package: package.id })"
+          :href="route('package.show', { package: package.id, tab: 'info' })"
           class="px-4 py-2 flex items-center"
           :style="styleLink('Info')"
         >
@@ -48,7 +53,7 @@
           <span>基本信息</span></Link
         >
         <Link
-          :href="route('package.audio', { package: package.id })"
+          :href="route('package.show', { package: package.id, tab: 'audio' })"
           class="px-4 py-2 flex items-center"
           :style="styleLink('Audio')"
         >
@@ -98,6 +103,11 @@ export default defineComponent({
       favorCount: this.favoritesCount,
     };
   },
+  computed: {
+    myPackage() {
+      return this.$page.props.user && this.$page.props.user.id === this.package.author.id;
+    },
+  },
   methods: {
     styleLink(tabName) {
       return this.tab === tabName
@@ -120,10 +130,7 @@ export default defineComponent({
       }
     },
     onClone() {
-      this.$inertia.post(route("package.clone", { package: this.package.id }), null, {
-        preserveState: false,
-        preserveScroll: false,
-      });
+      this.$inertia.post(route("package.clone", { package: this.package.id }));
     },
   },
 });
