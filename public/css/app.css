@@ -1204,14 +1204,14 @@ select {
 .mb-1 {
 	margin-bottom: 0.25rem;
 }
+.mb-2 {
+	margin-bottom: 0.5rem;
+}
 .mr-1 {
 	margin-right: 0.25rem;
 }
 .mb-5 {
 	margin-bottom: 1.25rem;
-}
-.mb-2 {
-	margin-bottom: 0.5rem;
 }
 .block {
 	display: block;
@@ -2594,6 +2594,11 @@ select {
 
 	.sm\:text-right {
 		text-align: right;
+	}
+
+	.sm\:text-xs {
+		font-size: 0.75rem;
+		line-height: 1rem;
 	}
 
 	.sm\:text-sm {

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Audio;
 use App\Models\Package;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -24,7 +25,13 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        Package::factory()->count(100)->create();
+        Package::factory()->count(1)->create(['author_id' => 1]);
+        Audio::factory()->count(7000)->create(['package_id' => 1, 'author_id' => 1]);
+
+
+        // Package::factory()->count(100)->create();
+
+
 
     }
 }

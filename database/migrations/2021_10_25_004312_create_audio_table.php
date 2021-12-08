@@ -18,7 +18,7 @@ class CreateAudioTable extends Migration
             $table->string('name')->nullable();
             $table->string('file_name')->nullable();
             $table->string('book_name')->nullable();
-            $table->string('audio_text')->nullable();
+            $table->text('audio_text')->nullable();
             $table->integer('size')->nullable();
             $table->unsignedBigInteger('package_id');
             $table->unsignedBigInteger('author_id');

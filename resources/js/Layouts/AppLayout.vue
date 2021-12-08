@@ -147,8 +147,7 @@
                   </template>
                 </jet-dropdown>
               </div>
-
-              <tempalte v-else>
+              <div v-else>
                 <Link
                   :href="route('login')"
                   class="text-sm text-gray-700 underline"
@@ -162,7 +161,7 @@
                 >
                   {{ $t("Register") }}
                 </Link>
-              </tempalte>
+              </div>
             </div>
 
             <!-- Hamburger -->

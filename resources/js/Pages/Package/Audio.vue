@@ -44,19 +44,31 @@
       <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent">保存</vxe-button>
     </template>
   </vxe-toolbar>
-
+  <div v-if="canEdit">
+    <label
+      for="filter"
+      class="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300"
+      >过滤</label
+    >
+    <input
+      v-model="filterItem"
+      type="text"
+      id="filter"
+      class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+    />
+  </div>
   <vxe-table
-    row-key="true"
+    :row-key="true"
     empty-text="还没有添加音频哦！"
     show-overflow
     :loading="loading"
     border
     highlight-hover-row
     highlight-hover-column
-    :data="tableData"
+    :data="tableDataFiltered"
     resizable
     height="600"
-    sort-config=" {
+    :sort-config=" {
       trigger: 'cell',
       defaultSort: { field: 'name', order: 'asc' },
       orders: ['desc', 'asc', null],
@@ -80,18 +92,7 @@
           change: onInputChange,
         },
       }"
-      :filters="[{ data: '' }]"
-      :filter-method="filterNameMethod"
     >
-      <template #filter="{ $panel, column }">
-        <input
-          type="type"
-          v-for="(option, index) in column.filters"
-          :key="index"
-          v-model="option.data"
-          @input="$panel.changeOption($event, !!option.data, option)"
-        />
-      </template>
     </vxe-column>
     <vxe-column title="播放和重录" width="520">
       <template #default="{ row }">
@@ -109,18 +110,7 @@
           change: onInputChange,
         },
       }"
-      :filters="[{ data: '' }]"
-      :filter-method="filterBookNameMethod"
     >
-      <template #filter="{ $panel, column }">
-        <input
-          type="type"
-          v-for="(option, index) in column.filters"
-          :key="index"
-          v-model="option.data"
-          @input="$panel.changeOption($event, !!option.data, option)"
-        />
-      </template>
     </vxe-column>
     <vxe-column
       field="audio_text"
@@ -133,18 +123,7 @@
           change: onInputChange,
         },
       }"
-      :filters="[{ data: '' }]"
-      :filter-method="filterAudioTextMethod"
     >
-      <template #filter="{ $panel, column }">
-        <input
-          type="type"
-          v-for="(option, index) in column.filters"
-          :key="index"
-          v-model="option.data"
-          @input="$panel.changeOption($event, !!option.data, option)"
-        />
-      </template>
     </vxe-column>
     <vxe-column title="操作" width="100" show-overflow>
       <template #default="{ row }">
@@ -203,18 +182,10 @@ export default defineComponent({
       modalContent: "",
       selectRow: null,
       deletedRow: [], //监控被删除的原生行
+      filterItem: "",
     };
   },
   methods: {
-    filterNameMethod({ option, row }) {
-      return XEUtils.toValueString(row.name).toLowerCase().indexOf(option.value) > -1;
-    },
-    filterBookNameMethod({ option, row }) {
-      return XEUtils.toValueString(row.book_name).toLowerCase().indexOf(option.value) > -1;
-    },
-    filterAudioTextMethod({ option, row }) {
-      return XEUtils.toValueString(row.audio_text).toLowerCase().indexOf(option.value) > -1;
-    },
     deleteChecked() {
       const selectRecords = this.$refs.xTable.getCheckboxRecords();
       selectRecords.forEach((row) => this.deleteRow(row));
@@ -503,6 +474,23 @@ export default defineComponent({
         row[field] = _.trim(row[field]);
       }
       return row;
+    },
+  },
+  computed: {
+    tableDataFiltered() {
+      const filterItemLowered = XEUtils.toValueString(this.filterItem).toLowerCase().trim();
+      if (!filterItemLowered) return this.tableData;
+      return this.tableData.filter((row) => {
+        return (
+          XEUtils.toValueString(row["name"]).toLowerCase().indexOf(filterItemLowered) >
+            -1 ||
+          XEUtils.toValueString(row["book_name"]).toLowerCase().indexOf(filterItemLowered) >
+            -1 ||
+          XEUtils.toValueString(row["audio_text"])
+            .toLowerCase()
+            .indexOf(filterItemLowered) > -1
+        );
+      });
     },
   },
 
