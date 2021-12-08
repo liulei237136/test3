@@ -1,26 +1,27 @@
-<template >
+<template>
   <div class="flex items-center">
-    <div style="width:320px;">
+    <div style="width: 320px">
       <audio v-if="url" :src="url" controls ref="audio" class="mr-1"></audio>
       <!-- <button v-if="showPlay" onClick="onPlayClick" class="purpleButton bg-purple-400 p-2 mr-1">播放</button>
       <button v-if="showPause" onClick="onPauseClick" class="purpleButton bg-purple-400 p-2 mr-1">暂停</button>
       <button v-if="showStop" onClick="on" class="purpleButton bg-purple-400 p-2 mr-1">停止</button> -->
     </div>
-    <vxe-button size="mini" :content="content" @click="record"></vxe-button>
-    <span class="w-16 inline-flex justify-end align-middle mr-1">
-      <span class="mr-1">{{ duration }}</span>
-      秒
-    </span>
-    <vxe-button
-      size="mini"
-      status="warning"
-      content="停止"
-      @click="recStop"
-      :disabled="status === '空闲'"
-    ></vxe-button>
+    <div v-if="canEdit">
+      <vxe-button size="mini" :content="content" @click="record"></vxe-button>
+      <span class="w-16 inline-flex justify-end align-middle mr-1">
+        <span class="mr-1">{{ duration }}</span>
+        秒
+      </span>
+      <vxe-button
+        size="mini"
+        status="warning"
+        content="停止"
+        @click="recStop"
+        :disabled="status === '空闲'"
+      ></vxe-button>
+    </div>
   </div>
 </template>
-
 
 <script>
 import { defineComponent, nextTick } from "vue";
@@ -32,6 +33,7 @@ import "recorder-core/src/engine/mp3-engine";
 export default defineComponent({
   props: {
     row: Object,
+    canEdit: Boolean,
   },
   emits: ["url"],
   data() {
@@ -78,9 +80,7 @@ export default defineComponent({
           success && success();
         },
         function (msg, isUserNotAllow) {
-          console.log(
-            (isUserNotAllow ? "UserNotAllow，" : "") + "无法录音:" + msg
-          );
+          console.log((isUserNotAllow ? "UserNotAllow，" : "") + "无法录音:" + msg);
         }
       );
     },

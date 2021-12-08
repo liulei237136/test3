@@ -8,21 +8,38 @@
     :content="modalContent"
   >
   </vxe-modal>
-  <vxe-toolbar v-if="canEdit" perfect>
+  <vxe-toolbar perfect>
     <template #buttons>
-      <vxe-button icon="fa fa-plus" status="perfect" @click="insertEmptyRow"
+      <div class="inline-flex items-center space-x-2 ml-2 mr-8">
+        <label
+          for="filter"
+          class="text-sm font-medium text-gray-900 flex-shrink-0 dark:text-gray-300"
+          >过滤:</label
+        >
+        <input
+          v-model="filterItem"
+          type="text"
+          id="filter"
+          class="w-64 h-8 bg-gray-50 border border-gray-300 text-gray-900 sm:text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        />
+      </div>
+      <vxe-button
+        v-if="canEdit"
+        icon="fa fa-plus"
+        status="perfect"
+        @click="insertEmptyRow"
         >添加空白行</vxe-button
       >
-      <vxe-button icon="fa fa-plus" status="perfect" @click="insertEmptyRowAtIndex"
-        >添加空白行(在勾选行前)</vxe-button
-      >
-      <vxe-button icon="fa fa-plus" status="perfect" @click="$refs.insertAudio.click()"
+
+      <vxe-button
+        v-if="canEdit"
+        icon="fa fa-plus"
+        status="perfect"
+        @click="$refs.insertAudio.click()"
         >添加MP3</vxe-button
       >
-      <vxe-button icon="fa fa-plus" status="perfect" @click="onClickInsertAudioAtIndex"
-        >添加MP3(在勾选行前)</vxe-button
-      >
       <input
+        v-if="canEdit"
         type="file"
         ref="insertAudio"
         accept=".mp3"
@@ -30,34 +47,18 @@
         multiple
         @change="insertAudio"
       />
-      <input
-        type="file"
-        ref="insertAudioAtIndex"
-        accept=".mp3"
-        hidden
-        multiple
-        @change="insertAudioAtIndex"
-      />
-      <vxe-button icon="fa fa-trash-o" status="perfect" @click="deleteChecked"
+      <vxe-button
+        v-if="canEdit"
+        icon="fa fa-trash-o"
+        status="perfect"
+        @click="deleteChecked"
         >批量删除</vxe-button
       >
-      <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent">保存</vxe-button>
+      <vxe-button v-if="canEdit" icon="fa fa-save" status="perfect" @click="saveEvent">保存</vxe-button>
     </template>
   </vxe-toolbar>
-  <div v-if="canEdit">
-    <label
-      for="filter"
-      class="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300"
-      >过滤</label
-    >
-    <input
-      v-model="filterItem"
-      type="text"
-      id="filter"
-      class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-    />
-  </div>
   <vxe-table
+    :checkbox-config="{ checkField: 'checked', highlight: true, range: true }"
     :row-key="true"
     empty-text="还没有添加音频哦！"
     show-overflow
@@ -68,23 +69,22 @@
     :data="tableDataFiltered"
     resizable
     height="600"
-    :sort-config=" {
-      trigger: 'cell',
-      defaultSort: { field: 'name', order: 'asc' },
-      orders: ['desc', 'asc', null],
-    }"
     ref="xTable"
-    :edit-config="{
-      trigger: 'click',
-      mode: 'cell',
-      showStatus: false,
-    }"
+    :edit-config="
+      canEdit
+        ? {
+            trigger: 'click',
+            mode: 'cell',
+            showStatus: false,
+          }
+        : null
+    "
   >
-    <vxe-column type="checkbox" width="60"></vxe-column>
+    <vxe-column v-if="canEdit" type="checkbox" width="60"></vxe-column>
     <vxe-column
+      width="150"
       field="name"
       title="文件名"
-      sortable
       :edit-render="{
         name: 'input',
         attrs: { type: 'text' },
@@ -94,15 +94,15 @@
       }"
     >
     </vxe-column>
-    <vxe-column title="播放和重录" width="520">
+    <vxe-column :title="'播放' + (canEdit ? '和重录' : '')" :width="canEdit ? 520 : 300">
       <template #default="{ row }">
-        <audio-recorder :row="row"></audio-recorder>
+        <audio-recorder :row="row" :can-edit="canEdit"></audio-recorder>
       </template>
     </vxe-column>
     <vxe-column
+      width="200"
       field="book_name"
       title="所属书名"
-      sortable
       :edit-render="{
         name: 'input',
         attrs: { type: 'text' },
@@ -114,8 +114,7 @@
     </vxe-column>
     <vxe-column
       field="audio_text"
-      title="音频内容文字"
-      sortable
+      title="音频文字"
       :edit-render="{
         name: 'input',
         attrs: { type: 'text' },
@@ -125,7 +124,7 @@
       }"
     >
     </vxe-column>
-    <vxe-column title="操作" width="100" show-overflow>
+    <vxe-column v-if="canEdit" title="操作" width="100" show-overflow>
       <template #default="{ row }">
         <vxe-button icon="fa fa-trash" status="perfect" @click="deleteRow(row)">
           删除
@@ -133,18 +132,6 @@
       </template>
     </vxe-column>
   </vxe-table>
-  <vxe-pager
-    background
-    size="small"
-    :loading="loading"
-    :current-page="tablePage.currentPage"
-    :page-size="tablePage.pageSize"
-    :total="tablePage.totalResult"
-    :page-sizes="[10, 20, 100, 1000, { label: '全部数据', value: -1 }]"
-    :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'FullJump', 'Sizes', 'Total']"
-    @page-change="handlePageChange"
-  >
-  </vxe-pager>
 </template>
 
 <script>
@@ -169,14 +156,8 @@ export default defineComponent({
     return {
       canEdit:
         this.$page.props.user && this.$page.props.user.id === this.package.author.id,
-      audioList: window._.cloneDeep(this.package.audio),
-      tableData: [],
-      tablePage: {
-        currentPage: 1,
-        pageSize: 10,
-        totalResult: 0,
-        currentRow: null,
-      },
+      initAudio: [],
+      audioList: [],
       loading: false,
       showModal: false,
       modalContent: "",
@@ -247,14 +228,6 @@ export default defineComponent({
       this.loadLocal();
     },
 
-    insertEmptyRowAtIndex() {
-      const index = this.getCheckedOnelineIndex();
-
-      if (index >= 0) {
-        this.audioList.splice(index, 0, { uuid: uuidv4() });
-        this.loadLocal();
-      }
-    },
     insertAudioFileAtIndex(files, index = 0) {
       let count = 0;
       for (let file of files) {
@@ -278,11 +251,6 @@ export default defineComponent({
     insertAudio(e) {
       const files = e.target.files;
       this.insertAudioFileAtIndex(files, 0);
-    },
-
-    onClickInsertAudioAtIndex() {
-      const index = this.getCheckedOnelineIndex();
-      if (index >= 0) this.$refs.insertAudioAtIndex.click();
     },
 
     insertAudioAtIndex(e) {
@@ -432,7 +400,7 @@ export default defineComponent({
 
         switch (type) {
           case "insert":
-            this.package.audio.push(newItem);
+            this.initAudio.push(newItem);
             foundItem = this.audioList.find((item) => item.uuid === uuid);
 
             foundItem.id = newItem.id;
@@ -444,8 +412,8 @@ export default defineComponent({
 
             break;
           case "delete":
-            index = this.package.audio.findIndex((item) => item.id === newItem.id);
-            this.package.audio.splice(index, 1);
+            index = this.initAudio.findIndex((item) => item.id === newItem.id);
+            this.initAudio.splice(index, 1);
             let indexForDeleted = this.deletedRow.findIndex(
               (item) => item.id === newItem.id
             );
@@ -453,8 +421,8 @@ export default defineComponent({
 
             break;
           case "update":
-            index = this.package.audio.findIndex((item) => item.id === newItem.id);
-            this.package.audio.splice(index, 1, newItem);
+            index = this.initAudio.findIndex((item) => item.id === newItem.id);
+            this.initAudio.splice(index, 1, newItem);
 
             foundItem = this.audioList.find((item) => item.id === newItem.id);
             if ((foundItem.blob || foundItem.file) && newItem.url) {
@@ -478,14 +446,17 @@ export default defineComponent({
   },
   computed: {
     tableDataFiltered() {
-      const filterItemLowered = XEUtils.toValueString(this.filterItem).toLowerCase().trim();
-      if (!filterItemLowered) return this.tableData;
-      return this.tableData.filter((row) => {
+      const filterItemLowered = XEUtils.toValueString(this.filterItem)
+        .toLowerCase()
+        .trim();
+      if (!filterItemLowered) return this.audioList;
+      return this.audioList.filter((row) => {
         return (
           XEUtils.toValueString(row["name"]).toLowerCase().indexOf(filterItemLowered) >
             -1 ||
-          XEUtils.toValueString(row["book_name"]).toLowerCase().indexOf(filterItemLowered) >
-            -1 ||
+          XEUtils.toValueString(row["book_name"])
+            .toLowerCase()
+            .indexOf(filterItemLowered) > -1 ||
           XEUtils.toValueString(row["audio_text"])
             .toLowerCase()
             .indexOf(filterItemLowered) > -1
@@ -493,9 +464,16 @@ export default defineComponent({
       });
     },
   },
-
+  created() {},
   mounted() {
-    this.loadLocal();
+    axios
+      .get(route("package.audio", { package: this.package.id }))
+      .then((res) => {
+        this.initAudio = res.data;
+        this.audioList = _.cloneDeep(this.initAudio);
+        this.loadLocal();
+      })
+      .catch((err) => console.log(err));
   },
 });
 </script>

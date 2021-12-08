@@ -6,9 +6,6 @@
     <p>
       {{ package.description }}
     </p>
-    <div>
-      <clone-button :package="package" class=""></clone-button>
-    </div>
   </div>
   <form v-if="canEdit" @submit.prevent="updatePackage" class="ml-2">
     <!-- Name -->

@@ -31,7 +31,7 @@ Route::get('/', function () {
 
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
-// Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
+Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {

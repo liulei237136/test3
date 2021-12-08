@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PackageResource;
+use App\Models\Audio;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -81,15 +82,17 @@ class PackageController extends Controller
     {
         $package->loadCount('children');
 
-        if (request()->tab === 'audio') $package->load('audio');
-
-        $data = ['package' => $package, 'tab' => request()->tab, 'favoritesCount' => $package->favoritesCount];
+        $data = ['package' => $package, 'favoritesCount' => $package->favoritesCount];
 
         if (auth()->check()) $data['isFavorited'] = $package->isFavorited();
 
-
-
         return Inertia::render('Package/Show', $data);
+    }
+
+    public function audio(Package $package){
+        return Audio::toBase()->where('package_id', $package->id)->get();
+        // return Audio::toBase()->where('package_id', $package->id)->explain();
+
     }
 
     public function clone(Package $package)

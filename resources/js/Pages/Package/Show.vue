@@ -24,9 +24,12 @@
           <div class="inline-flex shadow-sm rounded-md" role="group">
             <button
               @click="onClone"
-              :class="{'buttonGroupLeftButton': !myPackage, 'buttonGroupLeftButtonDisabled': myPackage}"
+              :class="{
+                buttonGroupLeftButton: !myPackage,
+                buttonGroupLeftButtonDisabled: myPackage,
+              }"
               :title="myPackage ? '不能克隆自己的项目' : ''"
-                :disabled="myPackage"
+              :disabled="myPackage"
             >
               <Icon class="w-4 h-4 mr-1" name="clone"></Icon>
               <span>克隆</span>
@@ -43,7 +46,7 @@
         <user-and-package-link :package="package.parent"></user-and-package-link>
       </div>
       <!-- tabs -->
-      <div class="flex items-center space-x-2 mt-8 text-lg">
+      <div class="flex items-center space-x-2 mt-4 text-lg">
         <Link
           :href="route('package.show', { package: package.id, tab: 'info' })"
           class="px-4 py-2 flex items-center"
@@ -63,7 +66,7 @@
       </div>
     </template>
 
-    <div class="py-12">
+    <div class="pt-1 ">
       <div class="mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
           <component :is="tab" :package="package"></component>
@@ -85,7 +88,7 @@ import Icon from "@/Components/Icon.vue";
 export default defineComponent({
   props: {
     package: Object,
-    tab: String,
+    // tab: String,
     isFavorited: Boolean,
     favoritesCount: Number,
   },
@@ -101,12 +104,17 @@ export default defineComponent({
     return {
       isFavor: this.isFavorited,
       favorCount: this.favoritesCount,
+      tab: null,
     };
   },
   computed: {
     myPackage() {
       return this.$page.props.user && this.$page.props.user.id === this.package.author.id;
     },
+  },
+  mounted() {
+    // console.log(this.$page);
+    this.tab = this.$page.url.endsWith('info') ? 'Info' : 'Audio';
   },
   methods: {
     styleLink(tabName) {

@@ -41,9 +41,9 @@ class AudioFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->sentence(),
-            'book_name' => collect(['book1', 'book2', 'book3'])->random(),
-            'audio_text' => $this->faker->paragraph(3),
+            'name' => $this->faker->numberBetween(1,100000) . '.mp3',
+            'book_name' => collect(['book1 is here', 'book2 is here', 'book3 here'])->random(),
+            'audio_text' => $this->faker->paragraph(2),
             'package_id' => collect(['1', '2', '3'])->random(),
             'author_id' => 1,
             'created_at' => now(),
