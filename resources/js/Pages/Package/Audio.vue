@@ -8,21 +8,57 @@
     :content="modalContent"
   >
   </vxe-modal>
+
+  <vxe-toolbar export :refresh="{ query: findList }">
+    <template #buttons>
+      <vxe-button>
+        <template #default>新增空白行</template>
+        <template #dropdowns>
+          <vxe-button type="text" @click="insertEvent(null)">从第一行插入</vxe-button>
+          <vxe-button type="text" @click="insertEvent(-1)">从最后插入</vxe-button>
+          <vxe-button type="text" @click="insertEvent($refs.xTable.getData(100))"
+            >插入到选中行</vxe-button
+          >
+        </template>
+      </vxe-button>
+      <vxe-button>
+        <template #default>删除操作</template>
+        <template #dropdowns>
+          <vxe-button type="text" @click="$refs.xTable.removeCheckboxRow()"
+            >删除选中</vxe-button
+          >
+          <vxe-button type="text" @click="$refs.xTable.remove($refs.xTable.getData(0))"
+            >删除第一行</vxe-button
+          >
+          <vxe-button
+            type="text"
+            @click="
+              $refs.xTable.remove($refs.xTable.getData($refs.xTable.getData().length - 1))
+            "
+            >删除最后一行</vxe-button
+          >
+          <vxe-button type="text" @click="$refs.xTable.remove($refs.xTable.getData(100))"
+            >删除第 100 行</vxe-button
+          >
+        </template>
+      </vxe-button>
+      <vxe-button @click="getInsertEvent">获取新增</vxe-button>
+      <vxe-button @click="getRemoveEvent">获取删除</vxe-button>
+      <vxe-button @click="getUpdateEvent">获取修改</vxe-button>
+    </template>
+  </vxe-toolbar>
+
   <vxe-toolbar perfect>
     <template #buttons>
-      <div class="inline-flex items-center space-x-2 ml-2 mr-8">
-        <label
-          for="filter"
-          class="text-sm font-medium text-gray-900 flex-shrink-0 dark:text-gray-300"
-          >过滤:</label
-        >
-        <input
-          v-model="filterItem"
-          type="text"
-          id="filter"
-          class="w-64 h-8 bg-gray-50 border border-gray-300 text-gray-900 sm:text-xs rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        />
-      </div>
+      <template #buttons>
+        <vxe-input
+          v-model="dataReactive.filter"
+          type="search"
+          placeholder="试试全表搜索"
+          @keyup="search"
+        ></vxe-input>
+      </template>
+
       <vxe-button
         v-if="canEdit"
         icon="fa fa-plus"
@@ -54,20 +90,23 @@
         @click="deleteChecked"
         >批量删除</vxe-button
       >
-      <vxe-button v-if="canEdit" icon="fa fa-save" status="perfect" @click="saveEvent">保存</vxe-button>
+      <vxe-button v-if="canEdit" icon="fa fa-save" status="perfect" @click="saveEvent"
+        >保存</vxe-button
+      >
     </template>
   </vxe-toolbar>
+
   <vxe-table
+    border
+    resizable
+    show-overflow
+    highlight-hover-row
+    highlight-hover-column
     :checkbox-config="{ checkField: 'checked', highlight: true, range: true }"
     :row-key="true"
     empty-text="还没有添加音频哦！"
-    show-overflow
-    :loading="loading"
-    border
-    highlight-hover-row
-    highlight-hover-column
+    :loading="data.loading"
     :data="tableDataFiltered"
-    resizable
     height="600"
     ref="xTable"
     :edit-config="
@@ -81,6 +120,7 @@
     "
   >
     <vxe-column v-if="canEdit" type="checkbox" width="60"></vxe-column>
+    <vxe-column type="seq" width="80"></vxe-column>
     <vxe-column
       width="150"
       field="name"
@@ -134,17 +174,82 @@
   </vxe-table>
 </template>
 
+<style lang="css" scoped>
+.keyword-lighten {
+  color: #000;
+  background-color: #ffff00;
+}
+</style>
+
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, reactive, nextTick, ref } from "vue";
+import XEUtils from "xe-utils";
 
 import Icon from "@/Components/Icon";
 import AudioRecorder from "./AudioRecorder";
 
 import { v4 as uuidv4 } from "uuid";
 
-import XEUtils from "xe-utils";
-
 export default defineComponent({
+  setup() {
+    const dataReactive = reactive({
+      loading: false,
+      filter: "",
+      initTableData: [],
+      tableData: [],
+    });
+
+    const xTable = ref({});
+
+    const search = () => {
+      const filter = XEUtils.toValueString(data.filter).trim().toLowerCase();
+      if (filter) {
+        const filterRE = new RegExp(filter, "gi");
+        const searchProps = ["name", "book_name", "audio_text"];
+        const rest = data.initTableData.filter((item) =>
+          searchProps.some(
+            (key) => XEUtils.toValueString(item[key]).toLowerCase().indexOf(filter) > -1
+          )
+        );
+        xTable.loadData(
+          rest.map((row) => {
+            const item = Object.assign({}, row);
+            searchProps.forEach((key) => {
+              item[key] = XEUtils.toValueString(item[key]).replace(
+                filterRE,
+                (match) => `<span class="keyword-lighten">${match}</span>`
+              );
+            });
+            return item;
+          })
+        );
+      } else {
+        xTable.loadData(data.initTableData);
+      }
+    };
+
+    const loadInitTableData = () => {
+      data.loading = true;
+      return axios
+        .get(route("package.audio", { package: this.package.id }))
+        .then((res) => {
+          data.initTableData = res.data;
+          search();
+        })
+        .catch((err) => console.log(err))
+        .finally(() => {
+          data.loading = false;
+        });
+    };
+
+    nextTick(loadInitTableData);
+
+    return {
+      dataReactive,
+      search,
+      loadInitTableData,
+    };
+  },
   props: {
     package: Object,
   },

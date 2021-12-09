@@ -1125,9 +1125,6 @@ select {
 .col-span-6 {
 	grid-column: span 6 / span 6;
 }
-.m-2 {
-	margin: 0.5rem;
-}
 .mx-auto {
 	margin-left: auto;
 	margin-right: auto;
@@ -1207,8 +1204,8 @@ select {
 .mb-1 {
 	margin-bottom: 0.25rem;
 }
-.mb-2 {
-	margin-bottom: 0.5rem;
+.mr-8 {
+	margin-right: 2rem;
 }
 .mr-1 {
 	margin-right: 0.25rem;
@@ -1216,8 +1213,8 @@ select {
 .mb-5 {
 	margin-bottom: 1.25rem;
 }
-.mr-8 {
-	margin-right: 2rem;
+.mb-2 {
+	margin-bottom: 0.5rem;
 }
 .block {
 	display: block;

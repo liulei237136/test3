@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PackageResource;
 use App\Models\Audio;
 use App\Models\Package;
+use ChristianKuri\LaravelFavorite\Models\Favorite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -82,11 +83,13 @@ class PackageController extends Controller
     {
         $package->loadCount('children');
 
-        $data = ['package' => $package, 'favoritesCount' => $package->favoritesCount];
+        $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
 
-        if (auth()->check()) $data['isFavorited'] = $package->isFavorited();
+        $favoritesCount = $package->favoritesCount;
 
-        return Inertia::render('Package/Show', $data);
+        $isFavorited = auth()->user() ? $package->isFavorited() : null;
+
+        return Inertia::render('Package/Show', compact('package', 'canEdit', 'favoritesCount', 'isFavorited'));
     }
 
     public function audio(Package $package){

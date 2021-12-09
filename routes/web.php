@@ -28,6 +28,9 @@ Route::get('/', function () {
     }
     return Inertia::render('Index');
 });
+Route::get('/test', function(){
+    return Inertia::render('Package/Test');
+});
 
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
@@ -62,5 +65,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         $audio = AudioResource::collection($p->audio);
         return ['package' => $p, 'audio'=>$audio];
     });
+
 
 
