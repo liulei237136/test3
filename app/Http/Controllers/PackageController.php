@@ -94,7 +94,6 @@ class PackageController extends Controller
 
     public function audio(Package $package){
         return Audio::toBase()->where('package_id', $package->id)->get();
-        // return Audio::toBase()->where('package_id', $package->id)->explain();
 
     }
 

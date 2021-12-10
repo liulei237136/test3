@@ -1086,6 +1086,9 @@ select {
 	white-space: nowrap;
 	border-width: 0;
 }
+.visible {
+	visibility: visible;
+}
 .fixed {
 	position: fixed;
 }
@@ -1204,9 +1207,6 @@ select {
 .mb-1 {
 	margin-bottom: 0.25rem;
 }
-.mr-8 {
-	margin-right: 2rem;
-}
 .mr-1 {
 	margin-right: 0.25rem;
 }
@@ -1317,9 +1317,6 @@ select {
 }
 .w-28 {
 	width: 7rem;
-}
-.w-64 {
-	width: 16rem;
 }
 .min-w-0 {
 	min-width: 0px;
@@ -2600,11 +2597,6 @@ select {
 
 	.sm\:text-right {
 		text-align: right;
-	}
-
-	.sm\:text-xs {
-		font-size: 0.75rem;
-		line-height: 1rem;
 	}
 
 	.sm\:text-sm {

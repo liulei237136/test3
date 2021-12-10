@@ -29,7 +29,7 @@ Route::get('/', function () {
     return Inertia::render('Index');
 });
 Route::get('/test', function(){
-    return Inertia::render('Package/Test');
+    return Inertia::render('Package/Audio');
 });
 
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');

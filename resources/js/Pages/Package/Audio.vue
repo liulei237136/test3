@@ -9,8 +9,15 @@
   >
   </vxe-modal>
 
-  <vxe-toolbar export :refresh="{ query: findList }">
+  <!-- <vxe-toolbar export :refresh="{ query: findList }"> -->
+  <vxe-toolbar>
     <template #buttons>
+      <vxe-input
+        v-model="dataReactive.filter"
+        type="search"
+        placeholder="试试全表搜索"
+        @keyup="search"
+      ></vxe-input>
       <vxe-button>
         <template #default>新增空白行</template>
         <template #dropdowns>
@@ -48,17 +55,7 @@
     </template>
   </vxe-toolbar>
 
-  <vxe-toolbar perfect>
-    <template #buttons>
-      <template #buttons>
-        <vxe-input
-          v-model="dataReactive.filter"
-          type="search"
-          placeholder="试试全表搜索"
-          @keyup="search"
-        ></vxe-input>
-      </template>
-
+  <!-- <vxe-toolbar perfect>
       <vxe-button
         v-if="canEdit"
         icon="fa fa-plus"
@@ -90,11 +87,11 @@
         @click="deleteChecked"
         >批量删除</vxe-button
       >
-      <vxe-button v-if="canEdit" icon="fa fa-save" status="perfect" @click="saveEvent"
+            <vxe-button v-if="canEdit" icon="fa fa-save" status="perfect" @click="saveEvent"
         >保存</vxe-button
       >
     </template>
-  </vxe-toolbar>
+  </vxe-toolbar> -->
 
   <vxe-table
     border
@@ -233,7 +230,7 @@ export default defineComponent({
       return axios
         .get(route("package.audio", { package: this.package.id }))
         .then((res) => {
-          data.initTableData = res.data;
+          dataReactive.initTableData = res.data;
           search();
         })
         .catch((err) => console.log(err))
@@ -242,12 +239,44 @@ export default defineComponent({
         });
     };
 
+    const insertEvent = (row) => {
+      const $table = xTable.value;
+      const record = {
+        checked: false,
+      };
+      $table.insertAt(record, row).then(({ row }) => {
+        $table.setActiveRow(row);
+      });
+    };
+
+    const getInsertEvent = () => {
+      const $table = xTable.value;
+      const insertRecords = $table.getInsertRecords();
+      VXETable.modal.alert(insertRecords.length);
+    };
+
+    const getRemoveEvent = () => {
+      const $table = xTable.value;
+      const removeRecords = $table.getRemoveRecords();
+      VXETable.modal.alert(removeRecords.length);
+    };
+
+    const getUpdateEvent = () => {
+      const $table = xTable.value;
+      const updateRecords = $table.getUpdateRecords();
+      VXETable.modal.alert(updateRecords.length);
+    };
+
     nextTick(loadInitTableData);
 
     return {
       dataReactive,
       search,
       loadInitTableData,
+      insertEvent,
+      getInsertEvent,
+      getRemoveEvent,
+      getUpdateEvent,
     };
   },
   props: {
