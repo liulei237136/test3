@@ -23,26 +23,29 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    if(auth()->user()){
+    if (auth()->user()) {
         return Redirect::route('dashboard');
     }
     return Inertia::render('Index');
 });
 
+Route::get('/test', function () {
+    return Inertia::render('Package/Audio');
+});
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
 // Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::get('/dashboard', function(){
+    Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');
     Route::post('/media', [MediaController::class, 'store'])->name('media.store');
 
-    Route::post('/packages/{package}/clone', [PackageController::class, 'clone'] )->name('package.clone');
+    Route::post('/packages/{package}/clone', [PackageController::class, 'clone'])->name('package.clone');
     Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
@@ -57,10 +60,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Route::post('/packages/{package}/toggle_favorite_after_login', [PackageController::class, 'toggleFavoriteAfterLogin'])->name('package.toggle_favorite_after_login');
 });
 
-    Route::get('/test/{package}', function($package){
-        $p = Package::without('audio')->findOrFail($package);
-        $audio = AudioResource::collection($p->audio);
-        return ['package' => $p, 'audio'=>$audio];
-    });
-
-
+Route::get('/test/{package}', function ($package) {
+    $p = Package::without('audio')->findOrFail($package);
+    $audio = AudioResource::collection($p->audio);
+    return ['package' => $p, 'audio' => $audio];
+});

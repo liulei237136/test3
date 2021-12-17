@@ -1,491 +1,239 @@
 <template>
-  <vxe-modal
-    v-model="showModal"
-    @show="onModalShow"
-    :show-header="false"
-    width="200"
-    height="60"
-    :content="modalContent"
-  >
-  </vxe-modal>
-  <vxe-toolbar v-if="canEdit" perfect>
-    <template #buttons>
-      <vxe-button icon="fa fa-plus" status="perfect" @click="insertEmptyRow"
-        >添加空白行</vxe-button
-      >
-      <vxe-button
-        icon="fa fa-plus"
-        status="perfect"
-        @click="insertEmptyRowAtIndex"
-        >添加空白行(在勾选行前)</vxe-button
-      >
-      <vxe-button
-        icon="fa fa-plus"
-        status="perfect"
-        @click="$refs.insertAudio.click()"
-        >添加MP3</vxe-button
-      >
-      <vxe-button
-        icon="fa fa-plus"
-        status="perfect"
-        @click="onClickInsertAudioAtIndex"
-        >添加MP3(在勾选行前)</vxe-button
-      >
-      <input
-        type="file"
-        ref="insertAudio"
-        accept=".mp3"
-        hidden
-        multiple
-        @change="insertAudio"
-      />
-      <input
-        type="file"
-        ref="insertAudioAtIndex"
-        accept=".mp3"
-        hidden
-        multiple
-        @change="insertAudioAtIndex"
-      />
-      <vxe-button icon="fa fa-trash-o" status="perfect" @click="deleteChecked"
-        >批量删除</vxe-button
-      >
-      <vxe-button icon="fa fa-save" status="perfect" @click="saveEvent"
-        >保存</vxe-button
-      >
+  <vxe-grid ref="xGrid" v-bind="gridOptions">
+    <template #toolbar_buttons>
+      <vxe-input
+        v-model="demo.filterAllString"
+        placeholder="全表过滤"
+        @change="onFilterAll"
+      ></vxe-input>
+      <vxe-button content="插入空白行">
+        <template #dropdowns>
+          <vxe-button
+            type="text"
+            @click="insertEmptyAt(0)"
+            content="在第一行插入"
+          ></vxe-button>
+          <vxe-button
+            type="text"
+            @click="insertEmptyAt(-1)"
+            content="在最后一行插入"
+          ></vxe-button>
+          <vxe-button
+            type="text"
+            @click="insertEmptyAt()"
+            content="在选中行前插入"
+          ></vxe-button>
+        </template>
+      </vxe-button>
     </template>
-  </vxe-toolbar>
-
-  <vxe-table
-    row-key="true"
-    empty-text="还没有添加音频哦！"
-    show-overflow
-    :loading="loading"
-    border
-    highlight-hover-row
-    highlight-hover-column
-    :data="tableData"
-    resizable
-    height="600"
-    sort-config=" {
-      trigger: 'cell',
-      defaultSort: { field: 'name', order: 'asc' },
-      orders: ['desc', 'asc', null],
-    }"
-    ref="xTable"
-    :edit-config="{
-      trigger: 'click',
-      mode: 'cell',
-      showStatus: false,
-    }"
-  >
-    <vxe-column type="checkbox" width="60"></vxe-column>
-    <vxe-column
-      field="name"
-      title="文件名"
-      sortable
-      :edit-render="{
-        name: 'input',
-        attrs: { type: 'text' },
-        events: {
-          change: onInputChange,
-        },
-      }"
-    ></vxe-column>
-    <vxe-column title="播放和重录" width="520">
-      <template #default="{ row }">
-        <audio-recorder :row="row"></audio-recorder>
-      </template>
-    </vxe-column>
-    <vxe-column
-      field="book_name"
-      title="所属书名"
-      sortable
-      :edit-render="{
-        name: 'input',
-        attrs: { type: 'text' },
-        events: {
-          change: onInputChange,
-        },
-      }"
-    ></vxe-column>
-    <vxe-column
-      field="audio_text"
-      title="音频内容文字"
-      sortable
-      :edit-render="{
-        name: 'input',
-        attrs: { type: 'text' },
-        events: {
-          change: onInputChange,
-        },
-      }"
-    ></vxe-column>
-    <vxe-column title="操作" width="100" show-overflow>
-      <template #default="{ row }">
-        <vxe-button icon="fa fa-trash" status="perfect" @click="deleteRow(row)">
-          删除
-        </vxe-button>
-      </template>
-    </vxe-column>
-  </vxe-table>
-  <vxe-pager
-    background
-    size="small"
-    :loading="loading"
-    :current-page="tablePage.currentPage"
-    :page-size="tablePage.pageSize"
-    :total="tablePage.totalResult"
-    :page-sizes="[10, 20, 100, 1000, { label: '全部数据', value: -1 }]"
-    :layouts="[
-      'PrevPage',
-      'JumpNumber',
-      'NextPage',
-      'FullJump',
-      'Sizes',
-      'Total',
-    ]"
-    @page-change="handlePageChange"
-  >
-  </vxe-pager>
+  </vxe-grid>
 </template>
-
-<script>
-import { defineComponent } from "vue";
-
-import Icon from "@/Components/Icon";
-import AudioRecorder from "./AudioRecorder";
-
-import { v4 as uuidv4 } from "uuid";
+<script >
+import { defineComponent, onMounted, reactive, ref, Ref } from "vue";
+import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
+import XEUtils from "xe-utils";
+import axios from "axios";
 
 export default defineComponent({
-  props: {
-    package: Object,
-  },
-  components: {
-    Icon,
-    AudioRecorder,
-  },
-  data() {
-    return {
-      canEdit:
-        this.$page.props.user &&
-        this.$page.props.user.id === this.package.author.id,
-      audioList: window._.cloneDeep(this.package.audio),
-      tableData: [],
-      tablePage: {
-        currentPage: 1,
-        pageSize: 10,
-        totalResult: 0,
-        currentRow: null,
-      },
-      loading: false,
-      showModal: false,
-      modalContent: "",
-      selectRow: null,
-      deletedRow: [], //监控被删除的原生行
+  setup() {
+    const xGrid = ref({});
+
+    const demo = reactive({
+      filterAllString: "",
+    });
+
+    const onFilterAll = () => {
+      console.log("onFilterAll");
     };
-  },
-  methods: {
-    deleteChecked() {
-      const selectRecords = this.$refs.xTable.getCheckboxRecords();
-      selectRecords.forEach((row) => this.deleteRow(row));
-    },
-    //监控是否非新增row内容发生改变
-    onInputChange({ row }) {
-      //新增行不用监控，用uuid来分辨
-      if (row.id) {
-        row.updated = true;
-      }
-    },
-    loadLocal() {
-      this.tablePage.totalResult = this.audioList.length;
-      this.tableData = this.audioList.slice(
-        (this.tablePage.currentPage - 1) * this.tablePage.pageSize,
-        this.tablePage.currentPage * this.tablePage.pageSize
-      );
-    },
 
-    handlePageChange({ currentPage, pageSize }) {
-      this.tablePage.currentPage = currentPage;
-      this.tablePage.pageSize = pageSize;
-      this.loadLocal();
-    },
+    const gridOptions = reactive({
+      border: true,
+      resizable: true,
+      showHeaderOverflow: true,
+      showOverflow: true,
+      highlightHoverRow: true,
+      keepSource: true,
+      id: "full_edit_1",
+      height: 600,
+      rowId: "id",
+      customConfig: {
+        storage: true,
+      },
+      importConfig: {},
+      printConfig: {},
+      sortConfig: {
+        trigger: "cell",
+      },
+      filterConfig: {},
 
-    formatTime({ cellValue, row, column }) {
-      if (cellValue) {
-        return dayjs(cellValue).fromNow();
-      }
-      return "";
-    },
-    //确保只有一行被选中，并返回它在audioList的索引
-    getCheckedOnelineIndex() {
-      const selectRecords = this.$refs.xTable.getCheckboxRecords();
-      if (!selectRecords || selectRecords.length < 1) {
-        alert("请勾选一行");
-        return;
-      }
-      if (selectRecords.length > 1) {
-        alert("请只勾选一行");
-        return;
-      }
+      toolbarConfig: {
+        slots: {
+          buttons: "toolbar_buttons",
+        },
+        refresh: true,
+        import: true,
+        export: true,
+        print: true,
+        zoom: true,
+        custom: true,
+      },
 
-      const selectedRow = selectRecords[0];
-      let index;
-      //如果是源行
-      if (selectedRow.id) {
-        index = this.audioList.findIndex((item) => item.id === selectedRow.id);
-        //如果是新加的
-      } else if (selectedRow.uuid) {
-        index = this.audioList.findIndex(
-          (item) => item.uuid === selectedRow.uuid
-        );
-      }
+      columns: [
+        { type: "checkbox", title: "ID", width: 120 },
+        {
+          field: "name",
+          title: "Name",
+          sortable: true,
+          titleHelp: { message: "名称必须填写！" },
+          editRender: { name: "input", attrs: { placeholder: "请输入名称" } },
+        },
+        {
+          field: "role",
+          title: "Role",
+          sortable: true,
+          filters: [
+            { label: "前端开发", value: "前端" },
+            { label: "后端开发", value: "后端" },
+            { label: "测试", value: "测试" },
+            { label: "程序员鼓励师", value: "程序员鼓励师" },
+          ],
+          filterMultiple: false,
+          editRender: { name: "input", attrs: { placeholder: "请输入角色" } },
+        },
+        {
+          field: "email",
+          title: "Email",
+          width: 160,
+          editRender: { name: "$input", props: { placeholder: "请输入邮件" } },
+        },
+        {
+          field: "nickname",
+          title: "Nickname",
+          editRender: { name: "input", attrs: { placeholder: "请输入昵称" } },
+        },
+        {
+          field: "sex",
+          title: "Sex",
+          filters: [
+            { label: "男", value: "1" },
+            { label: "女", value: "0" },
+          ],
+          editRender: {
+            name: "$select",
+            options: [],
+            props: { placeholder: "请选择性别" },
+          },
+        },
+        {
+          field: "age",
+          title: "Age",
+          visible: false,
+          sortable: true,
+          editRender: {
+            name: "$input",
+            props: { type: "number", min: 1, max: 120 },
+          },
+        },
+        {
+          field: "amount",
+          title: "Amount",
+          formatter({ cellValue }) {
+            return cellValue
+              ? `￥${XEUtils.commafy(XEUtils.toNumber(cellValue), {
+                  digits: 2,
+                })}`
+              : "";
+          },
+          editRender: {
+            name: "$input",
+            props: { type: "float", digits: 2, placeholder: "请输入数值" },
+          },
+        },
+        {
+          field: "updateDate",
+          title: "Update Date",
+          width: 160,
+          visible: false,
+          sortable: true,
+          formatter({ cellValue }) {
+            return XEUtils.toDateString(cellValue, "yyyy-MM-dd HH:ss:mm");
+          },
+        },
+        {
+          field: "createDate",
+          title: "Create Date",
+          width: 160,
+          visible: false,
+          sortable: true,
+          formatter({ cellValue }) {
+            return XEUtils.toDateString(cellValue, "yyyy-MM-dd");
+          },
+        },
+      ],
 
-      return index;
-    },
+      checkboxConfig: {
+        labelField: "id",
+        reserve: true,
+        highlight: true,
+        range: true,
+      },
+      editRules: {
+        name: [
+          { required: true, message: "app.body.valid.rName" },
+          { min: 3, max: 50, message: "名称长度在 3 到 50 个字符" },
+        ],
+      },
+      editConfig: {
+        trigger: "click",
+        mode: "row",
+        showStatus: true,
+      },
+    });
 
-    insertEmptyRow() {
-      this.audioList.unshift({ uuid: uuidv4() });
-      this.loadLocal();
-    },
-
-    insertEmptyRowAtIndex() {
-      const index = this.getCheckedOnelineIndex();
-
-      if (index >= 0) {
-        this.audioList.splice(index, 0, { uuid: uuidv4() });
-        this.loadLocal();
-      }
-    },
-    insertAudioFileAtIndex(files, index = 0) {
-      let count = 0;
-      for (let file of files) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async (e) => {
-          const record = {
-            name: file.name,
-            url: e.target.result,
-            file: file,
-            uuid: uuidv4(),
-          };
-          this.audioList.splice(index, 0, record);
-          count++;
-          if (count === files.length) {
-            this.loadLocal();
-          }
-        };
-      }
-    },
-    insertAudio(e) {
-      const files = e.target.files;
-      this.insertAudioFileAtIndex(files, 0);
-    },
-
-    onClickInsertAudioAtIndex() {
-      const index = this.getCheckedOnelineIndex();
-      if (index >= 0) this.$refs.insertAudioAtIndex.click();
-    },
-
-    insertAudioAtIndex(e) {
-      const files = e.target.files;
-      const index = this.getCheckedOnelineIndex();
-      this.insertAudioFileAtIndex(files, index);
-    },
-
-    deleteRow(row) {
-      if (row.id) this.deletedRow.push(_.cloneDeep(row));
-
-      const index = this.audioList.findIndex((item) => item.id === row.id);
-      this.audioList.splice(index, 1);
-      this.loadLocal();
-    },
-    sortCreatedAt({ row }) {
-      if (row.created_at) return new Date(row.created_at).valueOf();
-
-      return -1;
-    },
-    sortUpdatedAt({ row }) {
-      if (row.created_at) return new Date(row.updated_at).valueOf();
-
-      return -1;
-    },
-    onModalShow() {
-      //计算 diff setTimeout 是为了给显示'计算'一个间隔
-      const inserted = [];
-      const updated = [];
-      let deleted = [];
-
-      for (const row of this.audioList) {
-        //是新添加的行
-        if (!row.id) {
-          inserted.push(row);
-          //是源行或者说载入的行
-        } else {
-          //如果更新过
-          if (row.updated) {
-            updated.push(row);
-          }
+    const insertEmptyAt = async (index) => {
+      const grid = xGrid.value;
+      if (index === 0) {
+        const { row: newRow } = await grid.insertAt({});
+        await grid.setActiveCell(newRow, "name");
+      } else if (index === -1) {
+        const { row: newRow } = await grid.insertAt({}, -1);
+        await grid.setActiveCell(newRow, "name");
+      } else {
+        const selectedRow = grid.getCheckboxRecords(true)[0];
+        if (selectedRow) {
+          const { row: newRow } = await grid.insertAt({}, selectedRow);
+          await grid.setActiveCell(newRow, "name");
         }
       }
+    };
 
-      deleted = this.deletedRow;
-
-      if (inserted.length || deleted.length || updated.length) {
-        this.modalContent = "正在上传保存...";
-        this.save({ inserted, deleted, updated });
-        return;
-      }
-      this.modalContent = "没有需要保存的内容.";
-      setTimeout(() => {
-        this.modalContent = "";
-        this.showModal = false;
-      }, 500);
-    },
-
-    saveEvent() {
-      this.showModal = true;
-      this.modalContent = "正在计算需要保存的内容...";
-      return;
-    },
-
-    save({ inserted, deleted, updated }) {
-      const results = [];
-      const that = this;
-
-      //insert
-      inserted.forEach((row) => {
-        const data = new FormData();
-
-        (row.blob || row.file) && data.append("file", row.blob || row.file);
-        row.name && data.append("name", row.name);
-        row.book_name && data.append("book_name", row.book_name);
-        row.audio_text && data.append("audio_text", row.audio_text);
-        data.append("uuid", row["uuid"]);
-
-        results.push(
-          axios.post(
-            route("package.audio.store", { package: this.package.id }),
-            data,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          )
-        );
-      });
-
-      //delete
-      deleted.forEach((row) => {
-        results.push(
-          axios.delete(
-            route("package.audio.destroy", {
-              audio: row.id,
-              package: this.package.id,
-            })
-          )
-        );
-      });
-
-      updated.forEach((row) => {
-        const data = new FormData();
-
-        (row.blob || row.file) && data.append("file", row.blob || row.file);
-        data.append("name", row.name);
-        data.append("book_name", row.book_name);
-        data.append("audio_text", row.audio_text);
-        data.append("_method", "patch");
-        data.append("uuid", row["uuid"]);
-
-        results.push(
-          axios.post(
-            route("package.audio.update", {
-              package: this.package.id,
-              audio: row.id,
-            }),
-            data,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          )
-        );
-      });
-
-      Promise.all(results)
-        .then((results) => {
-          that.saveUpdateData(results);
-          that.modalContent = "";
-          that.showModal = false;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
-    saveUpdateData(results) {
-      for (let result of results) {
-        const item = result.data;
-        const success = item.success;
-        const type = item.type;
-        const newItem = item.data;
-        const uuid = item.uuid;
-        //todo  error handling
-        if (!success) continue;
-        let index, foundItem;
-
-        switch (type) {
-          case "insert":
-            this.package.audio.push(newItem);
-            foundItem = this.audioList.find((item) => item.uuid === uuid);
-
-            foundItem.id = newItem.id;
-            if (newItem.url) {
-              foundItem.url = newItem.url;
-              delete foundItem["file"];
-              delete foundItem["blob"];
-            }
-
-            break;
-          case "delete":
-            index = this.package.audio.findIndex((item) => item.id === newItem.id);
-            this.package.audio.splice(index, 1);
-            let indexForDeleted = this.deletedRow.findIndex(
-              (item) => item.id === newItem.id
-            );
-            this.deletedRow.splice(indexForDeleted, 1);
-
-            break;
-          case "update":
-            index = this.package.audio.findIndex((item) => item.id === newItem.id);
-            this.package.audio.splice(index, 1, newItem);
-
-            foundItem = this.audioList.find((item) => item.id === newItem.id);
-            if ((foundItem.blob || foundItem.file) && newItem.url) {
-              foundItem.url = newItem.url;
-              delete foundItem["file"];
-              delete foundItem["blob"];
-            }
-            delete foundItem["updated"];
-            break;
+    onMounted(() => {
+      const sexList = [
+        { label: "女", value: "0" },
+        { label: "男", value: "1" },
+      ];
+      const { formConfig, columns } = gridOptions;
+      if (columns) {
+        const sexColumn = columns[5];
+        if (sexColumn && sexColumn.editRender) {
+          sexColumn.editRender.options = sexList;
         }
       }
-    },
-
-    normalize(row) {
-      const fields = ["name", "book_name", "audio_text"];
-      for (const field of fields) {
-        row[field] = _.trim(row[field]);
+      if (formConfig && formConfig.items) {
+        const sexItem = formConfig.items[4];
+        if (sexItem && sexItem.itemRender) {
+          sexItem.itemRender.options = sexList;
+        }
       }
-      return row;
-    },
-  },
+    });
 
-  mounted() {
-    this.loadLocal();
+    return {
+      xGrid,
+      gridOptions,
+      demo,
+      onFilterAll,
+      insertEmptyAt,
+    };
   },
 });
 </script>
