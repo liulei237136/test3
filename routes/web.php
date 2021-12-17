@@ -32,6 +32,7 @@ Route::get('/test', function(){
     return Inertia::render('Package/Audio');
 });
 
+
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
@@ -65,6 +66,3 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         $audio = AudioResource::collection($p->audio);
         return ['package' => $p, 'audio'=>$audio];
     });
-
-
-
