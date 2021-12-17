@@ -25,6 +25,7 @@
           ></vxe-button>
         </template>
       </vxe-button>
+      <vxe-button content="保存" @click="xGrid.commitProxy('save')"></vxe-button>
     </template>
   </vxe-grid>
 </template>
@@ -35,7 +36,11 @@ import XEUtils from "xe-utils";
 import axios from "axios";
 
 export default defineComponent({
-  setup() {
+  props: {
+    package: Object,
+    canEdit: Boolean,
+  },
+  setup(props) {
     const xGrid = ref({});
 
     const demo = reactive({
@@ -70,6 +75,7 @@ export default defineComponent({
         slots: {
           buttons: "toolbar_buttons",
         },
+        save: true,
         refresh: true,
         import: true,
         export: true,
@@ -79,109 +85,37 @@ export default defineComponent({
       },
 
       columns: [
-        { type: "checkbox", title: "ID", width: 120 },
+        { type: "checkbox", width: 60 },
+        { type: "seq", width: 60 },
         {
           field: "name",
           title: "Name",
           sortable: true,
-          titleHelp: { message: "名称必须填写！" },
-          editRender: { name: "input", attrs: { placeholder: "请输入名称" } },
-        },
-        {
-          field: "role",
-          title: "Role",
-          sortable: true,
-          filters: [
-            { label: "前端开发", value: "前端" },
-            { label: "后端开发", value: "后端" },
-            { label: "测试", value: "测试" },
-            { label: "程序员鼓励师", value: "程序员鼓励师" },
-          ],
-          filterMultiple: false,
-          editRender: { name: "input", attrs: { placeholder: "请输入角色" } },
-        },
-        {
-          field: "email",
-          title: "Email",
-          width: 160,
-          editRender: { name: "$input", props: { placeholder: "请输入邮件" } },
-        },
-        {
-          field: "nickname",
-          title: "Nickname",
-          editRender: { name: "input", attrs: { placeholder: "请输入昵称" } },
-        },
-        {
-          field: "sex",
-          title: "Sex",
-          filters: [
-            { label: "男", value: "1" },
-            { label: "女", value: "0" },
-          ],
-          editRender: {
-            name: "$select",
-            options: [],
-            props: { placeholder: "请选择性别" },
-          },
-        },
-        {
-          field: "age",
-          title: "Age",
-          visible: false,
-          sortable: true,
-          editRender: {
-            name: "$input",
-            props: { type: "number", min: 1, max: 120 },
-          },
-        },
-        {
-          field: "amount",
-          title: "Amount",
-          formatter({ cellValue }) {
-            return cellValue
-              ? `￥${XEUtils.commafy(XEUtils.toNumber(cellValue), {
-                  digits: 2,
-                })}`
-              : "";
-          },
-          editRender: {
-            name: "$input",
-            props: { type: "float", digits: 2, placeholder: "请输入数值" },
-          },
-        },
-        {
-          field: "updateDate",
-          title: "Update Date",
-          width: 160,
-          visible: false,
-          sortable: true,
-          formatter({ cellValue }) {
-            return XEUtils.toDateString(cellValue, "yyyy-MM-dd HH:ss:mm");
-          },
-        },
-        {
-          field: "createDate",
-          title: "Create Date",
-          width: 160,
-          visible: false,
-          sortable: true,
-          formatter({ cellValue }) {
-            return XEUtils.toDateString(cellValue, "yyyy-MM-dd");
-          },
+          titleHelp: { message: "这里是Mp3文件的文件名" },
+          editRender: { name: "input", attrs: { placeholder: "请输入文件名" } },
         },
       ],
-
+      proxyConfig: {
+        ajax: {
+          // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
+          query: async ({ page, sorts, filters, form }) => {
+            const audioList = await getAudioList();
+            console.log(audioList);
+            await resetAll();
+            return audioList;
+          },
+          save: async (item) => {
+            console.log(item.body);
+            return;
+          },
+        },
+      },
       checkboxConfig: {
-        labelField: "id",
-        reserve: true,
         highlight: true,
         range: true,
       },
       editRules: {
-        name: [
-          { required: true, message: "app.body.valid.rName" },
-          { min: 3, max: 50, message: "名称长度在 3 到 50 个字符" },
-        ],
+        name: [{ min: 3, max: 50, message: "名称长度在 3 到 50 个字符" }],
       },
       editConfig: {
         trigger: "click",
@@ -207,24 +141,36 @@ export default defineComponent({
       }
     };
 
+    const getAudioList = () => {
+      return axios(route("package.audio", { package: props.package.id })).then(
+        (res) => res.data
+      );
+    };
+
+    const resetAll = () => {
+      console.log("reset all");
+    };
+
     onMounted(() => {
-      const sexList = [
-        { label: "女", value: "0" },
-        { label: "男", value: "1" },
-      ];
-      const { formConfig, columns } = gridOptions;
-      if (columns) {
-        const sexColumn = columns[5];
-        if (sexColumn && sexColumn.editRender) {
-          sexColumn.editRender.options = sexList;
-        }
-      }
-      if (formConfig && formConfig.items) {
-        const sexItem = formConfig.items[4];
-        if (sexItem && sexItem.itemRender) {
-          sexItem.itemRender.options = sexList;
-        }
-      }
+      //   console.log(item);
+      //   getAudioList();
+      //   const sexList = [
+      //     { label: "女", value: "0" },
+      //     { label: "男", value: "1" },
+      //   ];
+      //   const { formConfig, columns } = gridOptions;
+      //   if (columns) {
+      //     const sexColumn = columns[5];
+      //     if (sexColumn && sexColumn.editRender) {
+      //       sexColumn.editRender.options = sexList;
+      //     }
+      //   }
+      //   if (formConfig && formConfig.items) {
+      //     const sexItem = formConfig.items[4];
+      //     if (sexItem && sexItem.itemRender) {
+      //       sexItem.itemRender.options = sexList;
+      //     }
+      //   }
     });
 
     return {
@@ -233,6 +179,8 @@ export default defineComponent({
       demo,
       onFilterAll,
       insertEmptyAt,
+      getAudioList,
+      resetAll,
     };
   },
 });

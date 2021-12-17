@@ -206,13 +206,6 @@ export default defineComponent({
           name: "Test1",
           nickname: "T1",
           role: "Develop",
-<<<<<<< HEAD
-          num1: "222",
-          sex: "Man",
-          age: 28,
-          address: "Shenzhen",
-          img1: "/vxe-table/static/other/img1.gif",
-=======
           sex: "0",
           sex2: ["0"],
           num1: 40,
@@ -220,20 +213,11 @@ export default defineComponent({
           address: "Shenzhen",
           date12: "",
           date13: "",
->>>>>>> deb965a636cea90f602797ba2047f34742876f11
         },
         {
           id: 10002,
           name: "Test2",
           nickname: "T2",
-<<<<<<< HEAD
-          role: "Test",
-          num1: "536",
-          sex: "Women",
-          age: 22,
-          address: "Guangzhou",
-          img1: "/vxe-table/static/other/img2.gif",
-=======
           role: "Designer",
           sex: "1",
           sex2: ["0", "1"],
@@ -242,20 +226,11 @@ export default defineComponent({
           address: "Guangzhou",
           date12: "",
           date13: "2020-08-20",
->>>>>>> deb965a636cea90f602797ba2047f34742876f11
         },
         {
           id: 10003,
           name: "Test3",
           nickname: "T3",
-<<<<<<< HEAD
-          role: "PM",
-          num1: "1000",
-          sex: "Man",
-          age: 32,
-          address: "Shanghai",
-          img1: "/vxe-table/static/other/img1.gif",
-=======
           role: "Test",
           sex: "0",
           sex2: ["1"],
@@ -264,168 +239,12 @@ export default defineComponent({
           address: "Shanghai",
           date12: "2020-09-10",
           date13: "",
->>>>>>> deb965a636cea90f602797ba2047f34742876f11
         },
         {
           id: 10004,
           name: "Test4",
           nickname: "T4",
           role: "Designer",
-<<<<<<< HEAD
-          num1: "424323",
-          sex: "Women",
-          age: 23,
-          address: "Shenzhen",
-          img1: "",
-        },
-        {
-          id: 10005,
-          name: "Test5",
-          nickname: "T5",
-          role: "Develop",
-          num1: "253",
-          sex: "Women",
-          age: 30,
-          address: "Shanghai",
-          img1: "/vxe-table/static/other/img1.gif",
-        },
-        {
-          id: 10006,
-          name: "Test6",
-          nickname: "T6",
-          role: "Designer",
-          num1: "555",
-          sex: "Women",
-          age: 21,
-          address: "Shenzhen",
-          img1: "/vxe-table/static/other/img2.gif",
-        },
-        {
-          id: 10007,
-          name: "Test7",
-          nickname: "T7",
-          role: "Test",
-          num1: "11",
-          sex: "Man",
-          age: 29,
-          address: "Shenzhen",
-          img1: "",
-        },
-        {
-          id: 10008,
-          name: "Test8",
-          nickname: "T8",
-          role: "Develop",
-          num1: "998",
-          sex: "Man",
-          age: 35,
-          address: "Shenzhen",
-          img1: "/vxe-table/static/other/img1.gif",
-        },
-      ],
-      toolbarConfig: {
-        custom: true,
-        zoom:true,
-        slots: {
-          buttons: "toolbar_buttons",
-          tools: "toolbar_tools",
-        },
-      },
-      columns: [
-        { type: "checkbox", width: 60 },
-        {
-          field: "name",
-          title: "Name",
-          width: 200,
-          resizable: false,
-          slots: { header: "name_header" },
-        },
-        { field: "age", title: "Age", width: 100 },
-        {
-          field: "num1",
-          title: "Num1",
-          showHeaderOverflow: true,
-          filters: [{ data: "" }],
-          editRender: { autofocus: ".my-input" },
-          slots: {
-            // 使用插槽模板渲染
-            default: "num1_default",
-            header: "num1_header",
-            footer: "num1_footer",
-            filter: "num1_filter",
-            edit: "num1_edit",
-          },
-        },
-        {
-          field: "address",
-          title: "Address",
-          showOverflow: true,
-          slots: {
-            // 使用 JSX 渲染
-            // default: ({ row }) => {
-            //   return [
-            //     <span style="color: blue" onClick={ () => addressClickEvent(row) }>自定义模板内容</span>
-            //   ]
-            // }
-          },
-        },
-        { field: "img1", title: "图片路径", slots: { default: "img1_default" } },
-      ],
-      footerMethod({ columns, data }) {
-        return [
-          columns.map((column, index) => {
-            if (index === 0) {
-              return "平均";
-            } else if (["num1", "age"].includes(column.property)) {
-              return meanNum(data, column.property);
-            }
-            return null;
-          }),
-        ];
-      },
-    });
-
-    const searchEvent = () => {
-      VXETable.modal.alert("查询");
-    };
-
-    const headerClickEvent = () => {
-      VXETable.modal.alert("头部点击事件");
-    };
-
-    const changeFilterEvent = (evnt, option, $panel) => {
-      $panel.changeOption(evnt, !!option.data, option);
-    };
-
-    const showDetailEvent = (row) => {
-      demo1.selectRow = row;
-      demo1.showDetails = true;
-    };
-
-    const checkboxChangeEvent = ({ records }) => {
-      const $grid = xGrid.value;
-      demo1.isAllChecked = $grid.isAllCheckboxChecked();
-      demo1.isIndeterminate = $grid.isAllCheckboxIndeterminate();
-      demo1.selectRecords = records;
-    };
-
-    const changeAllEvent = () => {
-      const $grid = xGrid.value;
-      $grid.setAllCheckboxRow(demo1.isAllChecked);
-      demo1.selectRecords = $grid.getCheckboxRecords();
-    };
-
-    return {
-      xGrid,
-      demo1,
-      gridOptions,
-      searchEvent,
-      headerClickEvent,
-      changeFilterEvent,
-      showDetailEvent,
-      checkboxChangeEvent,
-      changeAllEvent,
-=======
           sex: "1",
           sex2: ["1"],
           num1: 30,
@@ -511,7 +330,6 @@ export default defineComponent({
       saveRowEvent,
       cancelRowEvent,
       insertEvent,
->>>>>>> deb965a636cea90f602797ba2047f34742876f11
     };
   },
 });
