@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <vxe-grid
     ref="xGrid"
     class="my-grid66"
@@ -201,44 +202,210 @@ export default defineComponent({
         icon: "fa fa-pencil-square-o",
       },
       data: [
+=======
+  <vxe-toolbar>
+    <template #buttons>
+      <vxe-button icon="fa fa-plus" @click="insertEvent()">新增</vxe-button>
+    </template>
+  </vxe-toolbar>
+
+  <vxe-table
+    border
+    resizable
+    show-overflow
+    ref="xTable"
+    height="500"
+    :loading="demo1.loading"
+    :data="demo1.tableData"
+    :edit-config="{ trigger: 'click', mode: 'cell' }"
+  >
+    <vxe-column type="seq" width="60"></vxe-column>
+    <vxe-column
+      field="name"
+      title="Name"
+      :edit-render="{ autofocus: '.my-input', autoselect: true }"
+    >
+      <template #edit="{ row }">
+        <vxe-input v-model="row.name" type="text" class="my-input"></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="role" title="Role" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-input
+          v-model="row.role"
+          type="text"
+          placeholder="请输入昵称"
+        ></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="sex" title="Sex" :edit-render="{}">
+      <template #default="{ row }">
+        <span>{{ formatSex(row.sex) }}</span>
+      </template>
+      <template #edit="{ row }">
+        <vxe-select v-model="row.sex" transfer>
+          <vxe-option
+            v-for="item in demo1.sexList"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          ></vxe-option>
+        </vxe-select>
+      </template>
+    </vxe-column>
+    <vxe-column field="sex2" title="多选下拉" :edit-render="{}">
+      <template #default="{ row }">
+        <span>{{ formatMultiSex(row.sex2) }}</span>
+      </template>
+      <template #edit="{ row }">
+        <vxe-select v-model="row.sex2" multiple transfer>
+          <vxe-option
+            v-for="item in demo1.sexList"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          ></vxe-option>
+        </vxe-select>
+      </template>
+    </vxe-column>
+    <vxe-column field="num6" title="Number" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-input
+          v-model="row.num6"
+          type="number"
+          placeholder="请输入数值"
+        ></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="date12" title="Date" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-input
+          v-model="row.date12"
+          type="date"
+          placeholder="请选择日期"
+          transfer
+        ></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="date13" title="Week" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-input
+          v-model="row.date13"
+          type="week"
+          placeholder="请选择日期"
+          transfer
+        ></vxe-input>
+      </template>
+    </vxe-column>
+    <vxe-column field="address" title="Address" :edit-render="{}">
+      <template #edit="{ row }">
+        <vxe-input v-model="row.address" type="text"></vxe-input>
+      </template>
+    </vxe-column>
+    <!-- <vxe-column title="操作" width="160">
+      <template #default="{ row }">
+        <template v-if="$refs.xTable.isActiveByRow(row)">
+          <vxe-button @click="saveRowEvent(row)">保存</vxe-button>
+          <vxe-button @click="cancelRowEvent(row)">取消</vxe-button>
+        </template>
+        <template v-else>
+          <vxe-button @click="editRowEvent(row)">编辑</vxe-button>
+        </template>
+      </template>
+    </vxe-column> -->
+  </vxe-table>
+
+  <vxe-toolbar>
+    <template #buttons>
+      <vxe-button icon="fa fa-plus" @click="insertEvent()">新增</vxe-button>
+    </template>
+  </vxe-toolbar>
+</template>
+
+<script>
+import { defineComponent, nextTick, reactive, ref } from "vue";
+import { VXETable, VxeTableInstance } from "vxe-table";
+
+export default defineComponent({
+  setup() {
+    const xTable = ref({});
+
+    const demo1 = reactive({
+      loading: false,
+      trigger: "click",
+      tableData: [
+>>>>>>> deb965a636cea90f602797ba2047f34742876f11
         {
           id: 10001,
           name: "Test1",
           nickname: "T1",
           role: "Develop",
+<<<<<<< HEAD
           num1: "222",
           sex: "Man",
           age: 28,
           address: "Shenzhen",
           img1: "/vxe-table/static/other/img1.gif",
+=======
+          sex: "0",
+          sex2: ["0"],
+          num1: 40,
+          age: 28,
+          address: "Shenzhen",
+          date12: "",
+          date13: "",
+>>>>>>> deb965a636cea90f602797ba2047f34742876f11
         },
         {
           id: 10002,
           name: "Test2",
           nickname: "T2",
+<<<<<<< HEAD
           role: "Test",
           num1: "536",
           sex: "Women",
           age: 22,
           address: "Guangzhou",
           img1: "/vxe-table/static/other/img2.gif",
+=======
+          role: "Designer",
+          sex: "1",
+          sex2: ["0", "1"],
+          num1: 20,
+          age: 22,
+          address: "Guangzhou",
+          date12: "",
+          date13: "2020-08-20",
+>>>>>>> deb965a636cea90f602797ba2047f34742876f11
         },
         {
           id: 10003,
           name: "Test3",
           nickname: "T3",
+<<<<<<< HEAD
           role: "PM",
           num1: "1000",
           sex: "Man",
           age: 32,
           address: "Shanghai",
           img1: "/vxe-table/static/other/img1.gif",
+=======
+          role: "Test",
+          sex: "0",
+          sex2: ["1"],
+          num1: 200,
+          age: 32,
+          address: "Shanghai",
+          date12: "2020-09-10",
+          date13: "",
+>>>>>>> deb965a636cea90f602797ba2047f34742876f11
         },
         {
           id: 10004,
           name: "Test4",
           nickname: "T4",
           role: "Designer",
+<<<<<<< HEAD
           num1: "424323",
           sex: "Women",
           age: 23,
@@ -392,6 +559,93 @@ export default defineComponent({
       showDetailEvent,
       checkboxChangeEvent,
       changeAllEvent,
+=======
+          sex: "1",
+          sex2: ["1"],
+          num1: 30,
+          age: 23,
+          address: "Shenzhen",
+          date12: "",
+          date13: "2020-12-04",
+        },
+      ],
+      sexList: [
+        { label: "", value: "" },
+        { label: "男", value: "1" },
+        { label: "女", value: "0" },
+      ],
+    });
+
+    const formatSex = (value) => {
+      if (value === "1") {
+        return "男";
+      }
+      if (value === "0") {
+        return "女";
+      }
+      return "";
+    };
+
+    const formatMultiSex = (values) => {
+      if (values) {
+        return values.map((val) => formatSex(val)).join(",");
+      }
+      return "";
+    };
+
+    const isActiveStatus = (row) => {
+      const $table = xTable.value;
+      return $table.isActiveByRow(row);
+    };
+
+    const editRowEvent = (row) => {
+      const $table = xTable.value;
+      $table.setActiveRow(row);
+    };
+
+    const saveRowEvent = () => {
+      const $table = xTable.value;
+      $table.clearActived().then(() => {
+        demo1.loading = true;
+        setTimeout(() => {
+          demo1.loading = false;
+          VXETable.modal.message({ content: "保存成功！", status: "success" });
+        }, 300);
+      });
+    };
+
+    const cancelRowEvent = (row) => {
+      const $table = xTable.value;
+      $table.clearActived().then(() => {
+        // 还原行数据
+        $table.revertData(row);
+      });
+    };
+
+    const insertEvent = () => {
+      const newRow = { name: "" };
+      demo1.tableData = [newRow].concat(demo1.tableData);
+      xTable.value.setActiveCell(newRow, "name").then(() => {
+        setTimeout(() => {
+          //   nextTick(() => {
+          xTable.value.scrollToRow(newRow);
+          //   });
+        }, 0);
+      });
+      //   demo1.trigger = "dblclick";
+    };
+
+    return {
+      xTable,
+      demo1,
+      formatSex,
+      formatMultiSex,
+      isActiveStatus,
+      editRowEvent,
+      saveRowEvent,
+      cancelRowEvent,
+      insertEvent,
+>>>>>>> deb965a636cea90f602797ba2047f34742876f11
     };
   },
 });
