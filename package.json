@@ -32,15 +32,6 @@
         "vue-loader": "^16.1.2"
     },
     "dependencies": {
-<<<<<<< HEAD
-        "@uppy/core": "^2.1.0",
-        "@uppy/dashboard": "^2.1.0",
-        "@uppy/locales": "^2.0.2",
-        "@uppy/vue": "^0.4.2",
-        "@uppy/xhr-upload": "^2.0.4",
-=======
-
->>>>>>> deb965a636cea90f602797ba2047f34742876f11
         "dayjs": "^1.10.7",
         "recorder-core": "^1.1.21080800",
         "uuid": "^8.3.2",
