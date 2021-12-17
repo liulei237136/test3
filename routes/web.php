@@ -64,16 +64,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     // Route::post('/packages/{package}/toggle_favorite_after_login', [PackageController::class, 'toggleFavoriteAfterLogin'])->name('package.toggle_favorite_after_login');
 });
 
-<<<<<<< HEAD
-    Route::get('/test/{package}', function($package){
-        $p = Package::without('audio')->findOrFail($package);
-        $audio = AudioResource::collection($p->audio);
-        return ['package' => $p, 'audio'=>$audio];
-    });
-=======
 Route::get('/test/{package}', function ($package) {
     $p = Package::without('audio')->findOrFail($package);
     $audio = AudioResource::collection($p->audio);
     return ['package' => $p, 'audio' => $audio];
 });
->>>>>>> deb965a636cea90f602797ba2047f34742876f11
