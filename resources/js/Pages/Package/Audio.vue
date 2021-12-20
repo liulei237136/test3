@@ -25,6 +25,7 @@
           ></vxe-button>
         </template>
       </vxe-button>
+      <vxe-button content="删除" @click="xGrid.removeCheckboxRow"></vxe-button>
       <vxe-button content="保存" @click="xGrid.commitProxy('save')"></vxe-button>
     </template>
   </vxe-grid>
@@ -103,6 +104,9 @@ export default defineComponent({
             console.log(audioList);
             await resetAll();
             return audioList;
+          },
+          delete: ({ body }) => {
+            return xGrid.value.removeCheckboxRow();
           },
           save: async (item) => {
             console.log(item.body);
