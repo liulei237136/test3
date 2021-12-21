@@ -40,12 +40,14 @@ export default defineComponent({
   props: {
     package: Object,
     canEdit: Boolean,
+    commitId: String,
   },
   setup(props) {
     const xGrid = ref({});
 
     const demo = reactive({
       filterAllString: "",
+      commitId: props.commitId,
     });
 
     const onFilterAll = () => {
@@ -100,7 +102,7 @@ export default defineComponent({
         ajax: {
           // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
           query: async ({ page, sorts, filters, form }) => {
-            const audioList = await getAudioList();
+            const audioList = await getCommitAudio(props.commitId);
             console.log(audioList);
             await resetAll();
             return audioList;
@@ -145,10 +147,13 @@ export default defineComponent({
       }
     };
 
-    const getAudioList = () => {
-      return axios(route("package.audio", { package: props.package.id })).then(
-        (res) => res.data
-      );
+    const getCommitAudio = async (commitId) => {
+      if (commitId) {
+        return axios(
+          route("package.commit.show", { package: props.package.id, commit: commitId })
+        ).then((res) => res.data);
+      }
+      return [];
     };
 
     const resetAll = () => {
@@ -157,7 +162,7 @@ export default defineComponent({
 
     onMounted(() => {
       //   console.log(item);
-      //   getAudioList();
+      //   getCommitAudio();
       //   const sexList = [
       //     { label: "女", value: "0" },
       //     { label: "男", value: "1" },
@@ -183,7 +188,7 @@ export default defineComponent({
       demo,
       onFilterAll,
       insertEmptyAt,
-      getAudioList,
+      getCommitAudio,
       resetAll,
     };
   },

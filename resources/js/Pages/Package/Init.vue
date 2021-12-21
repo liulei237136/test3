@@ -112,13 +112,12 @@ export default defineComponent({
           try {
             const result = await axios.post(
               route("package.commit.store", { package: this.package.id }),
-              { ids }
+              { title: "初次保存", ids }
             );
             console.log(result.data.id);
-            return;
             await this.$inertia.get(
-              route("package.show", {
-                package: this.p,
+              route("package.commit.show", {
+                package: this.package.id,
                 commit: result.data.id,
                 tab: "audio",
               }),

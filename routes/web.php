@@ -29,7 +29,7 @@ Route::get('/', function () {
     }
     return Inertia::render('Index');
 });
-Route::get('/test', function(){
+Route::get('/test', function () {
     return Inertia::render('Package/Audio');
 });
 
@@ -38,9 +38,11 @@ Route::get('/test', function () {
     return Inertia::render('Package/Audio');
 });
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');
-Route::get('/packages/{package}/commit/{commit}/show', [PackageController::class, 'show'])->name('package.show');
+Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+Route::get('/package/{package}/commits/{commit}', [CommitController::class, 'show'])->name('package.commit.show');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function () {

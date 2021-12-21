@@ -1075,9 +1075,6 @@ select {
 .prose > :last-child {
 	margin-bottom: 0;
 }
-.visible {
-	visibility: visible;
-}
 .fixed {
 	position: fixed;
 }

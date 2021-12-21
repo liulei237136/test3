@@ -80,8 +80,10 @@ class PackageController extends Controller
     }
 
 
-    public function show(Package $package, Commit $commit)
+    public function show(Package $package)
     {
+        $commit = request()->input('commit');
+
         $package->loadCount('children');
 
         $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
@@ -90,12 +92,13 @@ class PackageController extends Controller
 
         $isFavorited = auth()->user() ? $package->isFavorited() : null;
 
-        return Inertia::render('Package/Show', compact('package', 'canEdit', 'favoritesCount', 'isFavorited'));
+        return Inertia::render('Package/Show', compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'commit'));
     }
 
-    public function audio(Package $package){
-        // return Audio::toBase()->where('package_id', $package->id)->get();
-        return [['name' => 'file1'], ['name'=> 'file2'], ['name'=>'file3']];
+    public function audio(Package $package)
+    {
+        return Audio::toBase()->where('package_id', $package->id)->get();
+        return [['name' => 'file1'], ['name' => 'file2'], ['name' => 'file3']];
     }
 
 
@@ -142,7 +145,7 @@ class PackageController extends Controller
             $clonedPackageId = $id;
         });
 
-        return Redirect::route('package.show', ['package' => $clonedPackageId, 'tab'=> 'audio']);
+        return Redirect::route('package.show', ['package' => $clonedPackageId, 'tab' => 'audio']);
     }
 
     public function toggleFavorite(Package $package)
