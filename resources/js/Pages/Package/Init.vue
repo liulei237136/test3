@@ -116,7 +116,7 @@ export default defineComponent({
             );
             console.log(result.data.id);
             await this.$inertia.get(
-              route("package.commit.show", {
+              route("package.show", {
                 package: this.package.id,
                 commit: result.data.id,
                 tab: "audio",

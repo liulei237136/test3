@@ -40,15 +40,14 @@ export default defineComponent({
   props: {
     package: Object,
     canEdit: Boolean,
-    commitId: String,
   },
   setup(props) {
     const xGrid = ref({});
 
     const demo = reactive({
       filterAllString: "",
-      commitId: props.commitId,
       commits: [],
+      commitId: null,
     });
 
     const onFilterAll = () => {
@@ -172,6 +171,9 @@ export default defineComponent({
     };
 
     onMounted(async () => {
+      // 1. get commits
+      //2. try to get commitId
+      //3. use the id to get audios
       demo.commits = await getCommits();
 
       //   console.log(item);

@@ -70,7 +70,7 @@
       <div class="mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
           <component
-            :is="tab"
+            :is="tabComponent"
             :package="package"
             :canEdit="canEdit"
             :commitId="commit"
@@ -96,7 +96,7 @@ export default defineComponent({
     isFavorited: Boolean,
     favoritesCount: Number,
     canEdit: Boolean,
-    commit: String,
+    tab: String,
   },
   components: {
     AppLayout,
@@ -110,17 +110,24 @@ export default defineComponent({
     return {
       isFavor: this.isFavorited,
       favorCount: this.favoritesCount,
-      tab: null,
+      tabComponent: null,
     };
   },
   computed: {
     myPackage() {
       return this.$page.props.user && this.$page.props.user.id === this.package.author.id;
     },
+    tabComponent() {
+      if (this.tab === "info") {
+        return Info;
+      } else if (this.tab === "audio") {
+        return Audio;
+      }
+    },
   },
   mounted() {
-    // console.log(this.$page);
     this.tab = this.$page.url.endsWith("info") ? "Info" : "Audio";
+    console.log(this.$page);
   },
   methods: {
     styleLink(tabName) {
