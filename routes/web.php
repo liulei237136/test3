@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommitController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageAudioController;
 use App\Http\Controllers\PackageController;
@@ -37,7 +38,7 @@ Route::get('/test', function () {
     return Inertia::render('Package/Audio');
 });
 // Route::get('/', [SearchController::class, 'index'])->name('package.index');
-Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
+Route::get('/packages/{package}/commit/{commit}/show', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
@@ -62,6 +63,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
     // Route::post('/packages/{package}/toggle_favorite_after_login', [PackageController::class, 'toggleFavoriteAfterLogin'])->name('package.toggle_favorite_after_login');
+
+    Route::post('/package/{package}/commits', [CommitController::class, 'store'])->name('package.commit.store');
 });
 
 Route::get('/test/{package}', function ($package) {

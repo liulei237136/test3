@@ -10,23 +10,15 @@
 
     <div class="py-12">
       <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div
-          class="
-            bg-white
-            overflow-hidden
-            shadow-xl
-            sm:rounded-lg
-            p-5
-          "
-        >
+        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-5">
           <div v-show="processing" class="w-full flex">
-            <progress :value="percent" class="w-full" max="100">
-              {{ percent }}%
-            </progress>
+            <progress :value="percent" class="w-full" max="100">{{ percent }}%</progress>
             &nbsp;{{ percent }}%
           </div>
-          <div v-show="!processing" class="md:flex-row md:space-x-4 md:items-center md:space-y-0 w-full flex flex-col text-left
-            space-y-4">
+          <div
+            v-show="!processing"
+            class="md:flex-row md:space-x-4 md:items-center md:space-y-0 w-full flex flex-col text-left space-y-4"
+          >
             <vxe-button
               icon="fa fa-upload"
               status="perfect"
@@ -42,23 +34,23 @@
               multiple
               @change="uploadAudio"
             />
-          <!-- <div class="hidden md:block">|</div>
+            <!-- <div class="hidden md:block">|</div>
           <vxe-button icon="fa fa-copy" status="perfect" @click="copy"
             >复制其他点读包音频</vxe-button
           > -->
-          <div class="hidden md:block">|</div>
-          <vxe-button
-            icon="fa fa-edit"
-            status="perfect"
-            @click="
-              $inertia.get(
-                route('package.show', { package: p.id, tab:'audio' }),
-                {},
-                { replace: true }
-              )
-            "
-            >直接编辑</vxe-button
-          >
+            <div class="hidden md:block">|</div>
+            <vxe-button
+              icon="fa fa-edit"
+              status="perfect"
+              @click="
+                $inertia.get(
+                  route('package.show', { package: p.id, tab: 'audio' }),
+                  {},
+                  { replace: true }
+                )
+              "
+              >直接编辑</vxe-button
+            >
           </div>
         </div>
       </div>
@@ -86,17 +78,21 @@ export default defineComponent({
     };
   },
   methods: {
-    uploadAudio(e) {
+    async uploadAudio(e) {
       const files = e.target.files;
       const lengthOfFiles = files.length;
+      const ids = [];
       let count = 0;
+
       if (!lengthOfFiles) return;
+
       this.processing = true;
       for (let file of files) {
+        count++;
         const data = new FormData();
         data.append("file", file);
-        axios
-          .post(
+        try {
+          const result = await axios.post(
             route("package.audio.init_upload", { package: this.p.id }),
             data,
             {
@@ -104,21 +100,35 @@ export default defineComponent({
                 "Content-Type": "multipart/form-data",
               },
             }
-          )
-          .then((res) => {})
-          .catch((err) => console.log(err))
-          //todo error handle
-          .finally(() => {
-            count++;
-            this.percent = Math.ceil((count / lengthOfFiles) * 100);
-            if (count === lengthOfFiles) {
-              this.$inertia.get(
-                route("package.show", { package: this.p , tab: 'audio'}),
-                {},
-                { replace: true }
-              );
-            }
-          });
+          );
+          ids.push(result.data.id);
+        } catch (e) {
+          console.log(e);
+        }
+
+        //todo error handle
+        this.percent = Math.ceil((count / lengthOfFiles) * 100);
+        if (count === lengthOfFiles) {
+          try {
+            const result = await axios.post(
+              route("package.commit.store", { package: this.package.id }),
+              { ids }
+            );
+            console.log(result.data.id);
+            return;
+            await this.$inertia.get(
+              route("package.show", {
+                package: this.p,
+                commit: result.data.id,
+                tab: "audio",
+              }),
+              {},
+              { replace: true }
+            );
+          } catch (e) {
+            console.log(e);
+          }
+        }
       }
     },
   },

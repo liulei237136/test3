@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PackageResource;
 use App\Models\Audio;
+use App\Models\Commit;
 use App\Models\Package;
 use ChristianKuri\LaravelFavorite\Models\Favorite;
 use Illuminate\Http\Request;
@@ -79,7 +80,7 @@ class PackageController extends Controller
     }
 
 
-    public function show(Package $package)
+    public function show(Package $package, Commit $commit)
     {
         $package->loadCount('children');
 
@@ -96,6 +97,8 @@ class PackageController extends Controller
         // return Audio::toBase()->where('package_id', $package->id)->get();
         return [['name' => 'file1'], ['name'=> 'file2'], ['name'=>'file3']];
     }
+
+
 
     public function clone(Package $package)
     {
