@@ -37,8 +37,18 @@ class CommitController extends Controller
     public function show(Package $package, Commit $commit)
     {
         //todo the package is not private or the use is the author of commit
-        $audio = Audio::toBase()->find($commit->audio);
+        info($commit->audio);
+        $audio = Audio::find($commit->audio)->toArray();
+        info($audio);
 
-        return $audio;
+        return compact('audio');
+    }
+
+    public function index(Package $package)
+    {
+        //todo
+        $commits = $package->commits;
+
+        return compact('commits');
     }
 }

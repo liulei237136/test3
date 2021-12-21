@@ -43,6 +43,8 @@ Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->na
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/package/{package}/commits/{commit}', [CommitController::class, 'show'])->name('package.commit.show');
+Route::get('/package/{package}/commits', [CommitController::class, 'index'])->name('package.commit.index');
+
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function () {

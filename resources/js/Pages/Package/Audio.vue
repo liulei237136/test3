@@ -48,6 +48,7 @@ export default defineComponent({
     const demo = reactive({
       filterAllString: "",
       commitId: props.commitId,
+      commits: [],
     });
 
     const onFilterAll = () => {
@@ -149,18 +150,30 @@ export default defineComponent({
 
     const getCommitAudio = async (commitId) => {
       if (commitId) {
-        return axios(
+        console.log("commitId", commitId);
+        const result = await axios(
           route("package.commit.show", { package: props.package.id, commit: commitId })
-        ).then((res) => res.data);
+        );
+        console.log(result.data.audio);
+        return result.data.audio;
       }
       return [];
+    };
+
+    const getCommits = async () => {
+      const result = await axios(
+        route("package.commit.index", { package: props.package.id })
+      );
+      return result.data.commits;
     };
 
     const resetAll = () => {
       console.log("reset all");
     };
 
-    onMounted(() => {
+    onMounted(async () => {
+      demo.commits = await getCommits();
+
       //   console.log(item);
       //   getCommitAudio();
       //   const sexList = [

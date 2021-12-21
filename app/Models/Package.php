@@ -16,7 +16,7 @@ class Package extends Model
 
     protected $guarded = [];
 
-    protected $with = ['author','parent'];
+    protected $with = ['author', 'parent'];
 
     public function scopeMonth(Builder $builder, $date)
     {
@@ -39,20 +39,29 @@ class Package extends Model
         return $builder;
     }
 
-    public function author(){
+    public function author()
+    {
         return $this->belongsTo(User::class, 'author_id');
     }
 
 
-    public function audio(){
+    public function audio()
+    {
         return $this->hasMany(Audio::class);
     }
 
-    public function parent(){
+    public function parent()
+    {
         return $this->belongsTo(Package::class, 'parent_id');
     }
 
-    public function children(){
+    public function children()
+    {
         return $this->hasMany(Package::class, 'parent_id');
+    }
+
+    public function commits()
+    {
+        return $this->hasMany(Commit::class);
     }
 }
