@@ -1,4 +1,60 @@
 <template>
+  <vxe-modal
+    v-model="demo.showSaveModal"
+    id="saveModal"
+    width="800"
+    height="360"
+    min-width="460"
+    min-height="320"
+    show-zoom
+    resize
+    remember
+    storage
+    transfer
+  >
+    <template #title>
+      <span>给本次保存起个名字</span>
+    </template>
+    <template #default>
+      <vxe-form
+        title-colon
+        ref="saveForm"
+        title-align="right"
+        title-width="100"
+        :data="demo.saveFormData"
+        :rules="demo.saveFormRules"
+        :loading="demo.saveFormloading"
+        @submit="saveModalFormSubmitEvent"
+      >
+        <vxe-form-item title="名字" field="title" span="18" :item-render="{}">
+          <template #default="{ data }">
+            <vxe-input v-model="data.title" placeholder="" clearable></vxe-input>
+          </template>
+        </vxe-form-item>
+        <vxe-form-item title="描述" field="description" span="24" :item-render="{}">
+          <template #default="{ data }">
+            <vxe-textarea
+              v-model="data.description"
+              placeholder=""
+              :autosize="{ minRows: 6, maxRows: 10 }"
+              clearable
+            ></vxe-textarea>
+          </template>
+        </vxe-form-item>
+        <vxe-form-item align="center" span="24">
+          <template #default>
+            <vxe-button
+              :disabled="demo.saveFormLoading"
+              type="submit"
+              status="primary"
+              content="提交"
+            ></vxe-button>
+          </template>
+        </vxe-form-item>
+      </vxe-form>
+    </template>
+  </vxe-modal>
+
   <vxe-grid ref="xGrid" v-bind="gridOptions">
     <template #toolbar_buttons>
       <vxe-input
@@ -26,17 +82,15 @@
         </template>
       </vxe-button>
       <vxe-button content="删除" @click="xGrid.removeCheckboxRow"></vxe-button>
-      <vxe-button content="保存" @click="xGrid.commitProxy('save')"></vxe-button>
+      <vxe-button content="保存" @click="demo.showSaveModal = true"></vxe-button>
     </template>
   </vxe-grid>
 </template>
 <script>
-import { defineComponent, onMounted, reactive, ref, Ref } from "vue";
+import { defineComponent, onMounted, reactive, ref } from "vue";
 import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
 import axios from "axios";
-// import Url from "url-parse";
-import url from "url";
 
 export default defineComponent({
   props: {
@@ -48,10 +102,45 @@ export default defineComponent({
   setup(props, context) {
     const xGrid = ref({});
 
+    const saveForm = ref({});
+
     const demo = reactive({
       filterAllString: "",
       audioList: [],
+      showSaveModal: false,
+      saveFormLoading: false,
+      saveFormData: {
+        title: "",
+        description: "",
+      },
+      saveFormRules: {
+        title: [
+          { required: true, message: "请输入本次保存的名称" },
+          { min: 3, max: 56, message: "长度在 3 到 56 个字符" },
+        ],
+        description: [{ max: 1000, message: "长度小于1000个字符" }],
+      },
     });
+
+    const saveModalFormSubmitEvent = async () => {
+      demo.saveFormLoading = true;
+      const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
+      const removeAudioIds = [];
+      //1清理需要'删除'和新增的
+      removeRecords.forEach((record) => removeAudioIds.push(record.id));
+      updateRecords.forEach((record) => {
+        removeAudioIds.push(record.id);
+        record.id = null;
+        insertRecords.push(record);
+      });
+
+      //2.开始新增audio
+
+      //   setTimeout(() => {
+      //     demo.saveFormLoading = false;
+      //     VXETable.modal.message({ content: "保存成功", status: "success" });
+      //   }, 1000);
+    };
 
     const onFilterAll = () => {
       console.log("onFilterAll");
@@ -129,7 +218,6 @@ export default defineComponent({
         {
           field: "book_name",
           title: "书名",
-          sortable: true,
           titleHelp: { message: "书的名字，便于过滤和查找" },
           editRender: { name: "input", attrs: { placeholder: "请输入书名" } },
         },
@@ -201,8 +289,6 @@ export default defineComponent({
       console.log("reset all");
     };
 
-    // const filterNameMethod = ({ value, option, cellValue, row, column }) => {
-
     onMounted(async () => {
       // 1. get commits
       //2. try to get commitId
@@ -240,6 +326,8 @@ export default defineComponent({
       getCommitAudio,
       resetAll,
       filterNameMethod,
+      saveForm,
+      saveModalFormSubmitEvent,
     };
   },
 });

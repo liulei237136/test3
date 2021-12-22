@@ -22,3 +22,4 @@ mix.sass('resources/sass/style.scss', 'public/css');
 if (mix.inProduction()) {
     mix.version();
 }
+

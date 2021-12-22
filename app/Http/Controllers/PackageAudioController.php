@@ -12,67 +12,54 @@ use function Psy\debug;
 class PackageAudioController extends Controller
 {
 
-    public function edit($package){
+    public function edit($package)
+    {
         //todo 只有作者能编辑包
         return Inertia::render('Package/Audio/Edit', ['package' => Package::with('audio')->findOrFail($package)]);
     }
 
     public function store(Package $package, Audio $audio)
     {
-        request()->validate([
+        $validated = request()->validate([
             'file' => ['file', 'max:512000'],
             'name' => ['string', 'max:100'],
             'book_name' => ['string', 'max:200'],
             'audio_text' => ['string', 'max:2000'],
-            'uuid' => ['string', 'max:50'] //"d36dd07a-afda-49d5-a480-bff97a0c2bb3"
         ], [
             'max' => '上传的音频文件不能大于512m',
             'name' => '文件名不能长于50个字',
             'book_name' => '所属书名不能长于100个字',
             'audio_text' => '音频的文字内容不能长于1000个字',
-            'uuid' => 'xxx'
         ]);
 
-        $file = request()->file('file');
-        if($file){
+        if ($file = $validated['file']) {
             $directory = "audio/" . date('Y/m/d');
-            // "audio/2021/11/12/jkdfksf.mp3"
             $file_name = $file->store($directory, 'public');
-            if(!$file_name) {
+            if (!$file_name) {
                 return [
-                    'type' => 'insert',
                     'success' => false,
-                    'uuid' => request()->uuid,
                 ];
             }
             $audio->file_name = $file_name;
             $audio->size = $file->getSize();
         }
 
-        request()->name && $audio->name = request()->name;
-        request()->book_name && $audio->book_name = request()->book_name;
-        request()->audio_text && $audio->audio_text = request()->audio_text;
+        $audio->name = $validated['name'];
+        $audio->book_name = $validated['book_name'];
+        $audio->audio_text = $validated['audio_text'];
         $audio->author_id = auth()->id();
         $audio->package_id = $package->id;
 
-        $result = $audio->save();
-
-        if($result){
+        if ($audio->save()) {
             return [
-                'type' => 'insert',
                 'success' => true,
-                'data' =>  $audio,
-                'uuid' => request()->uuid,
+                'data' => $audio,
             ];
         }
 
         return [
-            'type' => 'insert',
             'success' => false,
-            'uuid' => request()->uuid,
         ];
-
-
     }
 
     public function initUpload(Package $package)
@@ -84,7 +71,7 @@ class PackageAudioController extends Controller
         ]);
 
         $file = request()->file('file');
-        if(!$file) return;
+        if (!$file) return;
         $directory = "audio/" . date('Y/m/d');
         // "audio/2021/11/12/jkdfksf"
         $file_name = $file->store($directory, 'public');
@@ -100,11 +87,12 @@ class PackageAudioController extends Controller
         return $audio;
     }
 
-    public function destroy(Package $package, Audio $audio){
-        if($package->author->id != auth()->id()) return;
+    public function destroy(Package $package, Audio $audio)
+    {
+        if ($package->author->id != auth()->id()) return;
 
         $result = $audio->delete();
-        if($result){
+        if ($result) {
             return [
                 'type' => 'delete',
                 'success' => true,
@@ -117,8 +105,9 @@ class PackageAudioController extends Controller
         ];
     }
 
-    public function update(Package $package, Audio $audio){
-        if($package->author->id != auth()->id()) return;
+    public function update(Package $package, Audio $audio)
+    {
+        if ($package->author->id != auth()->id()) return;
 
         request()->validate([
             'file' => ['file', 'max:512000'],
@@ -136,12 +125,12 @@ class PackageAudioController extends Controller
 
         //file_name && size
         $file = request()->file('file');
-        if($file){
+        if ($file) {
             $directory = "audio/" . date('Y/m/d');
             // "audio/2021/11/12/jkdfksf"
             $file_name = $file->store($directory, 'public');
             //todo can not store ?
-            if(!$file_name){
+            if (!$file_name) {
                 return [
                     'type' => 'update',
                     'success' => false,
@@ -156,7 +145,7 @@ class PackageAudioController extends Controller
         $audio->book_name = request()->book_name;
 
         $result = $audio->save();
-        if($result){
+        if ($result) {
             return [
                 'type' => 'update',
                 'success' => true,
