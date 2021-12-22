@@ -82,6 +82,9 @@ class PackageController extends Controller
 
     public function show(Package $package)
     {
+        $commitId = request()->query('commit');
+
+        if($commitId) $commit = Commit::findOrFail($commitId);
 
         $package->loadCount('children');
 
@@ -91,9 +94,13 @@ class PackageController extends Controller
 
         $isFavorited = auth()->user() ? $package->isFavorited() : null;
 
-        $tab = request()->input('tab') ?? 'info';
+        $tab = request()->query('tab') ?? 'info';
 
-        return Inertia::render('Package/Show', compact('package', 'canEdit', 'favoritesCount', 'isFavorited','tab'));
+        $commits = $package->commits;
+
+        $data =compact('package', 'canEdit', 'favoritesCount', 'isFavorited','tab', 'commit', 'commits') ;
+
+        return Inertia::render('Package/Show', $data);
     }
 
     public function audio(Package $package)

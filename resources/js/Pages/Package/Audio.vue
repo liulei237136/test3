@@ -35,23 +35,47 @@ import { defineComponent, onMounted, reactive, ref, Ref } from "vue";
 import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
 import axios from "axios";
+// import Url from "url-parse";
+import url from "url";
 
 export default defineComponent({
   props: {
     package: Object,
     canEdit: Boolean,
+    commit: Object,
+    commits: Array,
   },
-  setup(props) {
+  setup(props, context) {
     const xGrid = ref({});
 
     const demo = reactive({
       filterAllString: "",
-      commits: [],
-      commitId: null,
+      audioList: [],
     });
 
     const onFilterAll = () => {
       console.log("onFilterAll");
+    };
+
+    const filterNameMethod = ({ value, option, cellValue, row, column }) => {
+      //   console.log(s);
+      return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
+    };
+
+    const nameSortBy = ({ row, column }) => {
+      const name = XEUtils.toValueString(row.name).trim();
+      if (!name) return -1;
+      //todo
+      const matchMp3 = name.match("^([0-9]{1,8})\.mp3$");
+      if (matchMp3) {
+        return parseInt(matchMp3[1]);
+      } else {
+        const matchNumber = name.match("^[0-9]{1,8}$");
+        if (matchNumber) {
+          return parseInt(matchNumber[1]);
+        }
+        return -1;
+      }
     };
 
     const gridOptions = reactive({
@@ -94,24 +118,34 @@ export default defineComponent({
           field: "name",
           title: "Name",
           sortable: true,
+          sortBy: nameSortBy,
           titleHelp: { message: "这里是Mp3文件的文件名" },
           editRender: { name: "input", attrs: { placeholder: "请输入文件名" } },
+          filters: [{ data: "" }],
+          filterMethod: filterNameMethod,
+          filterConfig: {},
+          filterRender: { name: "$input" },
+        },
+        {
+          field: "book_name",
+          title: "书名",
+          sortable: true,
+          titleHelp: { message: "书的名字，便于过滤和查找" },
+          editRender: { name: "input", attrs: { placeholder: "请输入书名" } },
         },
       ],
       proxyConfig: {
         ajax: {
           // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
           query: async ({ page, sorts, filters, form }) => {
-            const audioList = await getCommitAudio(props.commitId);
-            console.log(audioList);
-            await resetAll();
+            const audioList = await getCommitAudio();
+            resetAll();
             return audioList;
           },
           delete: ({ body }) => {
             return xGrid.value.removeCheckboxRow();
           },
           save: async (item) => {
-            console.log(item.body);
             return;
           },
         },
@@ -147,35 +181,35 @@ export default defineComponent({
       }
     };
 
-    const getCommitAudio = async (commitId) => {
-      if (commitId) {
-        console.log("commitId", commitId);
+    const getCommitAudio = async () => {
+      if (props.package && props.package.id && props.commit && props.commit.id) {
         const result = await axios(
-          route("package.commit.show", { package: props.package.id, commit: commitId })
+          route("package.commit.audio", {
+            package: props.package.id,
+            commit: props.commit.id,
+          })
         );
-        console.log(result.data.audio);
-        return result.data.audio;
+        console.log("result.data", result.data);
+        demo.audioList = result.data.audio;
+      } else {
+        demo.audioList = [];
       }
-      return [];
-    };
-
-    const getCommits = async () => {
-      const result = await axios(
-        route("package.commit.index", { package: props.package.id })
-      );
-      return result.data.commits;
+      return demo.audioList;
     };
 
     const resetAll = () => {
       console.log("reset all");
     };
 
+    // const filterNameMethod = ({ value, option, cellValue, row, column }) => {
+
     onMounted(async () => {
       // 1. get commits
       //2. try to get commitId
       //3. use the id to get audios
-      demo.commits = await getCommits();
-
+      //   const r = url.parse(this.$inertia.url, true);
+      //   console.log(r.query);
+      //   demo.commits = await getCommits();
       //   console.log(item);
       //   getCommitAudio();
       //   const sexList = [
@@ -205,6 +239,7 @@ export default defineComponent({
       insertEmptyAt,
       getCommitAudio,
       resetAll,
+      filterNameMethod,
     };
   },
 });

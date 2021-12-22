@@ -42,8 +42,8 @@ Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-Route::get('/package/{package}/commits/{commit}', [CommitController::class, 'show'])->name('package.commit.show');
-Route::get('/package/{package}/commits', [CommitController::class, 'index'])->name('package.commit.index');
+Route::get('/package/{package}/commits/{commit}/audio', [CommitController::class, 'audio'])->name('package.commit.audio');
+// Route::get('/package/{package}/commits', [CommitController::class, 'index'])->name('package.commit.index');
 
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {

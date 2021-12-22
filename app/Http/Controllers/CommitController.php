@@ -35,43 +35,11 @@ class CommitController extends Controller
         return [];
     }
 
-    public function show(Package $package, Commit $commit)
+    public function audio(Package $package, Commit $commit)
     {
-        // $commit = request()->input('commit');
-
-        // $package->loadCount('children');
-
-        // $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
-
-        // $favoritesCount = $package->favoritesCount;
-
-        // $isFavorited = auth()->user() ? $package->isFavorited() : null;
-
-        // return Inertia::render('Package/Show', compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'commit'));
-
         //todo the package is not private or the use is the author of commit
-        info($commit->audio);
         $audio = Audio::find(json_decode($commit->audio));
-        info($audio);
 
-    // $commit = request()->input('commit');
-
-        $package->loadCount('children');
-
-        $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
-
-        $favoritesCount = $package->favoritesCount;
-
-        $isFavorited = auth()->user() ? $package->isFavorited() : null;
-
-        return Inertia::render('Package/Show', compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'commit'));
-    }
-
-    public function index(Package $package)
-    {
-        //todo
-        $commits = $package->commits;
-
-        return compact('commits');
+        return compact('audio');
     }
 }

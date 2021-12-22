@@ -73,7 +73,8 @@
             :is="tabComponent"
             :package="package"
             :canEdit="canEdit"
-            :commitId="commit"
+            :commit="commit"
+            :commits="commits"
           ></component>
         </div>
       </div>
@@ -97,6 +98,8 @@ export default defineComponent({
     favoritesCount: Number,
     canEdit: Boolean,
     tab: String,
+    commits: Array,
+    commit: Object,
   },
   components: {
     AppLayout,
@@ -110,7 +113,6 @@ export default defineComponent({
     return {
       isFavor: this.isFavorited,
       favorCount: this.favoritesCount,
-      tabComponent: null,
     };
   },
   computed: {
@@ -125,10 +127,7 @@ export default defineComponent({
       }
     },
   },
-  mounted() {
-    this.tab = this.$page.url.endsWith("info") ? "Info" : "Audio";
-    console.log(this.$page);
-  },
+  mounted() {},
   methods: {
     styleLink(tabName) {
       return this.tab === tabName

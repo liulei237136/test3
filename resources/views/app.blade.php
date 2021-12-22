@@ -1,28 +1,32 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- <title inertia>{{ config('app.name', 'Laravel') }}</title> --}}
-        <title>{{ config('app.name', 'Laravel') }}</title>
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-        <!-- Fonts -->
-        {{-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"> --}}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- Styles -->
-        <link rel="stylesheet" href="{{ mix('css/app.css') }}">
-        <link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css">
+    {{-- <title inertia>{{ config('app.name', 'Laravel') }}</title> --}}
+    <title>{{ config('app.name', 'Laravel') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Fonts -->
+    {{-- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"> --}}
 
-        <!-- Scripts -->
-        @routes
-    </head>
-    <body class="font-sans antialiased">
-        @inertia
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+    {{-- <link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css"> --}}
+    <link rel="stylesheet" href="/css/fontawesome-free-5.15.4-web/css/all.min.css">
 
-        @env ('local')
-            {{-- <script src="http://localhost:3000/browser-sync/browser-sync-client.js"></script> --}}
-        @endenv
-        <script src="{{ mix('js/app.js') }}" ></script>
-    </body>
+    <!-- Scripts -->
+    @routes
+</head>
+
+<body class="font-sans antialiased">
+    @inertia
+
+    @env('local')
+    {{-- <script src="http://localhost:3000/browser-sync/browser-sync-client.js"></script> --}}
+    @endenv
+    <script src="{{ mix('js/app.js') }}"></script>
+</body>
+
 </html>
