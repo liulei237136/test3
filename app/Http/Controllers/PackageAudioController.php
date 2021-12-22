@@ -18,9 +18,10 @@ class PackageAudioController extends Controller
         return Inertia::render('Package/Audio/Edit', ['package' => Package::with('audio')->findOrFail($package)]);
     }
 
-    public function store(Package $package, Audio $audio)
+    public function store(Package $package, Audio $audio,Request $request)
     {
-        $validated = request()->validate([
+
+        $request->validate([
             'file' => ['file', 'max:512000'],
             'name' => ['string', 'max:100'],
             'book_name' => ['string', 'max:200'],
@@ -32,7 +33,7 @@ class PackageAudioController extends Controller
             'audio_text' => '音频的文字内容不能长于1000个字',
         ]);
 
-        if ($file = $validated['file']) {
+        if ($file = $request->input('file')) {
             $directory = "audio/" . date('Y/m/d');
             $file_name = $file->store($directory, 'public');
             if (!$file_name) {
@@ -44,9 +45,9 @@ class PackageAudioController extends Controller
             $audio->size = $file->getSize();
         }
 
-        $audio->name = $validated['name'];
-        $audio->book_name = $validated['book_name'];
-        $audio->audio_text = $validated['audio_text'];
+        $audio->name = $request->name;
+        $audio->book_name = $request->book_name;
+        $audio->audio_text =$request->audio_text;
         $audio->author_id = auth()->id();
         $audio->package_id = $package->id;
 

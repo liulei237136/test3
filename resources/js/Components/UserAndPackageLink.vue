@@ -4,7 +4,7 @@
       package.author.name
     }}</a>
     <div>/</div>
-    <Link :href="package.url" class="text-blue-500 hover:underline" :class="classes">{{
+    <Link :href="href" class="text-blue-500 hover:underline" :class="classes">{{
       package.name
     }}</Link>
   </div>
@@ -19,8 +19,9 @@ export default defineComponent({
     Link,
   },
   props: {
-      'package': Object,
-      'classes': String,
+    package: Object,
+    classes: String,
+    href: String,
   },
 });
 </script>

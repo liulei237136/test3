@@ -91,9 +91,10 @@ export default defineComponent({
         count++;
         const data = new FormData();
         data.append("file", file);
+        data.append("name", file.name);
         try {
           const result = await axios.post(
-            route("package.audio.init_upload", { package: this.p.id }),
+            route("package.audio.store", { package: this.p.id }),
             data,
             {
               headers: {
@@ -101,33 +102,30 @@ export default defineComponent({
               },
             }
           );
-          ids.push(result.data.id);
+          ids.push(result.data.data.id);
         } catch (e) {
           console.log(e);
         }
 
         //todo error handle
         this.percent = Math.ceil((count / lengthOfFiles) * 100);
-        if (count === lengthOfFiles) {
-          try {
-            const result = await axios.post(
-              route("package.commit.store", { package: this.package.id }),
-              { title: "初次保存", ids }
-            );
-            console.log(result.data.id);
-            await this.$inertia.get(
-              route("package.show", {
-                package: this.package.id,
-                commit: result.data.id,
-                tab: "audio",
-              }),
-              {},
-              { replace: true }
-            );
-          } catch (e) {
-            console.log(e);
-          }
-        }
+      }
+      try {
+        const result = await axios.post(
+          route("package.commit.store", { package: this.package.id }),
+          { title: "初次保存", ids }
+        );
+        await this.$inertia.get(
+          route("package.show", {
+            package: this.package.id,
+            commit: result.data.data.id,
+            tab: "audio",
+          }),
+          {},
+          { replace: true }
+        );
+      } catch (e) {
+        console.log(e);
       }
     },
   },

@@ -98,7 +98,16 @@ class PackageController extends Controller
 
         $commits = $package->commits;
 
-        $data =compact('package', 'canEdit', 'favoritesCount', 'isFavorited','tab', 'commit', 'commits') ;
+        $data =compact('package', 'canEdit', 'favoritesCount', 'isFavorited','tab', 'commits') ;
+
+        $commitId = request()->query('commit');
+
+        if($commitId) {
+            $data['commit'] = Commit::findOrFail($commitId);
+        }
+        // else if(!$commits->isEmpty()){
+        //     $commit = array();
+        // }
 
         return Inertia::render('Package/Show', $data);
     }
@@ -108,8 +117,6 @@ class PackageController extends Controller
         return Audio::toBase()->where('package_id', $package->id)->get();
         return [['name' => 'file1'], ['name' => 'file2'], ['name' => 'file3']];
     }
-
-
 
     public function clone(Package $package)
     {

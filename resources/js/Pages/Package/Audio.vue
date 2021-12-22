@@ -87,6 +87,7 @@
   </vxe-grid>
 </template>
 <script>
+import { Inertia } from "@inertiajs/inertia";
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
@@ -126,6 +127,9 @@ export default defineComponent({
       demo.saveFormLoading = true;
       const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
       const removeAudioIds = [];
+      const insertAudioIds = [];
+      const unchangedAudioIds = [];
+      let ids = [];
       //1清理需要'删除'和新增的
       removeRecords.forEach((record) => removeAudioIds.push(record.id));
       updateRecords.forEach((record) => {
@@ -135,6 +139,50 @@ export default defineComponent({
       });
 
       //2.开始新增audio
+      insertRecords.forEach(async (record) => {
+        const data = new FormData();
+        data.append("file", file);
+        data.append("name", file.name);
+        const result = await axios.post(
+          route("package.audio.store", { package: props.package.id }),
+          record,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        console.log(result.data);
+        insertAudioIds.push(result.data.data.id);
+      });
+
+      //3 开始计算ids 等于 原有audio去掉removeAudioIds 再加上 insertAudiosIds
+      demo.audioList.forEach((audio) => {
+        if (!removeAudioIds.includes(audio.id)) unchangedAudioIds.push(audio.id);
+      });
+      ids = unchangedAudioIds.concat(insertAudioIds);
+
+      try {
+        const result = await axios.post(
+          route("package.commit.store", { package: props.package.id }),
+          {
+            title: demo.saveFormData.title,
+            description: demo.saveFormData.description,
+            ids,
+          }
+        );
+        await Inertia.get(
+          route("package.show", {
+            package: this.package.id,
+            commit: result.data.data.id,
+            tab: "audio",
+          }),
+          {},
+          { replace: true }
+        );
+      } catch (e) {
+        console.log(e);
+      }
 
       //   setTimeout(() => {
       //     demo.saveFormLoading = false;
@@ -234,6 +282,7 @@ export default defineComponent({
             return xGrid.value.removeCheckboxRow();
           },
           save: async (item) => {
+            console.log(item);
             return;
           },
         },

@@ -5,6 +5,7 @@
       <div class="flex item-center justify-between">
         <user-and-package-link
           :package="package"
+          :href="tabHref('info')"
           classes="text-xl"
         ></user-and-package-link>
 
@@ -48,7 +49,7 @@
       <!-- tabs -->
       <div class="flex items-center space-x-2 mt-4 text-lg">
         <Link
-          :href="route('package.show', { package: package.id, tab: 'info' })"
+          :href="tabHref('info')"
           class="px-4 py-2 flex items-center"
           :style="styleLink('Info')"
         >
@@ -56,7 +57,7 @@
           <span>基本信息</span></Link
         >
         <Link
-          :href="route('package.show', { package: package.id, tab: 'audio' })"
+          :href="tabHref('audio')"
           class="px-4 py-2 flex items-center"
           :style="styleLink('Audio')"
         >
@@ -127,8 +128,15 @@ export default defineComponent({
       }
     },
   },
-  mounted() {},
   methods: {
+    tabHref(tab) {
+      const options = {
+        package: this.package.id,
+        tab,
+      };
+      this.commit && (options.commit = this.commit.id);
+      return route("package.show", options);
+    },
     styleLink(tabName) {
       return this.tab === tabName
         ? "borderBottom: 1px solid #FD8C73; marginBottom: -1px"
