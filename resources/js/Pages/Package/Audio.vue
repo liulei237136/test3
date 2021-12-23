@@ -28,13 +28,19 @@
       >
         <vxe-form-item title="名字" field="title" span="18" :item-render="{}">
           <template #default="{ data }">
-            <vxe-input v-model="data.title" placeholder="" clearable></vxe-input>
+            <vxe-input
+              @change="saveForm.clearValidate('title')"
+              v-model="data.title"
+              placeholder=""
+              clearable
+            ></vxe-input>
           </template>
         </vxe-form-item>
         <vxe-form-item title="描述" field="description" span="24" :item-render="{}">
           <template #default="{ data }">
             <vxe-textarea
               v-model="data.description"
+              @change="saveForm.clearValidate('description')"
               placeholder=""
               :autosize="{ minRows: 6, maxRows: 10 }"
               clearable
@@ -57,7 +63,7 @@
 
   <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
     <template #toolbar_buttons>
-      <vxe-pulldown ref="xDown">
+      <vxe-pulldown ref="xDown" class="mr-4">
         <template #default>
           <vxe-input
             v-model="demo.filterCommitTitle"
@@ -89,9 +95,9 @@
         </template>
       </vxe-pulldown>
       <!-- 保存 -->
-      <vxe-button content="保存" @click="onSave"></vxe-button>
+      <vxe-button v-if="canEdit" content="保存" @click="onSave"></vxe-button>
       <!-- 插入 -->
-      <vxe-button content="插入空白行">
+      <vxe-button v-if="canEdit" content="插入空白行">
         <template #dropdowns>
           <vxe-button
             type="text"
@@ -105,25 +111,56 @@
           ></vxe-button>
           <vxe-button
             type="text"
-            @click="insertEmptyAt()"
+            @click="insertEmptyBeforeSelected()"
+            content="在选中行前插入"
+          ></vxe-button>
+        </template>
+      </vxe-button>
+      <vxe-button v-if="canEdit" content="插入音频文件">
+        <template #dropdowns>
+          <vxe-button
+            type="text"
+            @click="insertAudioAt(0)"
+            content="在第一行插入"
+          ></vxe-button>
+          <vxe-button
+            type="text"
+            @click="insertAudioAt(-1)"
+            content="在最后一行插入"
+          ></vxe-button>
+          <vxe-button
+            type="text"
+            @click="insertAudioBeforeSelected()"
             content="在选中行前插入"
           ></vxe-button>
         </template>
       </vxe-button>
       <!-- 删除 -->
-      <vxe-button content="删除" @click="xGrid.removeCheckboxRow"></vxe-button>
+      <vxe-button
+        v-if="canEdit"
+        content="删除"
+        @click="xGrid.removeCheckboxRow"
+      ></vxe-button>
     </template>
   </vxe-grid>
 </template>
 
 <style scoped>
 .my-dropdown {
+  padding: 4px;
   height: auto;
-  max-height: 200px;
-  overflow: auto;
+  max-height: 300px;
+  min-width: 300px;
+  max-width: 600px;
+  overflow-y: auto;
   border-radius: 4px;
   border: 1px solid #dcdfe6;
   background-color: #fff;
+}
+.list-item {
+  padding: 2px;
+  line-height: 22px;
+  font-size: 16px;
 }
 .list-item:hover {
   background-color: #f5f7fa;
@@ -205,7 +242,7 @@ export default defineComponent({
 
     const onSave = async () => {
       const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
-      //如果没有改变
+      // 如果没有改变
       if (!insertRecords.length && !updateRecords.length && !removeRecords.length) {
         return await VXETable.modal.message({ content: "内容没有改动" });
       }
@@ -213,6 +250,10 @@ export default defineComponent({
     };
 
     const saveModalFormSubmitEvent = async () => {
+      // 先验证是否有错误
+      const errMap = await saveForm.value.validate();
+      if (errMap) return;
+
       demo.saveFormLoading = true;
       const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
       const removeAudioIds = [];
@@ -409,20 +450,41 @@ export default defineComponent({
 
     const insertEmptyAt = async (index) => {
       const grid = xGrid.value;
-      if (index === 0) {
-        const { row: newRow } = await grid.insertAt({});
-        await grid.setActiveCell(newRow, "name");
-      } else if (index === -1) {
-        const { row: newRow } = await grid.insertAt({}, -1);
-        await grid.setActiveCell(newRow, "name");
-      } else {
-        const selectedRow = grid.getCheckboxRecords(true)[0];
-        if (selectedRow) {
-          const { row: newRow } = await grid.insertAt({}, selectedRow);
-          await grid.setActiveCell(newRow, "name");
-        }
+      const { row } = await grid.insertAt({}, index);
+      await grid.setActiveCell(row, "name");
+    };
+
+    const insertEmptyBeforeSelected = async () => {
+      const grid = xGrid.value;
+      const selectedRow = grid.getCheckboxRecords(true)[0];
+      if (selectedRow) {
+        const { row } = await grid.insertAt({}, selectedRow);
+        return grid.setActiveCell(row, "name");
       }
     };
+
+    const insertAudioAt = async (index) => {
+      const grid = xGrid.value;
+      const { files } = await grid.readFile({ multiple: true });
+      let count = 0;
+      let fileLength = files.length;
+      for (let file of files) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async (e) => {
+          const record = {
+            name: file.name,
+            localFileUrl: e.target.result,
+            localFilefile: file,
+          };
+          const { row } = await grid.insertAt({}, selectedRow);
+          grid.setActiveCell(row, "name");
+          Promise.all();
+        };
+      }
+    };
+
+    const insertAudioBoforeSelected = async () => {};
 
     const getCommitAudio = async () => {
       if (props.package && props.package.id && props.commit && props.commit.id) {
@@ -497,6 +559,9 @@ export default defineComponent({
       gridOptions,
       demo,
       insertEmptyAt,
+      insertAudioAt,
+      insertEmptyBeforeSelected,
+      insertAudioBeforeSelected,
       getCommitAudio,
       resetAll,
       filterNameMethod,
