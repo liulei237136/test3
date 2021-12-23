@@ -84,7 +84,7 @@ class PackageController extends Controller
     {
         $commitId = request()->query('commit');
 
-        if($commitId) $commit = Commit::findOrFail($commitId);
+        if ($commitId) $commit = Commit::findOrFail($commitId);
 
         $package->loadCount('children');
 
@@ -96,18 +96,15 @@ class PackageController extends Controller
 
         $tab = request()->query('tab') ?? 'info';
 
-        $commits = $package->commits;
+        $commits = $package->commits()->latest()->get();
 
-        $data =compact('package', 'canEdit', 'favoritesCount', 'isFavorited','tab', 'commits') ;
+        $data = compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'tab', 'commits');
 
         $commitId = request()->query('commit');
 
-        if($commitId) {
+        if ($commitId) {
             $data['commit'] = Commit::findOrFail($commitId);
         }
-        // else if(!$commits->isEmpty()){
-        //     $commit = array();
-        // }
 
         return Inertia::render('Package/Show', $data);
     }

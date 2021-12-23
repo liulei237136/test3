@@ -57,6 +57,40 @@
 
   <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
     <template #toolbar_buttons>
+      <vxe-pulldown ref="xDown">
+        <template #default>
+          <vxe-input
+            v-model="demo.filterCommitTitle"
+            placeholder="历史保存"
+            @focus="commitFocusEvent"
+            @keyup="commitKeyupEvent"
+          ></vxe-input>
+        </template>
+        <template #dropdown>
+          <div class="my-dropdown">
+            <div
+              class="list-item"
+              v-for="commit in demo.filteredCommitsList"
+              :key="commit.id"
+            >
+              <Link
+                :to="
+                  route('package.show', {
+                    package: package.id,
+                    commit: commit.id,
+                    tab: 'audio',
+                  })
+                "
+                :title="commit.description ? commit.description : commit.title"
+                >{{ commit.title }}</Link
+              >
+            </div>
+          </div>
+        </template>
+      </vxe-pulldown>
+      <!-- 保存 -->
+      <vxe-button content="保存" @click="onSave"></vxe-button>
+      <!-- 插入 -->
       <vxe-button content="插入空白行">
         <template #dropdowns>
           <vxe-button
@@ -76,14 +110,29 @@
           ></vxe-button>
         </template>
       </vxe-button>
+      <!-- 删除 -->
       <vxe-button content="删除" @click="xGrid.removeCheckboxRow"></vxe-button>
-      <!-- <vxe-button content="保存" @click="demo.showSaveModal = true"></vxe-button> -->
-      <vxe-button content="保存" @click="onSave"></vxe-button>
     </template>
   </vxe-grid>
 </template>
+
+<style scoped>
+.my-dropdown {
+  height: auto;
+  max-height: 200px;
+  overflow: auto;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+}
+.list-item:hover {
+  background-color: #f5f7fa;
+}
+</style>
+
 <script>
 import { Inertia } from "@inertiajs/inertia";
+import { Link } from "@inertiajs/inertia-vue3";
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
@@ -96,14 +145,21 @@ export default defineComponent({
     commit: Object,
     commits: Array,
   },
+  components: {
+    Link,
+  },
   setup(props, context) {
     const xGrid = ref({});
 
     const saveForm = ref({});
 
+    const xDown = ref({});
+
     const demo = reactive({
       filterAllString: "",
       audioList: [],
+      filterCommitTitle: "",
+      filteredCommitsList: props.commits,
       showSaveModal: false,
       saveFormLoading: false,
       saveFormData: {
@@ -118,6 +174,34 @@ export default defineComponent({
         description: [{ max: 1000, message: "长度小于1000个字符" }],
       },
     });
+
+    const commitFocusEvent = () => {
+      const $pulldown = xDown.value;
+      $pulldown.showPanel();
+    };
+
+    const commitKeyupEvent = () => {
+      demo.filteredCommitsList = demo.filterCommitTitle
+        ? props.commits.filter(
+            (commit) => commit.title.indexOf(demo.filterCommitTitle) > -1
+          )
+        : props.commits;
+    };
+
+    const commitSelectEvent = (commit) => {
+      const $pulldown = xDown.value;
+      //   demo1.value1 = item.label;
+      $pulldown.hidePanel().then(() => {
+        // demo1.list1 = data1;
+        Inertia.get(
+          route("package.show", {
+            package: props.package.id,
+            commit: commit.id,
+            tab: "audio",
+          })
+        );
+      });
+    };
 
     const onSave = async () => {
       const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
@@ -380,7 +464,7 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      // 1. get commits
+      //    1. get commits
       //2. try to get commitId
       //3. use the id to get audios
       //   const r = url.parse(this.$inertia.url, true);
@@ -409,6 +493,7 @@ export default defineComponent({
 
     return {
       xGrid,
+      xDown,
       gridOptions,
       demo,
       insertEmptyAt,
@@ -420,6 +505,9 @@ export default defineComponent({
       onSave,
       saveModalFormSubmitEvent,
       gridEvents,
+      commitFocusEvent,
+      commitKeyupEvent,
+      commitSelectEvent,
     };
   },
 });
