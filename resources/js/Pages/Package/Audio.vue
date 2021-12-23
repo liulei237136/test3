@@ -55,13 +55,8 @@
     </template>
   </vxe-modal>
 
-  <vxe-grid ref="xGrid" v-bind="gridOptions">
+  <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
     <template #toolbar_buttons>
-      <vxe-input
-        v-model="demo.filterAllString"
-        placeholder="全表过滤"
-        @change="onFilterAll"
-      ></vxe-input>
       <vxe-button content="插入空白行">
         <template #dropdowns>
           <vxe-button
@@ -82,7 +77,8 @@
         </template>
       </vxe-button>
       <vxe-button content="删除" @click="xGrid.removeCheckboxRow"></vxe-button>
-      <vxe-button content="保存" @click="demo.showSaveModal = true"></vxe-button>
+      <!-- <vxe-button content="保存" @click="demo.showSaveModal = true"></vxe-button> -->
+      <vxe-button content="保存" @click="onSave"></vxe-button>
     </template>
   </vxe-grid>
 </template>
@@ -123,6 +119,15 @@ export default defineComponent({
       },
     });
 
+    const onSave = async () => {
+      const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
+      //如果没有改变
+      if (!insertRecords.length && !updateRecords.length && !removeRecords.length) {
+        return await VXETable.modal.message({ content: "内容没有改动" });
+      }
+      demo.showSaveModal = true;
+    };
+
     const saveModalFormSubmitEvent = async () => {
       demo.saveFormLoading = true;
       const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
@@ -134,33 +139,39 @@ export default defineComponent({
       removeRecords.forEach((record) => removeAudioIds.push(record.id));
       updateRecords.forEach((record) => {
         removeAudioIds.push(record.id);
-        record.id = null;
         insertRecords.push(record);
       });
+      console.log("insertRecords", insertRecords);
 
       //2.开始新增audio
-      insertRecords.forEach(async (record) => {
+      for (let record of insertRecords) {
         const data = new FormData();
-        data.append("file", file);
-        data.append("name", file.name);
+        console.log("new record", record);
+        record.file && data.append("file", record.file);
+        record.name && data.append("name", record.name);
+        record.book_name && data.append("book_name", record.book_name);
+        record.audio_text && data.append("audio_text", record.audio_text);
         const result = await axios.post(
           route("package.audio.store", { package: props.package.id }),
-          record,
+          data,
           {
             headers: {
               "Content-Type": "multipart/form-data",
             },
           }
         );
-        console.log(result.data);
+        console.log("result", result);
         insertAudioIds.push(result.data.data.id);
-      });
+      }
 
       //3 开始计算ids 等于 原有audio去掉removeAudioIds 再加上 insertAudiosIds
       demo.audioList.forEach((audio) => {
         if (!removeAudioIds.includes(audio.id)) unchangedAudioIds.push(audio.id);
       });
+      console.log("unchangedAudioIds", unchangedAudioIds);
+      console.log("insertAudioIds", insertAudioIds);
       ids = unchangedAudioIds.concat(insertAudioIds);
+      console.log(ids);
 
       try {
         const result = await axios.post(
@@ -173,29 +184,21 @@ export default defineComponent({
         );
         await Inertia.get(
           route("package.show", {
-            package: this.package.id,
+            package: props.package.id,
             commit: result.data.data.id,
             tab: "audio",
-          }),
-          {},
-          { replace: true }
+          })
         );
       } catch (e) {
         console.log(e);
       }
-
-      //   setTimeout(() => {
-      //     demo.saveFormLoading = false;
-      //     VXETable.modal.message({ content: "保存成功", status: "success" });
-      //   }, 1000);
-    };
-
-    const onFilterAll = () => {
-      console.log("onFilterAll");
     };
 
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
-      //   console.log(s);
+      return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
+    };
+
+    const filterBookNameMethod = ({ value, option, cellValue, row, column }) => {
       return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
     };
 
@@ -215,6 +218,12 @@ export default defineComponent({
       }
     };
 
+    const commitButtons = props.commits.map((commit) => ({
+      code: `commit_${commit.id}`,
+      name: commit.title,
+      type: "text",
+    }));
+
     const gridOptions = reactive({
       border: true,
       resizable: true,
@@ -228,7 +237,9 @@ export default defineComponent({
       customConfig: {
         storage: true,
       },
-      importConfig: {},
+      importConfig: {
+        mode: "covering",
+      },
       printConfig: {},
       sortConfig: {
         trigger: "cell",
@@ -239,10 +250,17 @@ export default defineComponent({
         slots: {
           buttons: "toolbar_buttons",
         },
+        tools: [
+          { code: "myImport", name: "导入" },
+          { code: "myExport", name: "导出" },
+          //   {
+          //     name: "历史保存",
+          //     disabled: false,
+          //     dropdowns: commitButtons,
+          //   },
+        ],
         save: true,
         refresh: true,
-        import: true,
-        export: true,
         print: true,
         zoom: true,
         custom: true,
@@ -253,10 +271,10 @@ export default defineComponent({
         { type: "seq", width: 60 },
         {
           field: "name",
-          title: "Name",
+          title: "文件名",
           sortable: true,
           sortBy: nameSortBy,
-          titleHelp: { message: "这里是Mp3文件的文件名" },
+          titleHelp: { message: "注意要加上文件后缀" },
           editRender: { name: "input", attrs: { placeholder: "请输入文件名" } },
           filters: [{ data: "" }],
           filterMethod: filterNameMethod,
@@ -268,6 +286,10 @@ export default defineComponent({
           title: "书名",
           titleHelp: { message: "书的名字，便于过滤和查找" },
           editRender: { name: "input", attrs: { placeholder: "请输入书名" } },
+          filters: [{ data: "" }],
+          filterMethod: filterBookNameMethod,
+          filterConfig: {},
+          filterRender: { name: "$input" },
         },
       ],
       proxyConfig: {
@@ -278,13 +300,13 @@ export default defineComponent({
             resetAll();
             return audioList;
           },
-          delete: ({ body }) => {
-            return xGrid.value.removeCheckboxRow();
-          },
-          save: async (item) => {
-            console.log(item);
-            return;
-          },
+          //   delete: ({ body }) => {
+          //     return xGrid.value.removeCheckboxRow();
+          //   },
+          //   save: async (item) => {
+          //     console.log(item);
+          //     return;
+          //   },
         },
       },
       checkboxConfig: {
@@ -338,6 +360,25 @@ export default defineComponent({
       console.log("reset all");
     };
 
+    const gridEvents = {
+      toolbarToolClick({ code }) {
+        const $grid = xGrid.value;
+        switch (code) {
+          case "myImport":
+            $grid.importData({
+              mode: "insert",
+            });
+            break;
+          case "myExport":
+            $grid.openExport({
+              mode: "all",
+              modes: ["all", "selected"],
+              original: true,
+            });
+        }
+      },
+    };
+
     onMounted(async () => {
       // 1. get commits
       //2. try to get commitId
@@ -370,13 +411,15 @@ export default defineComponent({
       xGrid,
       gridOptions,
       demo,
-      onFilterAll,
       insertEmptyAt,
       getCommitAudio,
       resetAll,
       filterNameMethod,
+      filterBookNameMethod,
       saveForm,
+      onSave,
       saveModalFormSubmitEvent,
+      gridEvents,
     };
   },
 });

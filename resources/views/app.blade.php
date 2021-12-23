@@ -13,6 +13,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vxe-table@next/lib/style.css">
     {{-- <link rel="stylesheet" href="/css/font-awesome-4.7.0/css/font-awesome.min.css"> --}}
     <link rel="stylesheet" href="/css/fontawesome-free-5.15.4-web/css/all.min.css">
 

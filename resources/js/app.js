@@ -18,7 +18,7 @@ const i18n = createI18n({
 
 import 'xe-utils';
 import VXETable from 'vxe-table';
-import 'vxe-table/lib/style.css';
+// import 'vxe-table/lib/style.css';
 
 
 VXETable.setup({
@@ -41,6 +41,8 @@ VXETable.setup({
         TABLE_EXPAND_LOADED: 'vxe-icon--refresh roll',
         TABLE_EXPAND_OPEN: 'vxe-icon--arrow-right rotate90',
         TABLE_EXPAND_CLOSE: 'vxe-icon--arrow-right',
+
+        TABLE_QUESTION: 'fas fa-question-circle',
 
         // button
         BUTTON_DROPDOWN: 'vxe-icon--arrow-bottom',
@@ -74,11 +76,13 @@ VXETable.setup({
         MODAL_SUCCESS: 'vxe-icon--success',
         MODAL_WARNING: 'vxe-icon--warning',
         MODAL_ERROR: 'vxe-icon--error',
-        MODAL_QUESTION: 'vxe-icon--question',
+        // MODAL_QUESTION: 'vxe-icon--question',
+        MODAL_QUESTION: 'fas fa-question-circle',
         MODAL_LOADING: 'vxe-icon--refresh roll',
 
         // toolbar
-        TOOLBAR_TOOLS_REFRESH: 'vxe-icon--refresh',
+        // TOOLBAR_TOOLS_REFRESH: 'vxe-icon--refresh',
+        TOOLBAR_TOOLS_REFRESH: 'fas fa-sync-alt',
         TOOLBAR_TOOLS_REFRESH_LOADING: 'vxe-icon--refresh roll',
         TOOLBAR_TOOLS_IMPORT: 'vxe-icon--upload',
         TOOLBAR_TOOLS_EXPORT: 'vxe-icon--download',
