@@ -456,35 +456,71 @@ export default defineComponent({
 
     const insertEmptyBeforeSelected = async () => {
       const grid = xGrid.value;
-      const selectedRow = grid.getCheckboxRecords(true)[0];
-      if (selectedRow) {
-        const { row } = await grid.insertAt({}, selectedRow);
-        return grid.setActiveCell(row, "name");
+      const selectedRows = grid.getCheckboxRecords(true);
+      if (selectedRows.length === 0) {
+        return VXETable.modal.message({ content: "请选中一行", status: "warning" });
+      } else if (selectedRows.length > 1) {
+        return VXETable.modal.message({
+          content: "勾选了多行，请只选一行",
+          status: "warning",
+        });
+      } else {
+        await insertEmptyAt(selectedRows[0]);
       }
     };
 
     const insertAudioAt = async (index) => {
       const grid = xGrid.value;
       const { files } = await grid.readFile({ multiple: true });
-      let count = 0;
-      let fileLength = files.length;
-      for (let file of files) {
+      let fileCount = files.length;
+      if (fileCount === 0) return;
+      let readCount = 0;
+      let rows = [];
+      for (let i = 0; i < fileCount; i++) {
+        const file = files[i];
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async (e) => {
-          const record = {
+          readCount++;
+          const data = {
             name: file.name,
             localFileUrl: e.target.result,
             localFilefile: file,
           };
-          const { row } = await grid.insertAt({}, selectedRow);
-          grid.setActiveCell(row, "name");
-          Promise.all();
+          rows.push({ index: i, data });
+          if (readCount === fileCount) {
+            if (index === 0) {
+              rows.sort((a, b) => b.index - a.index);
+            } else {
+              rows.sort((a, b) => a.index - b.index);
+            }
+            for (let j = 0; j < fileCount; j++) {
+              const item = rows[j];
+              const { row: currentRow } = await grid.insertAt(item.data, index);
+              if (j === fileCount - 1) {
+                //todo 根据条件选出setActiveCell row
+                await grid.setActiveCell(currentRow, "name");
+              }
+            }
+          }
         };
       }
     };
 
-    const insertAudioBoforeSelected = async () => {};
+    const insertAudioBeforeSelected = async () => {
+      const grid = xGrid.value;
+      const selectedRows = grid.getCheckboxRecords(true);
+      if (selectedRows.length === 0) {
+        return VXETable.modal.message({ content: "请选中一行", status: "warning" });
+      } else if (selectedRows.length > 1) {
+        return VXETable.modal.message({
+          content: "勾选了多行，请只选一行",
+          status: "warning",
+        });
+      } else {
+        await insertAudioAt(selectedRows[0]);
+      }
+    };
 
     const getCommitAudio = async () => {
       if (props.package && props.package.id && props.commit && props.commit.id) {
