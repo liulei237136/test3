@@ -1,4 +1,4 @@
-/*! tailwindcss v2.2.19 | MIT License | https://tailwindcss.com *//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
+/*! tailwindcss v2.2.16 | MIT License | https://tailwindcss.com *//*! modern-normalize v1.1.0 | MIT License | https://github.com/sindresorhus/modern-normalize */
 
 /*
 Document
@@ -1190,6 +1190,9 @@ select {
 .mb-1 {
 	margin-bottom: 0.25rem;
 }
+.mr-4 {
+	margin-right: 1rem;
+}
 .mr-1 {
 	margin-right: 0.25rem;
 }
@@ -1198,9 +1201,6 @@ select {
 }
 .mb-2 {
 	margin-bottom: 0.5rem;
-}
-.mr-4 {
-	margin-right: 1rem;
 }
 .block {
 	display: block;
@@ -1965,6 +1965,8 @@ select {
 	border-radius: 0.25rem;
 	font-weight: 700;
 	text-transform: uppercase;
+	--tw-text-opacity: 1;
+	color: rgba(255, 255, 255, var(--tw-text-opacity));
 	--tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 	box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 	outline: 2px solid transparent;
@@ -1990,8 +1992,6 @@ select {
 .purpleButton:active {
 	--tw-bg-opacity: 1;
 	background-color: rgba(91, 33, 182, var(--tw-bg-opacity));
-	--tw-text-opacity: 1;
-	color: rgba(255, 255, 255, var(--tw-text-opacity));
 }
 .whiteButton {
 	border-radius: 0.25rem;
@@ -2097,6 +2097,9 @@ select {
 	z-index: 10;
 	--tw-text-opacity: 1;
 	color: rgba(255, 255, 255, var(--tw-text-opacity));
+}
+.vxe-cell-help-icon.vxe-icon--question{
+    --tw-border-opacity:auto;
 }
 .hover\:rounded-lg:hover {
 	border-radius: 0.5rem;
@@ -2659,5 +2662,4 @@ select {
 		line-height: 1.25rem;
 	}
 }
-
 
