@@ -142,6 +142,10 @@
         @click="xGrid.removeCheckboxRow"
       ></vxe-button>
     </template>
+
+    <template #source_audio="{row}">
+        <audio v-if="row.url" :src="row.url" controls></audio>
+    </template>
   </vxe-grid>
 </template>
 
@@ -378,11 +382,6 @@ export default defineComponent({
         tools: [
           { code: "myImport", name: "导入" },
           { code: "myExport", name: "导出" },
-          //   {
-          //     name: "历史保存",
-          //     disabled: false,
-          //     dropdowns: commitButtons,
-          //   },
         ],
         save: true,
         refresh: true,
@@ -405,6 +404,12 @@ export default defineComponent({
           filterMethod: filterNameMethod,
           filterConfig: {},
           filterRender: { name: "$input" },
+        },
+        {
+            title:"源音频",
+            slots:{
+                default: 'source_audio',
+            }
         },
         {
           field: "book_name",

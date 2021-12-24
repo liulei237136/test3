@@ -33,7 +33,7 @@ class PackageAudioController extends Controller
             'audio_text' => '音频的文字内容不能长于1000个字',
         ]);
 
-        if ($file = $request->input('file')) {
+        if ($file = $request->file('file')) {
             $directory = "audio/" . date('Y/m/d');
             $file_name = $file->store($directory, 'public');
             if (!$file_name) {
