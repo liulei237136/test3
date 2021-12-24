@@ -112,11 +112,11 @@
           <vxe-button
             type="text"
             @click="insertEmptyBeforeSelected()"
-            content="在选中行前插入"
+            content="选中行前插入"
           ></vxe-button>
         </template>
       </vxe-button>
-      <vxe-button v-if="canEdit" content="插入音频文件">
+      <vxe-button v-if="canEdit" content="插入音频">
         <template #dropdowns>
           <vxe-button
             type="text"
@@ -131,7 +131,7 @@
           <vxe-button
             type="text"
             @click="insertAudioBeforeSelected()"
-            content="在选中行前插入"
+            content="选中行前插入"
           ></vxe-button>
         </template>
       </vxe-button>
@@ -143,8 +143,15 @@
       ></vxe-button>
     </template>
 
-    <template #source_audio="{row}">
-        <audio v-if="row.url" :src="row.url" controls></audio>
+    <template #source_audio="{ row }">
+      <audio v-if="row.url" :src="row.url" controls></audio>
+    </template>
+    <template #local_audio="{ row }">
+      <audio v-if="row.localUrl" :src="row.localUrl" controls></audio>
+    </template>
+    <template #record_audio="{ row }">
+      <audio-recorder :row="row"></audio-recorder>
+      <!-- <audio v-if="row.audioUrl" :src="row.audioUrl" controls></audio> -->
     </template>
   </vxe-grid>
 </template>
@@ -179,6 +186,8 @@ import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
 import axios from "axios";
 
+import AudioRecorder from "./AudioRecorder.vue";
+
 export default defineComponent({
   props: {
     package: Object,
@@ -188,6 +197,7 @@ export default defineComponent({
   },
   components: {
     Link,
+    AudioRecorder,
   },
   setup(props, context) {
     const xGrid = ref({});
@@ -406,10 +416,22 @@ export default defineComponent({
           filterRender: { name: "$input" },
         },
         {
-            title:"源音频",
-            slots:{
-                default: 'source_audio',
-            }
+          title: "源音频",
+          slots: {
+            default: "source_audio",
+          },
+        },
+        {
+          title: "本次插入音频",
+          slots: {
+            default: "local_audio",
+          },
+        },
+        {
+          title: "本次录音",
+          slots: {
+            default: "record_audio",
+          },
         },
         {
           field: "book_name",

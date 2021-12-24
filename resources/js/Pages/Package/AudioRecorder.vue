@@ -1,12 +1,12 @@
 <template>
   <div class="flex items-center">
     <div style="width: 320px">
-      <audio v-if="url" :src="url" controls ref="audio" class="mr-1"></audio>
+      <audio v-if="recordUrl" :src="recordUrl" controls ref="player" class="mr-1"></audio>
       <!-- <button v-if="showPlay" onClick="onPlayClick" class="purpleButton bg-purple-400 p-2 mr-1">播放</button>
       <button v-if="showPause" onClick="onPauseClick" class="purpleButton bg-purple-400 p-2 mr-1">暂停</button>
       <button v-if="showStop" onClick="on" class="purpleButton bg-purple-400 p-2 mr-1">停止</button> -->
     </div>
-    <div v-if="canEdit">
+    <div>
       <vxe-button size="mini" :content="content" @click="record"></vxe-button>
       <span class="w-16 inline-flex justify-end align-middle mr-1">
         <span class="mr-1">{{ duration }}</span>
@@ -33,7 +33,6 @@ import "recorder-core/src/engine/mp3-engine";
 export default defineComponent({
   props: {
     row: Object,
-    canEdit: Boolean,
   },
   emits: ["url"],
   data() {
@@ -43,7 +42,7 @@ export default defineComponent({
       content: "录音", //录音，暂停，恢复
       duration: 0,
       blob: null,
-      url: this.row.url,
+      recordUrl: "",
     };
   },
   components: {},
@@ -97,13 +96,13 @@ export default defineComponent({
           that.rec.close();
           that.rec = null;
           that.blob = blob;
-          that.url = (window.URL || webkitURL).createObjectURL(blob);
+          that.recordUrl = (window.URL || webkitURL).createObjectURL(blob);
           that.status = "空闲";
           that.content = "录音";
-          that.row.blob = blob;
-          that.row.url = that.url;
+          that.row.recordFile = blob;
+          that.row.recordUrl = that.recordUrl;
           nextTick(function () {
-            that.$refs.audio.play();
+            that.$refs.player.play();
           });
         },
         function (msg) {
