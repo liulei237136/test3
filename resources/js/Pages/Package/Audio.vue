@@ -36,12 +36,7 @@
             ></vxe-input>
           </template>
         </vxe-form-item>
-        <vxe-form-item
-          title="描述"
-          field="description"
-          span="24"
-          :item-render="{}"
-        >
+        <vxe-form-item title="描述" field="description" span="24" :item-render="{}">
           <template #default="{ data }">
             <vxe-textarea
               v-model="data.description"
@@ -150,10 +145,10 @@
 
     <template #source_audio="{ row }">
       <!-- <audio v-if="row.url" :src="row.url" controls></audio> -->
-      <Player v-if="row.url" :url="row.url"></Player>
+      <audio v-if="row.url" :src="row.url" @play="onPlay($event, row)" controls></audio>
     </template>
     <template #local_audio="{ row }">
-      <Player v-if="row.localUrl" :url="row.localUrl" controls></Player>
+      <audio v-if="row.localUrl" :src="row.localUrl" controls></audio>
     </template>
     <template #record_audio="{ row }">
       <audio-recorder :row="row"></audio-recorder>
@@ -193,7 +188,6 @@ import XEUtils from "xe-utils";
 import axios from "axios";
 
 import AudioRecorder from "./AudioRecorder.vue";
-import Player from "./Player.vue";
 
 export default defineComponent({
   props: {
@@ -205,7 +199,6 @@ export default defineComponent({
   components: {
     Link,
     AudioRecorder,
-    Player,
   },
   setup(props, context) {
     const xGrid = ref({});
@@ -232,7 +225,16 @@ export default defineComponent({
         ],
         description: [{ max: 1000, message: "长度小于1000个字符" }],
       },
+      playingAudio: {},
     });
+
+    const onPlay = (e) => {
+      const { el} = demo.playingAudio;
+      if (el && el !== e.target) {
+        el.pause();
+      }
+      demo.playingAudio = {el:e.target};
+    };
 
     const commitFocusEvent = () => {
       const $pulldown = xDown.value;
@@ -263,14 +265,9 @@ export default defineComponent({
     };
 
     const onSave = async () => {
-      const { insertRecords, updateRecords, removeRecords } =
-        xGrid.value.getRecordset();
+      const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
       // 如果没有改变
-      if (
-        !insertRecords.length &&
-        !updateRecords.length &&
-        !removeRecords.length
-      ) {
+      if (!insertRecords.length && !updateRecords.length && !removeRecords.length) {
         return await VXETable.modal.message({ content: "内容没有改动" });
       }
       demo.showSaveModal = true;
@@ -282,8 +279,7 @@ export default defineComponent({
       if (errMap) return;
 
       demo.saveFormLoading = true;
-      const { insertRecords, updateRecords, removeRecords } =
-        xGrid.value.getRecordset();
+      const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
       const removeAudioIds = [];
       const insertAudioIds = [];
       const unchangedAudioIds = [];
@@ -319,8 +315,7 @@ export default defineComponent({
 
       //3 开始计算ids 等于 原有audio去掉removeAudioIds 再加上 insertAudiosIds
       demo.audioList.forEach((audio) => {
-        if (!removeAudioIds.includes(audio.id))
-          unchangedAudioIds.push(audio.id);
+        if (!removeAudioIds.includes(audio.id)) unchangedAudioIds.push(audio.id);
       });
       console.log("unchangedAudioIds", unchangedAudioIds);
       console.log("insertAudioIds", insertAudioIds);
@@ -349,21 +344,11 @@ export default defineComponent({
     };
 
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
-      return (
-        XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1
-      );
+      return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
     };
 
-    const filterBookNameMethod = ({
-      value,
-      option,
-      cellValue,
-      row,
-      column,
-    }) => {
-      return (
-        XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1
-      );
+    const filterBookNameMethod = ({ value, option, cellValue, row, column }) => {
+      return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
     };
 
     const nameSortBy = ({ row, column }) => {
@@ -581,12 +566,7 @@ export default defineComponent({
     };
 
     const getCommitAudio = async () => {
-      if (
-        props.package &&
-        props.package.id &&
-        props.commit &&
-        props.commit.id
-      ) {
+      if (props.package && props.package.id && props.commit && props.commit.id) {
         const result = await axios(
           route("package.commit.audio", {
             package: props.package.id,
@@ -672,6 +652,7 @@ export default defineComponent({
       commitFocusEvent,
       commitKeyupEvent,
       commitSelectEvent,
+      onPlay,
     };
   },
 });
