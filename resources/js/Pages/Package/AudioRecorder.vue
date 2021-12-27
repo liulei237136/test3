@@ -104,27 +104,36 @@ export default defineComponent({
     },
 
     recStop() {
-      const that = this;
-      that.rec.stop(
-        function (blob, duration) {
+      //   const that = this;
+      this.rec.stop(
+        (blob, duration) => {
           console.log(
             blob,
             (window.URL || webkitURL).createObjectURL(blob),
             "时长:" + duration + "ms"
           );
-          that.rec.close();
-          that.rec = null;
-          that.blob = blob;
-          that.recordUrl = (window.URL || webkitURL).createObjectURL(blob);
-          that.status = "空闲";
-          that.content = "录音";
-          that.row.recordFile = blob;
-          that.row.recordUrl = that.recordUrl;
+          this.rec.close();
+          this.rec = null;
+          this.row.recordFile = blob;
+          this.recordUrl = (window.URL || webkitURL).createObjectURL(blob);
+          this.status = "空闲";
+          this.content = "录音";
+          //   this.recordUrl = that.recordUrl;
           nextTick(() => {
             if (this.demo.playerMode === "normal") {
               that.$refs.player.play();
             } else if (this.demo.playerMode === "simple") {
-              that.$refs.player.click();
+              let { audio } = demo.playingAudio;
+              if (!audio) {
+                audio = document.createElement("audio");
+                document.body.append(audio);
+              }
+              audio.src = this.recordUrl;
+              audio.onload = function () {
+                (window.URL || webkitURL).revokeObjectURL(audio.src);
+              };
+              demo.playingAudio = { audio: audio };
+              audio.play();
             }
           });
         },
