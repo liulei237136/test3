@@ -145,13 +145,35 @@
 
     <template #source_audio="{ row }">
       <!-- <audio v-if="row.url" :src="row.url" controls></audio> -->
-      <audio v-if="row.url" :src="row.url" @play="onPlay($event, row)" controls></audio>
+      <vxe-button
+        v-if="demo.playerMode === 'simple' && row.url"
+        size="mini"
+        content="播放"
+        @click="onSourcePlayButtonClick($event, row)"
+      ></vxe-button>
+      <audio
+        v-if="demo.playerMode === 'normal' && row.url"
+        :src="row.url"
+        @play="onAudioPlayEvent($event, row)"
+        controls
+      ></audio>
     </template>
     <template #local_audio="{ row }">
-      <audio v-if="row.localUrl" :src="row.localUrl" controls></audio>
+      <vxe-button
+        v-if="demo.playerMode === 'simple' && row.localFile"
+        size="mini"
+        content="播放"
+        @click="onLocalPlayButtonClick($event, row)"
+      ></vxe-button>
+      <audio
+        v-if="demo.playerMode === 'normal' && row.localAudioUrl"
+        :src="row.localAudioUrl"
+        @play="onAudioPlayEvent($event, row)"
+        controls
+      ></audio>
     </template>
     <template #record_audio="{ row }">
-      <audio-recorder :row="row"></audio-recorder>
+      <audio-recorder :row="row" :demo="demo"></audio-recorder>
       <!-- <audio v-if="row.audioUrl" :src="row.audioUrl" controls></audio> -->
     </template>
   </vxe-grid>
@@ -226,14 +248,45 @@ export default defineComponent({
         description: [{ max: 1000, message: "长度小于1000个字符" }],
       },
       playingAudio: {},
+      playerMode: "simple",
     });
 
-    const onPlay = (e) => {
-      const { el} = demo.playingAudio;
-      if (el && el !== e.target) {
-        el.pause();
+    const onAudioPlayEvent = (e) => {
+      const { audio } = demo.playingAudio;
+      if (audio && audio !== e.target) {
+        audio.pause();
+        // audio.fastSeek(0);
       }
-      demo.playingAudio = {el:e.target};
+      demo.playingAudio = { audio: e.target };
+    };
+
+    const onSourcePlayButtonClick = (event, row) => {
+      if (!row.url) return;
+      let { audio } = demo.playingAudio;
+      if (!audio) {
+        audio = document.createElement("audio");
+        document.body.append(audio);
+      }
+      audio.src = row.url;
+      audio.load(row.url);
+      demo.playingAudio = { audio: audio };
+      audio.play();
+    };
+
+    const onLocalPlayButtonClick = (event, row) => {
+      if (!row.localFile) return;
+      let { audio } = demo.playingAudio;
+      if (!audio) {
+        audio = document.createElement("audio");
+        document.body.append(audio);
+      }
+      const localUrl = (window.URL || webkitURL).createObjectURL(row.localFile);
+      audio.src = localUrl;
+      audio.onload = function () {
+        (window.URL || webkitURL).revokeObjectURL(localUrl);
+      };
+      demo.playingAudio = { audio: audio };
+      audio.play();
     };
 
     const commitFocusEvent = () => {
@@ -411,7 +464,7 @@ export default defineComponent({
       },
 
       columns: [
-        { type: "checkbox", width: 60 },
+        { type: "checkbox", width: 40 },
         { type: "seq", width: 60 },
         {
           field: "name",
@@ -427,18 +480,21 @@ export default defineComponent({
         },
         {
           title: "源音频",
+          width: 210,
           slots: {
             default: "source_audio",
           },
         },
         {
           title: "本次插入音频",
+          width: 210,
           slots: {
             default: "local_audio",
           },
         },
         {
           title: "本次录音",
+          width: 370,
           slots: {
             default: "record_audio",
           },
@@ -514,36 +570,23 @@ export default defineComponent({
       const { files } = await grid.readFile({ multiple: true });
       let fileCount = files.length;
       if (fileCount === 0) return;
-      let readCount = 0;
       let rows = [];
-      for (let i = 0; i < fileCount; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async (e) => {
-          readCount++;
-          const data = {
-            name: file.name,
-            localFileUrl: e.target.result,
-            localFilefile: file,
-          };
-          rows.push({ index: i, data });
-          if (readCount === fileCount) {
-            if (index === 0) {
-              rows.sort((a, b) => b.index - a.index);
-            } else {
-              rows.sort((a, b) => a.index - b.index);
-            }
-            for (let j = 0; j < fileCount; j++) {
-              const item = rows[j];
-              const { row: currentRow } = await grid.insertAt(item.data, index);
-              if (j === fileCount - 1) {
-                //todo 根据条件选出setActiveCell row
-                await grid.setActiveCell(currentRow, "name");
-              }
-            }
-          }
-        };
+      for (let file of files) {
+        rows.push({
+          name: file.name,
+          localFile: file,
+        });
+      }
+      if (index === 0) {
+        rows.reverse();
+      }
+      for (let j = 0; j < fileCount; j++) {
+        const item = rows[j];
+        const { row: currentRow } = await grid.insertAt(item, index);
+        if (j === fileCount - 1) {
+          //todo 根据条件选出setActiveCell row
+          await grid.setActiveCell(currentRow, "name");
+        }
       }
     };
 
@@ -652,7 +695,9 @@ export default defineComponent({
       commitFocusEvent,
       commitKeyupEvent,
       commitSelectEvent,
-      onPlay,
+      onAudioPlayEvent,
+      onSourcePlayButtonClick,
+      onLocalPlayButtonClick,
     };
   },
 });

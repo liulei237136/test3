@@ -1,15 +1,10 @@
 <template>
   <div class="flex items-center">
-    <div style="width: 320px">
-      <audio v-if="recordUrl" :src="recordUrl" controls ref="player" class="mr-1"></audio>
-      <!-- <button v-if="showPlay" onClick="onPlayClick" class="purpleButton bg-purple-400 p-2 mr-1">播放</button>
-      <button v-if="showPause" onClick="onPauseClick" class="purpleButton bg-purple-400 p-2 mr-1">暂停</button>
-      <button v-if="showStop" onClick="on" class="purpleButton bg-purple-400 p-2 mr-1">停止</button> -->
-    </div>
-    <div>
+    <div class="mr-1">
       <vxe-button size="mini" :content="content" @click="record"></vxe-button>
-      <span class="w-16 inline-flex justify-end align-middle mr-1">
+      <span class="w-12 inline-flex justify-end align-middle mr-1">
         <span class="mr-1">{{ duration }}</span>
+        <!-- <span class="mr-1">{{ 999 }}</span> -->
         秒
       </span>
       <vxe-button
@@ -19,6 +14,24 @@
         @click="recStop"
         :disabled="status === '空闲'"
       ></vxe-button>
+    </div>
+    <div>
+      <vxe-button
+        v-if="demo.playMode === 'simple' && row.recordUrl"
+        size="mini"
+        content="播放"
+        ref="player"
+        @click="onRecordPlayButtonClick($event, row)"
+      ></vxe-button>
+      <audio
+        v-if="demo.playMode === 'normal' && recordUrl"
+        :src="recordUrl"
+        controls
+        ref="player"
+      ></audio>
+      <!-- <button v-if="showPlay" onClick="onPlayClick" class="purpleButton bg-purple-400 p-2 mr-1">播放</button>
+      <button v-if="showPause" onClick="onPauseClick" class="purpleButton bg-purple-400 p-2 mr-1">暂停</button>
+      <button v-if="showStop" onClick="on" class="purpleButton bg-purple-400 p-2 mr-1">停止</button> -->
     </div>
   </div>
 </template>
@@ -33,13 +46,14 @@ import "recorder-core/src/engine/mp3-engine";
 export default defineComponent({
   props: {
     row: Object,
+    demo: Object,
   },
   emits: ["url"],
   data() {
     return {
       rec: null,
       status: "空闲", //空闲，录音，暂停，
-      content: "录音", //录音，暂停，恢复
+      content: "录音", //录音，暂停，继续
       duration: 0,
       blob: null,
       recordUrl: "",
@@ -48,6 +62,11 @@ export default defineComponent({
   components: {},
   methods: {
     record() {
+      const { audio } = this.demo.playingAudio;
+      console.log(audio);
+      if (audio) {
+        audio.pause();
+      }
       if (this.status === "空闲") {
         this.recOpen(this.recStart);
       } else if (this.status === "录音") {
@@ -101,8 +120,12 @@ export default defineComponent({
           that.content = "录音";
           that.row.recordFile = blob;
           that.row.recordUrl = that.recordUrl;
-          nextTick(function () {
-            that.$refs.player.play();
+          nextTick(() => {
+            if (this.demo.playerMode === "normal") {
+              that.$refs.player.play();
+            } else if (this.demo.playerMode === "simple") {
+              that.$refs.player.click();
+            }
           });
         },
         function (msg) {
@@ -124,7 +147,7 @@ export default defineComponent({
     recPause() {
       this.rec.pause();
       this.status = "暂停";
-      this.content = "恢复";
+      this.content = "继续";
     },
 
     recResume() {
