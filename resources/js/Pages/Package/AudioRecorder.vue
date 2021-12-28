@@ -1,38 +1,17 @@
 <template>
   <div class="flex items-center">
-    <div class="mr-1">
-      <vxe-button size="mini" :content="content" @click="record"></vxe-button>
-      <span class="w-12 inline-flex justify-end align-middle mr-1">
-        <span class="mr-1">{{ duration }}</span>
-        <!-- <span class="mr-1">{{ 999 }}</span> -->
-        秒
-      </span>
-      <vxe-button
-        size="mini"
-        status="warning"
-        content="停止"
-        @click="recStop"
-        :disabled="status === '空闲'"
-      ></vxe-button>
-    </div>
-    <div>
-      <vxe-button
-        v-if="demo.playMode === 'simple' && row.recordUrl"
-        size="mini"
-        content="播放"
-        ref="player"
-        @click="onRecordPlayButtonClick($event, row)"
-      ></vxe-button>
-      <audio
-        v-if="demo.playMode === 'normal' && recordUrl"
-        :src="recordUrl"
-        controls
-        ref="player"
-      ></audio>
-      <!-- <button v-if="showPlay" onClick="onPlayClick" class="purpleButton bg-purple-400 p-2 mr-1">播放</button>
-      <button v-if="showPause" onClick="onPauseClick" class="purpleButton bg-purple-400 p-2 mr-1">暂停</button>
-      <button v-if="showStop" onClick="on" class="purpleButton bg-purple-400 p-2 mr-1">停止</button> -->
-    </div>
+    <vxe-button size="mini" :content="content" @click="record"></vxe-button>
+    <span class="w-12 inline-flex justify-end align-middle mr-1">
+      <span class="mr-1">{{ duration }}</span>
+      秒
+    </span>
+    <vxe-button
+      size="mini"
+      status="warning"
+      content="停止"
+      @click="recStop"
+      :disabled="status === '空闲'"
+    ></vxe-button>
   </div>
 </template>
 
@@ -115,27 +94,17 @@ export default defineComponent({
           this.rec.close();
           this.rec = null;
           this.row.recordFile = blob;
-          this.recordUrl = (window.URL || webkitURL).createObjectURL(blob);
+          this.row.recordUrl = (window.URL || webkitURL).createObjectURL(blob);
           this.status = "空闲";
           this.content = "录音";
-          //   this.recordUrl = that.recordUrl;
-          nextTick(() => {
-            if (this.demo.playerMode === "normal") {
-              that.$refs.player.play();
-            } else if (this.demo.playerMode === "simple") {
-              let { audio } = demo.playingAudio;
-              if (!audio) {
-                audio = document.createElement("audio");
-                document.body.append(audio);
-              }
-              audio.src = this.recordUrl;
-              audio.onload = function () {
-                (window.URL || webkitURL).revokeObjectURL(audio.src);
-              };
-              demo.playingAudio = { audio: audio };
-              audio.play();
-            }
-          });
+          //   nextTick(() => {
+          //     const { audio } = demo.playingAudio;
+          //     if (audio) {
+          //       audio.pause();
+          //       // audio.fastSeek(0);
+          //     }
+          //     demo.playingAudio = { audio: this.$refs.player };
+          //   });
         },
         function (msg) {
           console.log("录音失败:" + msg);

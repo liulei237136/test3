@@ -87,8 +87,10 @@
 import { defineComponent } from "vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Info from "./BasicInfo.vue";
-import Audio from "./Audio.vue";
+import Info from "./ShowBasicInfo.vue";
+import EditInfo from "./EditBasicInfo.vue";
+import ShowAudio from "./ShowAudio.vue";
+import EditAudio from "./EditAudio.vue";
 import UserAndPackageLink from "@/Components/UserAndPackageLink";
 import Icon from "@/Components/Icon.vue";
 
@@ -106,6 +108,7 @@ export default defineComponent({
     AppLayout,
     Link,
     Info,
+
     Audio,
     UserAndPackageLink,
     Icon,
