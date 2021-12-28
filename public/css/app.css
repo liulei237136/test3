@@ -1075,6 +1075,9 @@ select {
 .prose > :last-child {
 	margin-bottom: 0;
 }
+.visible {
+	visibility: visible;
+}
 .fixed {
 	position: fixed;
 }
@@ -1190,17 +1193,17 @@ select {
 .mb-1 {
 	margin-bottom: 0.25rem;
 }
-.mr-4 {
-	margin-right: 1rem;
-}
 .mr-1 {
 	margin-right: 0.25rem;
 }
-.mb-5 {
-	margin-bottom: 1.25rem;
-}
 .mb-2 {
 	margin-bottom: 0.5rem;
+}
+.mr-4 {
+	margin-right: 1rem;
+}
+.mb-5 {
+	margin-bottom: 1.25rem;
 }
 .block {
 	display: block;
@@ -1584,10 +1587,6 @@ select {
 .bg-gray-200 {
 	--tw-bg-opacity: 1;
 	background-color: rgba(229, 231, 235, var(--tw-bg-opacity));
-}
-.bg-purple-400 {
-	--tw-bg-opacity: 1;
-	background-color: rgba(167, 139, 250, var(--tw-bg-opacity));
 }
 .bg-opacity-25 {
 	--tw-bg-opacity: 0.25;

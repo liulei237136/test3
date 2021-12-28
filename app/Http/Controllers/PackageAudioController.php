@@ -32,8 +32,10 @@ class PackageAudioController extends Controller
             'book_name' => '所属书名不能长于100个字',
             'audio_text' => '音频的文字内容不能长于1000个字',
         ]);
-
-        if ($file = $request->file('file')) {
+        if($request->file_name && $request->size){
+            $audio->file_name = $request->file_name;
+            $audio->size = $request->size;
+        }else if ($file = $request->file('file')) {
             $directory = "audio/" . date('Y/m/d');
             $file_name = $file->store($directory, 'public');
             if (!$file_name) {

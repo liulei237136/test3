@@ -1,6 +1,4 @@
 <template>
-  <audio id="audioElement" ref="audioElemnt" src="audioElementSrc"></audio>
-
   <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
     <template #toolbar_buttons>
       <vxe-pulldown ref="xDown" class="mr-4">
@@ -168,7 +166,6 @@ export default defineComponent({
       showHeaderOverflow: true,
       showOverflow: true,
       highlightHoverRow: true,
-      //   keepSource: true,
       id: "full_edit_1",
       height: 600,
       rowId: "id",
@@ -197,6 +194,7 @@ export default defineComponent({
         {
           field: "name",
           title: "文件名",
+          width: 120,
           sortable: true,
           sortBy: nameSortBy,
           titleHelp: { message: "注意要加上文件后缀" },
@@ -205,9 +203,12 @@ export default defineComponent({
           filterConfig: {},
           filterRender: { name: "$input" },
         },
+        //for export only
+        {field:"file_name",visible:false},
+        { field: "size" ,visible:false},
         {
           title: "音频",
-          width: 210,
+          width: 300,
           slots: {
             default: "source_audio",
           },
@@ -270,10 +271,11 @@ export default defineComponent({
         const $grid = xGrid.value;
         switch (code) {
           case "myExport":
-            $grid.openExport({
-              mode: "all",
-              modes: ["all", "selected"],
+            $grid.exportData({
+              type: "csv",
+              mode: "all", //	current, selected, all
               original: true,
+              columns: [{ field: "name" },{ field: "file_name" },{field:"size"},{ field: "book_name" }],
             });
         }
       },

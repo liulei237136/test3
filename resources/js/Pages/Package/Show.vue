@@ -87,8 +87,8 @@
 import { defineComponent } from "vue";
 import { Link } from "@inertiajs/inertia-vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Info from "./ShowBasicInfo.vue";
-import EditInfo from "./EditBasicInfo.vue";
+import ShowBasicInfo from "./ShowBasicInfo.vue";
+import EditBasicInfo from "./EditBasicInfo.vue";
 import ShowAudio from "./ShowAudio.vue";
 import EditAudio from "./EditAudio.vue";
 import UserAndPackageLink from "@/Components/UserAndPackageLink";
@@ -107,9 +107,10 @@ export default defineComponent({
   components: {
     AppLayout,
     Link,
-    Info,
-
-    Audio,
+    ShowBasicInfo,
+    ShowAudio,
+    EditBasicInfo,
+    EditAudio,
     UserAndPackageLink,
     Icon,
   },
@@ -125,9 +126,15 @@ export default defineComponent({
     },
     tabComponent() {
       if (this.tab === "info") {
-        return Info;
+        if (this.canEdit) {
+          return EditBasicInfo;
+        }
+        return ShowBasicInfo;
       } else if (this.tab === "audio") {
-        return Audio;
+          if(this.canEdit){
+              return EditAudio;
+          }
+        return ShowAudio;
       }
     },
   },

@@ -1,6 +1,4 @@
 <template>
-  <audio id="audioElement" ref="audioElemnt" src="audioElementSrc"></audio>
-
   <vxe-modal
     v-model="demo.showSaveModal"
     id="saveModal"
@@ -200,7 +198,7 @@
 <script>
 import { Inertia } from "@inertiajs/inertia";
 import { Link } from "@inertiajs/inertia-vue3";
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { defineComponent, nextTick, onMounted, reactive, ref } from "vue";
 import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
 import axios from "axios";
@@ -319,6 +317,8 @@ export default defineComponent({
         record.name && data.append("name", record.name);
         record.book_name && data.append("book_name", record.book_name);
         record.audio_text && data.append("audio_text", record.audio_text);
+        record.file_name && data.append("file_name", record.file_name);
+        record.size && data.append("size", record.size);
         const result = await axios.post(
           route("package.audio.store", { package: props.package.id }),
           data,
@@ -395,7 +395,7 @@ export default defineComponent({
       keepSource: true,
       id: "full_edit_1",
       height: 600,
-      rowId: "id",
+      rowKey: true,
       customConfig: {
         storage: true,
       },
@@ -438,6 +438,9 @@ export default defineComponent({
           filterConfig: {},
           filterRender: { name: "$input" },
         },
+        //for export only
+        { field: "file_name", visible: false },
+        { field: "size", visible: false },
         {
           title: "源音频",
           width: 210,
@@ -595,13 +598,29 @@ export default defineComponent({
           case "myImport":
             $grid.importData({
               mode: "insert",
+              afterImportMethod: () => {
+                console.log($grid.getRecordset());
+              },
             });
+            // $grid.openImport();
             break;
           case "myExport":
-            $grid.openExport({
-              mode: "all",
-              modes: ["all", "selected"],
+            const { insertRecords, removeRecords, updateRecords } = $grid.getRecordset();
+            if (insertRecords.length || removeRecords.length || updateRecords.length) {
+              return VXETable.modal.alert({
+                content: "当前有未保存的改动，请先保存或撤销后再导出",
+              });
+            }
+            $grid.exportData({
+              type: "csv",
+              mode: "all", //	urrent, selected, all
               original: true,
+              columns: [
+                { field: "name" },
+                { field: "file_name" },
+                { field: "size" },
+                { field: "book_name" },
+              ],
             });
         }
       },
