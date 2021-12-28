@@ -1,4 +1,6 @@
 <template>
+  <audio id="audioElement" ref="audioElemnt" src="audioElementSrc"></audio>
+
   <vxe-modal
     v-model="demo.showSaveModal"
     id="saveModal"
@@ -144,13 +146,13 @@
     </template>
 
     <template #source_audio="{ row }">
-      <!-- <audio v-if="row.url" :src="row.url" controls></audio> -->
-      <vxe-button
-        v-if="demo.playerMode === 'simple' && row.url"
-        size="mini"
-        content="播放"
-        @click="onSourcePlayButtonClick($event, row)"
-      ></vxe-button>
+      <play-button
+        :row="row"
+        :demo="demo"
+        mode="source"
+        @play="onPlayButtonPlay($event, row, 'source')"
+        @stop="onPlayButtonStop($event, row, 'source')"
+      ></play-button>
       <audio
         v-if="demo.playerMode === 'normal' && row.url"
         :src="row.url"
@@ -159,12 +161,12 @@
       ></audio>
     </template>
     <template #local_audio="{ row }">
-      <vxe-button
-        v-if="demo.playerMode === 'simple' && row.localFile"
-        size="mini"
-        content="播放"
-        @click="onLocalPlayButtonClick($event, row)"
-      ></vxe-button>
+      <play-button
+        :row="row"
+        :demo="demo"
+        mode="local"
+        @click="onPlayButtonClick($event, row, 'local')"
+      ></play-button>
       <audio
         v-if="demo.playerMode === 'normal' && row.localAudioUrl"
         :src="row.localAudioUrl"
@@ -174,7 +176,6 @@
     </template>
     <template #record_audio="{ row }">
       <audio-recorder :row="row" :demo="demo"></audio-recorder>
-      <!-- <audio v-if="row.audioUrl" :src="row.audioUrl" controls></audio> -->
     </template>
   </vxe-grid>
 </template>
@@ -210,6 +211,8 @@ import XEUtils from "xe-utils";
 import axios from "axios";
 
 import AudioRecorder from "./AudioRecorder.vue";
+import PlayButton from "./PlayButton.vue";
+import PlayButton from "./PlayButton.vue";
 
 export default defineComponent({
   props: {
@@ -221,11 +224,14 @@ export default defineComponent({
   components: {
     Link,
     AudioRecorder,
+    PlayButton,
   },
   setup(props, context) {
     const xGrid = ref({});
 
     const saveForm = ref({});
+
+    const audioElement = ref({});
 
     const xDown = ref({});
 
@@ -249,6 +255,7 @@ export default defineComponent({
       },
       playingAudio: {},
       playerMode: "simple",
+      audioElementSrc: null,
     });
 
     const onAudioPlayEvent = (e) => {
@@ -260,8 +267,36 @@ export default defineComponent({
       demo.playingAudio = { audio: e.target };
     };
 
+    const onPlayButtonPlay = (event, row, mode) => {
+      //1, get src
+      if (mode === "source") {
+        audioElementSrc = row.url;
+      } else if (mode === "local") {
+        if (!row.localUrl) {
+          row.localUrl = (window.URL || webkitURL).createObjectURL(row.localFile);
+        }
+        audioElementSrc = row.localUrl;
+        audioElement.value.onload = function () {
+          (window.URL || webkitURL).revokeObjectURL(row.localUrl);
+        };
+      } else if (mode === "record") {
+        if (!row.recordUrl) {
+          row.recordUrl = (window.URL || webkitURL).createObjectURL(row.recordFile);
+        }
+        audioElementSrc = row.recordUrl;
+        audioElement.value.onload = function () {
+          (window.URL || webkitURL).revokeObjectURL(row.audioUrl);
+        };
+      }
+
+      const element = audioElement.value;
+      element.load();
+      element.play();
+    };
+
+    const onPlayButtonStop = (event, row, mode) => {};
+
     const onSourcePlayButtonClick = (event, row) => {
-      if (!row.url) return;
       let { audio } = demo.playingAudio;
       if (!audio) {
         audio = document.createElement("audio");
@@ -419,12 +454,6 @@ export default defineComponent({
         return -1;
       }
     };
-
-    const commitButtons = props.commits.map((commit) => ({
-      code: `commit_${commit.id}`,
-      name: commit.title,
-      type: "text",
-    }));
 
     const gridOptions = reactive({
       border: true,
@@ -698,6 +727,8 @@ export default defineComponent({
       onAudioPlayEvent,
       onSourcePlayButtonClick,
       onLocalPlayButtonClick,
+      audioElement,
+      onPlayButtonClick,
     };
   },
 });
