@@ -171,6 +171,14 @@ export default defineComponent({
       rowId: "id",
       customConfig: {
         storage: true,
+        checkMethod({ column }) {
+          console.log(column);
+          const field = column.property;
+          if (field === "file_name" || field === "size") {
+            return false;
+          }
+          return true;
+        },
       },
       printConfig: {},
       sortConfig: {
@@ -204,8 +212,8 @@ export default defineComponent({
           filterRender: { name: "$input" },
         },
         //for export only
-        {field:"file_name",visible:false},
-        { field: "size" ,visible:false},
+        { field: "file_name", visible: false },
+        { field: "size", visible: false },
         {
           title: "音频",
           width: 300,
@@ -275,7 +283,12 @@ export default defineComponent({
               type: "csv",
               mode: "all", //	current, selected, all
               original: true,
-              columns: [{ field: "name" },{ field: "file_name" },{field:"size"},{ field: "book_name" }],
+              columns: [
+                { field: "name" },
+                { field: "file_name" },
+                { field: "size" },
+                { field: "book_name" },
+              ],
             });
         }
       },
