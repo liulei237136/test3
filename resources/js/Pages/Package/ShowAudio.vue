@@ -71,11 +71,8 @@
 import { Inertia } from "@inertiajs/inertia";
 import { Link } from "@inertiajs/inertia-vue3";
 import { defineComponent, onMounted, reactive, ref } from "vue";
-import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
 import axios from "axios";
-
-import AudioRecorder from "./AudioRecorder.vue";
 
 export default defineComponent({
   props: {
@@ -239,13 +236,6 @@ export default defineComponent({
             resetAll();
             return audioList;
           },
-          //   delete: ({ body }) => {
-          //     return xGrid.value.removeCheckboxRow();
-          //   },
-          //   save: async (item) => {
-          //     console.log(item);
-          //     return;
-          //   },
         },
       },
       checkboxConfig: {
@@ -295,14 +285,6 @@ export default defineComponent({
     };
 
     onMounted(async () => {
-      //    1. get commits
-      //2. try to get commitId
-      //3. use the id to get audios
-      //   const r = url.parse(this.$inertia.url, true);
-      //   console.log(r.query);
-      //   demo.commits = await getCommits();
-      //   console.log(item);
-      //   getCommitAudio();
       //   const sexList = [
       //     { label: "女", value: "0" },
       //     { label: "男", value: "1" },
