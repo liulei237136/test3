@@ -67,7 +67,7 @@
         <template #default>
           <vxe-input
             v-model="demo.filterCommitTitle"
-            placeholder="历史保存"
+            :placeholder="commit ? commit.title : '还没有保存过'"
             @focus="commitFocusEvent"
             @keyup="commitKeyupEvent"
           ></vxe-input>
@@ -342,11 +342,15 @@ export default defineComponent({
       console.log(ids);
 
       try {
+        const path = props.commit
+          ? JSON.parse(props.commit.path).concat([props.commit.id])
+          : [];
         const result = await axios.post(
           route("package.commit.store", { package: props.package.id }),
           {
             title: demo.saveFormData.title,
             description: demo.saveFormData.description,
+            path,
             ids,
           }
         );

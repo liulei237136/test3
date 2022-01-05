@@ -131,9 +131,9 @@ export default defineComponent({
         }
         return ShowBasicInfo;
       } else if (this.tab === "audio") {
-          if(this.canEdit){
-              return EditAudio;
-          }
+        if (this.canEdit) {
+          return EditAudio;
+        }
         return ShowAudio;
       }
     },

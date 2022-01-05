@@ -111,7 +111,7 @@ export default defineComponent({
       try {
         const result = await axios.post(
           route("package.commit.store", { package: this.package.id }),
-          { title: "初次保存", ids }
+          { title: "初次保存", path: [], ids }
         );
         await this.$inertia.get(
           route("package.show", {
