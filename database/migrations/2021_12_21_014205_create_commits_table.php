@@ -20,6 +20,7 @@ class CreateCommitsTable extends Migration
             $table->string('title');
             $table->string('description')->nullable();
             $table->json('audio')->nullable();
+            $table->json('path')->nullable();
             $table->timestamps();
 
             $table->foreign('package_id')->references('id')->on('packages');

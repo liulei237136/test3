@@ -20,6 +20,7 @@ class CommitController extends Controller
         $commit->title = $request->input('title');
         $commit->description = $request->input('description');
         $commit->audio = json_encode($request->input('ids'));
+        $commit->path = json_encode($request->input('path'));
         if ($commit->save()) {
             return [
                 'success' => true,

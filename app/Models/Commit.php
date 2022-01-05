@@ -11,5 +11,6 @@ class Commit extends Model
 
     protected $casts = [
         'audio' => 'array',
+        'path' => 'array',
     ];
 }
