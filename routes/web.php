@@ -4,6 +4,7 @@ use App\Http\Controllers\CommitController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageAudioController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PullController;
 use App\Http\Controllers\SearchController;
 use App\Http\Resources\AudioResource;
 use App\Models\Package;
@@ -40,6 +41,8 @@ Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->na
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/package/{package}/commits/{commit}/audio', [CommitController::class, 'audio'])->name('package.commit.audio');
+
+Route::get('/package{package}/pulls',[PullController::class,'index']);
 
 
 

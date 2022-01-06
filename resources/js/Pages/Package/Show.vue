@@ -100,6 +100,7 @@ import EditBasicInfo from "./EditBasicInfo.vue";
 import ShowAudio from "./ShowAudio.vue";
 import EditAudio from "./EditAudio.vue";
 import UserAndPackageLink from "@/Components/UserAndPackageLink";
+import PullIndex from "./PullIndex.vue";
 import Icon from "@/Components/Icon.vue";
 
 export default defineComponent({
@@ -111,6 +112,11 @@ export default defineComponent({
     tab: String,
     commits: Array,
     commit: Object,
+    pulls: Array,
+    // pulls: {
+    //   type: [Array, undefined],
+    //   required: false,
+    // },
   },
   components: {
     AppLayout,
@@ -119,6 +125,7 @@ export default defineComponent({
     ShowAudio,
     EditBasicInfo,
     EditAudio,
+    PullIndex,
     UserAndPackageLink,
     Icon,
   },
@@ -145,6 +152,8 @@ export default defineComponent({
           return EditAudio;
         }
         return ShowAudio;
+      } else if (this.tab === "pull") {
+        return PullIndex;
       }
     },
   },
@@ -154,7 +163,7 @@ export default defineComponent({
         package: this.package.id,
         tab,
       };
-      this.commit && (options.commit = this.commit.id);
+      tab === "commit" && this.commit && (options.commit = this.commit.id);
       return route("package.show", options);
     },
     tabStyle(tabName) {
@@ -163,11 +172,6 @@ export default defineComponent({
         : "haha";
     },
 
-    // tabStyle(tabName) {
-    //   return this.tab === tabName
-    //     ? { borderBottom: "1px solid #FD8C73", marginBottom: "-1px" }
-    //     : "haha";
-    // },
     onFavorite() {
       //如果用户已经登录，用axios比较好
       if (this.$page.props.user) {
