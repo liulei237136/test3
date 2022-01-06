@@ -7,6 +7,7 @@ use App\Models\Audio;
 use App\Models\Commit;
 use App\Models\Package;
 use ChristianKuri\LaravelFavorite\Models\Favorite;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -82,9 +83,18 @@ class PackageController extends Controller
 
     public function show(Package $package)
     {
+
         $commitId = request()->query('commit');
 
-        if ($commitId) $commit = Commit::findOrFail($commitId);
+        $commits = $package->commits()->latest()->get();
+
+        $commit = null;
+        if ($commitId){
+            $commit = $commits->find($commitId);
+            if(!$commit) throw new Exception('error commit', 404);
+        }else if($commits->isNotEmpty()){
+            $commit = $commits->first();
+        }
 
         $package->loadCount('children');
 
@@ -96,14 +106,10 @@ class PackageController extends Controller
 
         $tab = request()->query('tab') ?? 'info';
 
-        $commits = $package->commits()->latest()->get();
-
         $data = compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'tab', 'commits');
 
-        $commitId = request()->query('commit');
-
-        if ($commitId) {
-            $data['commit'] = Commit::findOrFail($commitId);
+        if ($commit) {
+            $data['commit'] = $commit;
         }
 
         return Inertia::render('Package/Show', $data);
@@ -117,44 +123,19 @@ class PackageController extends Controller
 
     public function clone(Package $package)
     {
-        info('clone');
-        //todo  该包是public的可以克隆,
-        $clonedPackageId = null;
+        $clonedPackaged = null;
 
         DB::transaction(function () use ($package, &$clonedPackageId) {
-            // clone package
-            $id = DB::table('packages')->insertGetId([
-                'name' => $package->name,
-                'description' => $package->description,
-                'author_id' => auth()->id(),
-                'parent_id' => $package->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $newPackage = new Package();
+            $newPackage->name = $package->name;
+            $newPackage->description = $package->description;
+            $newPackage->author()->associate(auth()->user());
+            $newPackage->parent()->associate($package);
+            $newPackage->save();
 
-            //clone audio of package
-            $audioClonedAll = [];
-            $audioCollection = DB::table('audio')
-                ->where('package_id', '=', $package->id)
-                ->get()
-                ->toArray();
-            foreach ($audioCollection as $audio) {
-                array_push($audioClonedAll, [
-                    'name' => $audio->name,
-                    'file_name' => $audio->file_name,
-                    'book_name' => $audio->book_name,
-                    'audio_text' => $audio->audio_text,
-                    'size' => $audio->size,
-                    'author_id' => $audio->author_id,
-                    'package_id' => $id,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            $newPackage->commits()->attach($package->commits);
 
-            DB::table('audio')->insert($audioClonedAll);
-
-            $clonedPackageId = $id;
+            $clonedPackageId = $newPackage->id;
         });
 
         return Redirect::route('package.show', ['package' => $clonedPackageId, 'tab' => 'audio']);

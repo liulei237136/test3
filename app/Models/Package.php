@@ -62,6 +62,7 @@ class Package extends Model
 
     public function commits()
     {
-        return $this->hasMany(Commit::class);
+        // return $this->hasMany(Commit::class);
+        return $this->belongsToMany(Commit::class,'package_commit')->withTimestamps();
     }
 }

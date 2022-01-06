@@ -36,17 +36,7 @@
               @keydown.enter="search()"
               type="search"
               id="search"
-              class="
-                ml-2
-                mr-2
-                w-full
-                h-11
-                rounded
-                border-gray-300
-                shadow-sm
-                lg:h-9 lg:text-sm lg:w-96
-                focus:ring-blue-500 focus:border-blue-500
-              "
+              class="ml-2 mr-2 w-full h-11 rounded border-gray-300 shadow-sm lg:h-9 lg:text-sm lg:w-96 focus:ring-blue-500 focus:border-blue-500"
               :placeholder="$t('Search')"
               autocomplete="off"
             />
@@ -56,13 +46,7 @@
               <div>
                 <Link
                   :href="route('package.create')"
-                  class="
-                    px-4
-                    py-2
-                    rounded
-                    hover:rounded-lg hover:shadow-md hover:bg-gray-50
-                    text-sm
-                  "
+                  class="px-4 py-2 rounded hover:rounded-lg hover:shadow-md hover:bg-gray-50 text-sm"
                 >
                   {{ $t("Create ClickRead Package") }}
                 </Link>
@@ -72,14 +56,7 @@
                   <template #trigger>
                     <button
                       v-if="$page.props.jetstream.managesProfilePhotos"
-                      class="
-                        flex
-                        text-sm
-                        border-2 border-transparent
-                        rounded-full
-                        focus:outline-none focus:border-gray-300
-                        transition
-                      "
+                      class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
                     >
                       <img
                         class="h-8 w-8 rounded-full object-cover"
@@ -91,22 +68,7 @@
                     <span v-else class="inline-flex rounded-md">
                       <button
                         type="button"
-                        class="
-                          inline-flex
-                          items-center
-                          px-3
-                          py-2
-                          border border-transparent
-                          text-sm
-                          leading-4
-                          font-medium
-                          rounded-md
-                          text-gray-500
-                          bg-white
-                          hover:text-gray-700
-                          focus:outline-none
-                          transition
-                        "
+                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition"
                       >
                         {{ $page.props.user.name }}
 
@@ -148,10 +110,7 @@
                 </jet-dropdown>
               </div>
               <div v-else>
-                <Link
-                  :href="route('login')"
-                  class="text-sm text-gray-700 underline"
-                >
+                <Link :href="route('login')" class="text-sm text-gray-700 underline">
                   {{ $t("Log in") }}
                 </Link>
 
@@ -168,17 +127,7 @@
             <div class="-mr-2 flex items-center sm:hidden">
               <button
                 @click="showingNavigationDropdown = !showingNavigationDropdown"
-                class="
-                  inline-flex
-                  items-center
-                  justify-center
-                  p-2
-                  rounded-md
-                  text-gray-400
-                  hover:text-gray-500 hover:bg-gray-100
-                  focus:outline-none focus:bg-gray-100 focus:text-gray-500
-                  transition
-                "
+                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition"
               >
                 <svg
                   class="h-6 w-6"
@@ -305,7 +254,7 @@
 
       <!-- Page Heading -->
       <header class="bg-white shadow" v-if="$slots.header">
-        <div class="py-4 px-4 sm:px-6 lg:px-8">
+        <div class="px-4 sm:px-6 lg:px-8">
           <slot name="header"></slot>
         </div>
       </header>

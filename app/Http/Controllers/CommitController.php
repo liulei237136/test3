@@ -22,6 +22,7 @@ class CommitController extends Controller
         $commit->audio = json_encode($request->input('ids'));
         $commit->path = json_encode($request->input('path'));
         if ($commit->save()) {
+            $package->commits()->attach($commit->id);
             return [
                 'success' => true,
                 'data' => $commit,
