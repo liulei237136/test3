@@ -70,7 +70,7 @@
           :style="tabStyle('pull')"
         >
           <Icon name="pull" class="d-none sm:inline w-5 h-5 mr-1"></Icon>
-          <span>求拉</span></Link
+          <span>拉取</span></Link
         >
       </div>
     </template>
@@ -133,8 +133,6 @@ export default defineComponent({
     return {
       isFavor: this.isFavorited,
       favorCount: this.favoritesCount,
-      infoTabHref: "",
-      audioTabHref: "",
     };
   },
   computed: {

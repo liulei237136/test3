@@ -66,6 +66,6 @@ class Package extends Model
     }
 
     public function pulls(){
-        return $this->hasMany(Pull::class, 'target_package_id');
+        return $this->hasMany(Pull::class, 'to_package');
     }
 }

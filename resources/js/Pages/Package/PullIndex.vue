@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-between">
-    <button class="bg-green-500 px-4 py-2 rounded" @click="onNewPull">请拉我</button>
+    <button class="bg-green-500 px-4 py-2 rounded" @click="onNewPull">新建一个拉取</button>
   </div>
   <ul v-if="pulls && pulls.length">
     <li v-for="pull in pulls" :key="pull.id">
@@ -32,7 +32,12 @@ export default defineComponent({
       //   pullList: this.pulls ? this.pulls : [],
     });
     const onNewPull = () => {
-      alert("new ull");
+        if($page.user && props.package.parent){
+            alert('compare ready')
+        }else{
+            alert('not ready');
+        }
+        // Inertia.get(route('compare.package', {toPackage:}));
     };
     onMounted(() => {});
     return {
@@ -40,5 +45,6 @@ export default defineComponent({
       onNewPull,
     };
   },
+
 });
 </script>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CommitController;
+use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageAudioController;
 use App\Http\Controllers\PackageController;
@@ -42,7 +43,9 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/package/{package}/commits/{commit}/audio', [CommitController::class, 'audio'])->name('package.commit.audio');
 
-Route::get('/package{package}/pulls',[PullController::class,'index']);
+// Route::get('/package{package}/pulls',[PullController::class,'index']);
+
+// Route::get('/package/{package}/compare', [CompareController::class, 'compare'])->name('compare.compare');
 
 
 
@@ -68,6 +71,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
 
     Route::post('/package/{package}/commits', [CommitController::class, 'store'])->name('package.commit.store');
+
+    // Route::get('/package/{toPackage}/compare/package/{fromPackage}', [CompareController::class, 'package'])->route('compare.package');
 });
 
 Route::get('/test/{package}', function ($package) {
