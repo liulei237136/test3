@@ -253,7 +253,7 @@
       </nav>
 
       <!-- Page Heading -->
-      <header class="bg-white shadow" v-if="$slots.header">
+      <header class="bg-white" v-if="$slots.header">
         <div class="px-4 sm:px-6 lg:px-8">
           <slot name="header"></slot>
         </div>

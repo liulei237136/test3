@@ -24,6 +24,12 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('ll237136'),
             'email_verified_at' => now(),
         ]);
+        User::factory()->create([
+            'name' => 'liulei',
+            'email' => 'liulei237136@gmail.com',
+            'password' => bcrypt('ll237136'),
+            'email_verified_at' => now(),
+        ]);
 
         // Package::factory()->count(1)->create(['author_id' => 1]);
         // Audio::factory()->count(3000)->create(['package_id' => 1, 'author_id' => 1]);

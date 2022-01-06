@@ -149,6 +149,8 @@
         :src="row.url"
         @play="onAudioPlayEvent($event, row)"
         controls
+        preload="auto"
+        autobuffer
       ></audio>
     </template>
     <template #local_audio="{ row }">

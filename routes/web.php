@@ -30,13 +30,11 @@ Route::get('/', function () {
     return Inertia::render('Index');
 });
 Route::get('/test', function () {
-    return Inertia::render('Package/Audio');
+    return view('test');
 });
 
 
-Route::get('/test', function () {
-    return Inertia::render('Package/Audio');
-});
+
 Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');

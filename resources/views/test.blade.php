@@ -7,61 +7,19 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.6.12/plyr.css" />
+
 </head>
 
-<body class="font-sans antialiased">
-    <table id="example" class="display" style="width:100%">
-        <thead>
-            <tr>
-                <th>Name</th>
-                {{-- <th>Position</th>
-                <th>Office</th>
-                <th>Extn.</th> --}}
-                <th>Start date</th>
-                <th>Salary</th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <th>Name</th>
-                {{-- <th>Position</th>
-                <th>Office</th>
-                <th>Extn.</th> --}}
-                <th>Start date</th>
-                <th>Salary</th>
-            </tr>
-        </tfoot>
-    </table>
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<body>
+    <video controls="" autoplay="" name="media"><source src="http://localhost:8000/storage/audio/2022/01/06/xPAQWla2yAFgW5YQPZzESqt5BjkLO39946nFh7rD.mp3" type="audio/x-wav"></video>
+    {{-- <audio  id="player" controls>
+        <source src="http://localhost:8000/storage/audio/2022/01/06/xPAQWla2yAFgW5YQPZzESqt5BjkLO39946nFh7rD.mp3" type="audio/mp3" />
+    </audio> --}}
+
+    <script src="https://cdn.plyr.io/3.6.12/plyr.polyfilled.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#example').DataTable({
-                "ajax": "data/objects.txt",
-                // "iDisplayLength": 1
-                "lengthMenu": [[10, 25, 50, 100, 1000, -1], [10, 25, 50, 100, 1000, "All"]],
-                "columns": [{
-                        "data": "name"
-                    },
-                    // {
-                    //     "data": "position"
-                    // },
-                    // {
-                    //     "data": "office"
-                    // },
-                    // {
-                    //     "data": "extn"
-                    // },
-                    {
-                        "data": "start_date"
-                    },
-                    {
-                        "data": "salary"
-                    }
-                ]
-            });
-        });
+        const player = new Plyr('#player',{});
     </script>
 </body>
 

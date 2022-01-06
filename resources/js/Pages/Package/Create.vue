@@ -1,7 +1,7 @@
 <template>
   <app-layout title="Package">
     <template #header>
-      <div class="flex items-center space-x-2">
+      <div class="py-4 flex items-center space-x-2">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
           新建点读包
         </h2>
