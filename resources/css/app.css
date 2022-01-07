@@ -26,3 +26,7 @@
 .vxe-cell-help-icon.vxe-icon--question{
     --tw-border-opacity:auto;
 }
+
+.my-bg-gray{
+    background-color: #F6F8FA;
+}

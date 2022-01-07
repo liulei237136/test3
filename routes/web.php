@@ -42,7 +42,7 @@ Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->na
 Route::get('/packages/{package}/pulls', [PackageController::class, 'pulls'])->name('package.pulls');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-Route::get('/package/{package}/commits/{commit}/audio', [CommitController::class, 'audio'])->name('package.commit.audio');
+Route::get('/commits/{commit}/audio', [CommitController::class, 'audio'])->name('commit.audio');
 
 // Route::get('/package{package}/pulls',[PullController::class,'index']);
 
@@ -59,7 +59,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/media', [MediaController::class, 'store'])->name('media.store');
 
     Route::post('/packages/{package}/clone', [PackageController::class, 'clone'])->name('package.clone');
-    Route::get('/packages/create', [PackageController::class, 'create'])->name('package.create');
+    Route::get('/create_package', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
     Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');

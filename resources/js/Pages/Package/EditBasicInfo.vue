@@ -71,7 +71,6 @@
 <script>
 import ContentLayout from "@/Layouts/ContentLayout.vue";
 import { defineComponent } from "vue";
-import CloneButton from "./CloneButton.vue";
 
 // import JetActionMessage from "@/Jetstream/ActionMessage.vue";
 import JetButton from "@/Jetstream/Button.vue";
@@ -95,7 +94,6 @@ export default defineComponent({
     };
   },
   components: {
-    CloneButton,
     JetInput,
     JetLabel,
     JetInputError,

@@ -1,7 +1,7 @@
 <template>
   <app-layout title="Index">
     <div class="px-4 bg-white overflow-hidden">
-        {{ $t('test')}}
+        {{ $t('index page')}}
     </div>
   </app-layout>
 </template>

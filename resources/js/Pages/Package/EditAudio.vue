@@ -33,6 +33,7 @@
                 @change="saveForm.clearValidate('title')"
                 v-model="data.title"
                 placeholder=""
+
                 clearable
               ></vxe-input>
             </template>
@@ -584,8 +585,7 @@ export default defineComponent({
     const getCommitAudio = async () => {
       if (props.package && props.package.id && props.commit && props.commit.id) {
         const result = await axios(
-          route("package.commit.audio", {
-            package: props.package.id,
+          route("commit.audio", {
             commit: props.commit.id,
           })
         );

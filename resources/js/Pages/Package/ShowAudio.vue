@@ -6,7 +6,7 @@
           <template #default>
             <vxe-input
               v-model="demo.filterCommitTitle"
-              placeholder="历史保存"
+              :placeholder="commit ? commit.title : '还没有保存过'"
               @focus="commitFocusEvent"
               @keyup="commitKeyupEvent"
             ></vxe-input>
@@ -251,8 +251,7 @@ export default defineComponent({
     const getCommitAudio = async () => {
       if (props.package && props.package.id && props.commit && props.commit.id) {
         const result = await axios(
-          route("package.commit.audio", {
-            package: props.package.id,
+          route("commit.audio", {
             commit: props.commit.id,
           })
         );

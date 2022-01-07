@@ -32,11 +32,10 @@ class CommitController extends Controller
         return ['success' => false];
     }
 
-    public function audio(Package $package, Commit $commit)
+    public function audio(Commit $commit)
     {
         //todo the package is not private or the use is the author of commit
         $audio = Audio::find(json_decode($commit->audio));
-        // $audio = Audio::whereIn('id', json_decode($commit->audio))->get();
 
         return compact('audio');
     }

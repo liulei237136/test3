@@ -105,6 +105,14 @@ class PackageController extends Controller
         }
     }
 
+    public function pulls(Package $package){
+        $data = $this->commonInfo($package);
+
+        $data['pulls'] = $package->pulls()->latest()->get();
+
+        return Inertia::render('Package/ShowPulls', $data);
+    }
+
     function clone (Package $package) {
         $clonedPackageId = null;
 
