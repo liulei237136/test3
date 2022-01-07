@@ -105,10 +105,12 @@ class PackageController extends Controller
         }
     }
 
-    public function pulls(Package $package){
+    public function pulls(Package $package, Request $request){
         $data = $this->commonInfo($package);
 
-        $data['pulls'] = $package->pulls()->latest()->get();
+        $data['status'] = $request->query('status') ?? 'open';
+
+        $data['pulls'] = $package->pulls()->where('status', $data['status'])->latest()->get();
 
         return Inertia::render('Package/ShowPulls', $data);
     }

@@ -114,10 +114,8 @@ export default defineComponent({
           { title: "初次保存", path: [], ids }
         );
         await this.$inertia.get(
-          route("package.show", {
+          route("package.audio", {
             package: this.package.id,
-            commit: result.data.data.id,
-            tab: "audio",
           }),
           {},
           { replace: true }

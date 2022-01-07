@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Audio;
 use App\Models\Package;
+use App\Models\Pull;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
