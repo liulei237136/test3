@@ -321,5 +321,10 @@ export default defineComponent({
       this.$inertia.post(route("logout"));
     },
   },
+
+  mounted() {
+    console.log(111111111);
+    console.log(this);
+  },
 });
 </script>

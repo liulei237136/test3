@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PackageResource;
 use App\Models\Audio;
-use App\Models\Commit;
 use App\Models\Package;
-use ChristianKuri\LaravelFavorite\Models\Favorite;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -25,7 +22,6 @@ class PackageController extends Controller
                 ->paginate()
         );
 
-
         $months = DB::table('packages')
             ->selectRaw('distinct DATE_FORMAT(created_at, "01-%m-%Y") as value, DATE_FORMAT(created_at, "%M %Y") as label, created_at as sort')
             ->orderByDesc('sort')
@@ -34,7 +30,7 @@ class PackageController extends Controller
         return Inertia::render('Package/Index', [
             'package' => $package,
             'months' => $months,
-            'queryParams' => request()->all(['month', 'term'])
+            'queryParams' => request()->all(['month', 'term']),
         ]);
     }
 
@@ -63,11 +59,11 @@ class PackageController extends Controller
         return Redirect::route('package.init', ['package' => $package->id]);
     }
 
-
-
     public function update(Request $request, Package $package)
     {
-        if ($package->author_id != auth()->id()) return;
+        if ($package->author_id != auth()->id()) {
+            return;
+        }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -80,39 +76,52 @@ class PackageController extends Controller
         return Redirect::route('package.show', ['package' => $package->id, 'tab' => 'info']);
     }
 
-
     public function show(Package $package)
     {
 
-        $commitId = request()->query('commit');
+        // $commitId = request()->query('commit');
 
-        $commits = $package->commits()->latest()->get();
+        // $commits = $package->commits()->latest()->get();
 
-        $commit = null;
-        if ($commitId){
-            $commit = $commits->find($commitId);
-            if(!$commit) throw new Exception('error commit', 404);
-        }else if($commits->isNotEmpty()){
-            $commit = $commits->first();
-        }
+        // $commit = null;
+        // if ($commitId){
+        //     $commit = $commits->find($commitId);
+        //     if(!$commit) throw new Exception('error commit', 404);
+        // }else if($commits->isNotEmpty()){
+        //     $commit = $commits->first();
+        // }
 
-        $package->loadCount('children');
+        // $package->loadCount('children');
 
-        $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
+        // $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
 
+        // $favoritesCount = $package->favoritesCount;
+
+        // $isFavorited = auth()->user() ? $package->isFavorited() : null;
+
+        // $tab = request()->query('tab') ?? 'info';
+
+        // $data = compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'tab', 'commits');
+
+        // if ($commit) {
+        //     $data['commit'] = $commit;
+        // }
+
+        // return Inertia::render('Package/Show', $data);
         $favoritesCount = $package->favoritesCount;
 
         $isFavorited = auth()->user() ? $package->isFavorited() : null;
 
-        $tab = request()->query('tab') ?? 'info';
+        $data = compact('package', 'favoritesCount', 'isFavorited');
 
-        $data = compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'tab', 'commits');
+        $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
 
-        if ($commit) {
-            $data['commit'] = $commit;
+        if ($canEdit) {
+            return Inertia::render('Package/EditBasicInfo', $data);
+        } else {
+            return Inertia::render('Package/ShowBasicInfo', $data);
         }
 
-        return Inertia::render('Package/Show', $data);
     }
 
     public function audio(Package $package)
@@ -121,9 +130,8 @@ class PackageController extends Controller
         return [['name' => 'file1'], ['name' => 'file2'], ['name' => 'file3']];
     }
 
-    public function clone(Package $package)
-    {
-        $clonedPackaged = null;
+    function clone (Package $package) {
+        $clonedPackageId = null;
 
         DB::transaction(function () use ($package, &$clonedPackageId) {
             $newPackage = new Package();
@@ -148,7 +156,10 @@ class PackageController extends Controller
         info('.....' . url()->previous());
 
         //是未登录用户，没有previous url
-        if (!url()->previous()) return Redirect::back();
+        if (!url()->previous()) {
+            return Redirect::back();
+        }
+
     }
 
     public function toggleFavoriteAfterLogin(Package $package)

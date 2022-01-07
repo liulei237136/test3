@@ -37,7 +37,7 @@ Route::get('/test', function () {
 
 
 
-Route::get('/packages/{package}/show', [PackageController::class, 'show'])->name('package.show');
+Route::get('/packages/{package}', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
