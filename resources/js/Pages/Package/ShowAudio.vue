@@ -1,48 +1,50 @@
 <template>
-  <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
-    <template #toolbar_buttons>
-      <vxe-pulldown ref="xDown" class="mr-4">
-        <template #default>
-          <vxe-input
-            v-model="demo.filterCommitTitle"
-            placeholder="历史保存"
-            @focus="commitFocusEvent"
-            @keyup="commitKeyupEvent"
-          ></vxe-input>
-        </template>
-        <template #dropdown>
-          <div class="my-dropdown">
-            <div
-              class="list-item"
-              v-for="commit in demo.filteredCommitsList"
-              :key="commit.id"
-            >
-              <Link
-                :to="
-                  route('package.show', {
-                    package: package.id,
-                    commit: commit.id,
-                    tab: 'audio',
-                  })
-                "
-                :title="commit.description ? commit.description : commit.title"
-                >{{ commit.title }}</Link
+  <content-layout>
+    <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
+      <template #toolbar_buttons>
+        <vxe-pulldown ref="xDown" class="mr-4">
+          <template #default>
+            <vxe-input
+              v-model="demo.filterCommitTitle"
+              placeholder="历史保存"
+              @focus="commitFocusEvent"
+              @keyup="commitKeyupEvent"
+            ></vxe-input>
+          </template>
+          <template #dropdown>
+            <div class="my-dropdown">
+              <div
+                class="list-item"
+                v-for="commit in demo.filteredCommitsList"
+                :key="commit.id"
               >
+                <Link
+                  :to="
+                    route('package.show', {
+                      package: package.id,
+                      commit: commit.id,
+                      tab: 'audio',
+                    })
+                  "
+                  :title="commit.description ? commit.description : commit.title"
+                  >{{ commit.title }}</Link
+                >
+              </div>
             </div>
-          </div>
-        </template>
-      </vxe-pulldown>
-    </template>
+          </template>
+        </vxe-pulldown>
+      </template>
 
-    <template #source_audio="{ row }">
-      <audio
-        v-if="row.url"
-        :src="row.url"
-        @play="onAudioPlayEvent($event, row)"
-        controls
-      ></audio>
-    </template>
-  </vxe-grid>
+      <template #source_audio="{ row }">
+        <audio
+          v-if="row.url"
+          :src="row.url"
+          @play="onAudioPlayEvent($event, row)"
+          controls
+        ></audio>
+      </template>
+    </vxe-grid>
+  </content-layout>
 </template>
 
 <style scoped>
@@ -73,6 +75,7 @@ import { Link } from "@inertiajs/inertia-vue3";
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import XEUtils from "xe-utils";
 import axios from "axios";
+import ContentLayout from "@/Layouts/ContentLayout.vue";
 
 export default defineComponent({
   props: {
@@ -83,6 +86,7 @@ export default defineComponent({
   },
   components: {
     Link,
+    ContentLayout,
   },
   setup(props, context) {
     const xGrid = ref({});
@@ -283,26 +287,6 @@ export default defineComponent({
         }
       },
     };
-
-    onMounted(async () => {
-      //   const sexList = [
-      //     { label: "女", value: "0" },
-      //     { label: "男", value: "1" },
-      //   ];
-      //   const { formConfig, columns } = gridOptions;
-      //   if (columns) {
-      //     const sexColumn = columns[5];
-      //     if (sexColumn && sexColumn.editRender) {
-      //       sexColumn.editRender.options = sexList;
-      //     }
-      //   }
-      //   if (formConfig && formConfig.items) {
-      //     const sexItem = formConfig.items[4];
-      //     if (sexItem && sexItem.itemRender) {
-      //       sexItem.itemRender.options = sexList;
-      //     }
-      //   }
-    });
 
     return {
       xGrid,

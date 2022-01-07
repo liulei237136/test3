@@ -39,6 +39,7 @@ Route::get('/test', function () {
 
 Route::get('/packages/{package}', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
+Route::get('/packages/{package}/pulls', [PackageController::class, 'pulls'])->name('package.pulls');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/package/{package}/commits/{commit}/audio', [CommitController::class, 'audio'])->name('package.commit.audio');

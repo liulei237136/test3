@@ -1,178 +1,180 @@
 <template>
-  <vxe-modal
-    v-model="demo.showSaveModal"
-    id="saveModal"
-    width="800"
-    height="360"
-    min-width="460"
-    min-height="320"
-    show-zoom
-    resize
-    remember
-    storage
-    transfer
-  >
-    <template #title>
-      <span>给本次保存起个名字</span>
-    </template>
-    <template #default>
-      <vxe-form
-        title-colon
-        ref="saveForm"
-        title-align="right"
-        title-width="100"
-        :data="demo.saveFormData"
-        :rules="demo.saveFormRules"
-        :loading="demo.saveFormloading"
-        @submit="saveModalFormSubmitEvent"
-      >
-        <vxe-form-item title="名字" field="title" span="18" :item-render="{}">
-          <template #default="{ data }">
+  <content-layout>
+    <vxe-modal
+      v-model="demo.showSaveModal"
+      id="saveModal"
+      width="800"
+      height="360"
+      min-width="460"
+      min-height="320"
+      show-zoom
+      resize
+      remember
+      storage
+      transfer
+    >
+      <template #title>
+        <span>给本次保存起个名字</span>
+      </template>
+      <template #default>
+        <vxe-form
+          title-colon
+          ref="saveForm"
+          title-align="right"
+          title-width="100"
+          :data="demo.saveFormData"
+          :rules="demo.saveFormRules"
+          :loading="demo.saveFormloading"
+          @submit="saveModalFormSubmitEvent"
+        >
+          <vxe-form-item title="名字" field="title" span="18" :item-render="{}">
+            <template #default="{ data }">
+              <vxe-input
+                @change="saveForm.clearValidate('title')"
+                v-model="data.title"
+                placeholder=""
+                clearable
+              ></vxe-input>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item title="描述" field="description" span="24" :item-render="{}">
+            <template #default="{ data }">
+              <vxe-textarea
+                v-model="data.description"
+                @change="saveForm.clearValidate('description')"
+                placeholder=""
+                :autosize="{ minRows: 6, maxRows: 10 }"
+                clearable
+              ></vxe-textarea>
+            </template>
+          </vxe-form-item>
+          <vxe-form-item align="center" span="24">
+            <template #default>
+              <vxe-button
+                :disabled="demo.saveFormLoading"
+                type="submit"
+                status="primary"
+                content="提交"
+              ></vxe-button>
+            </template>
+          </vxe-form-item>
+        </vxe-form>
+      </template>
+    </vxe-modal>
+
+    <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
+      <template #toolbar_buttons>
+        <vxe-pulldown ref="xDown" class="mr-4">
+          <template #default>
             <vxe-input
-              @change="saveForm.clearValidate('title')"
-              v-model="data.title"
-              placeholder=""
-              clearable
+              v-model="demo.filterCommitTitle"
+              :placeholder="commit ? commit.title : '还没有保存过'"
+              @focus="commitFocusEvent"
+              @keyup="commitKeyupEvent"
             ></vxe-input>
           </template>
-        </vxe-form-item>
-        <vxe-form-item title="描述" field="description" span="24" :item-render="{}">
-          <template #default="{ data }">
-            <vxe-textarea
-              v-model="data.description"
-              @change="saveForm.clearValidate('description')"
-              placeholder=""
-              :autosize="{ minRows: 6, maxRows: 10 }"
-              clearable
-            ></vxe-textarea>
+          <template #dropdown>
+            <div class="my-dropdown">
+              <div
+                class="list-item"
+                v-for="commit in demo.filteredCommitsList"
+                :key="commit.id"
+              >
+                <Link
+                  :to="
+                    route('package.show', {
+                      package: package.id,
+                      commit: commit.id,
+                      tab: 'audio',
+                    })
+                  "
+                  :title="commit.description ? commit.description : commit.title"
+                  >{{ commit.title }}</Link
+                >
+              </div>
+            </div>
           </template>
-        </vxe-form-item>
-        <vxe-form-item align="center" span="24">
-          <template #default>
+        </vxe-pulldown>
+        <!-- 保存 -->
+        <vxe-button v-if="canEdit" content="保存" @click="onSave"></vxe-button>
+        <!-- 插入 -->
+        <vxe-button v-if="canEdit" content="插入空白行">
+          <template #dropdowns>
             <vxe-button
-              :disabled="demo.saveFormLoading"
-              type="submit"
-              status="primary"
-              content="提交"
+              type="text"
+              @click="insertEmptyAt(0)"
+              content="在第一行插入"
+            ></vxe-button>
+            <vxe-button
+              type="text"
+              @click="insertEmptyAt(-1)"
+              content="在最后一行插入"
+            ></vxe-button>
+            <vxe-button
+              type="text"
+              @click="insertEmptyBeforeSelected()"
+              content="选中行前插入"
             ></vxe-button>
           </template>
-        </vxe-form-item>
-      </vxe-form>
-    </template>
-  </vxe-modal>
+        </vxe-button>
+        <vxe-button v-if="canEdit" content="插入音频">
+          <template #dropdowns>
+            <vxe-button
+              type="text"
+              @click="insertAudioAt(0)"
+              content="在第一行插入"
+            ></vxe-button>
+            <vxe-button
+              type="text"
+              @click="insertAudioAt(-1)"
+              content="在最后一行插入"
+            ></vxe-button>
+            <vxe-button
+              type="text"
+              @click="insertAudioBeforeSelected()"
+              content="选中行前插入"
+            ></vxe-button>
+          </template>
+        </vxe-button>
+        <!-- 删除 -->
+        <vxe-button
+          v-if="canEdit"
+          content="删除"
+          @click="xGrid.removeCheckboxRow"
+        ></vxe-button>
+      </template>
 
-  <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
-    <template #toolbar_buttons>
-      <vxe-pulldown ref="xDown" class="mr-4">
-        <template #default>
-          <vxe-input
-            v-model="demo.filterCommitTitle"
-            :placeholder="commit ? commit.title : '还没有保存过'"
-            @focus="commitFocusEvent"
-            @keyup="commitKeyupEvent"
-          ></vxe-input>
-        </template>
-        <template #dropdown>
-          <div class="my-dropdown">
-            <div
-              class="list-item"
-              v-for="commit in demo.filteredCommitsList"
-              :key="commit.id"
-            >
-              <Link
-                :to="
-                  route('package.show', {
-                    package: package.id,
-                    commit: commit.id,
-                    tab: 'audio',
-                  })
-                "
-                :title="commit.description ? commit.description : commit.title"
-                >{{ commit.title }}</Link
-              >
-            </div>
-          </div>
-        </template>
-      </vxe-pulldown>
-      <!-- 保存 -->
-      <vxe-button v-if="canEdit" content="保存" @click="onSave"></vxe-button>
-      <!-- 插入 -->
-      <vxe-button v-if="canEdit" content="插入空白行">
-        <template #dropdowns>
-          <vxe-button
-            type="text"
-            @click="insertEmptyAt(0)"
-            content="在第一行插入"
-          ></vxe-button>
-          <vxe-button
-            type="text"
-            @click="insertEmptyAt(-1)"
-            content="在最后一行插入"
-          ></vxe-button>
-          <vxe-button
-            type="text"
-            @click="insertEmptyBeforeSelected()"
-            content="选中行前插入"
-          ></vxe-button>
-        </template>
-      </vxe-button>
-      <vxe-button v-if="canEdit" content="插入音频">
-        <template #dropdowns>
-          <vxe-button
-            type="text"
-            @click="insertAudioAt(0)"
-            content="在第一行插入"
-          ></vxe-button>
-          <vxe-button
-            type="text"
-            @click="insertAudioAt(-1)"
-            content="在最后一行插入"
-          ></vxe-button>
-          <vxe-button
-            type="text"
-            @click="insertAudioBeforeSelected()"
-            content="选中行前插入"
-          ></vxe-button>
-        </template>
-      </vxe-button>
-      <!-- 删除 -->
-      <vxe-button
-        v-if="canEdit"
-        content="删除"
-        @click="xGrid.removeCheckboxRow"
-      ></vxe-button>
-    </template>
-
-    <template #source_audio="{ row }">
-      <audio
-        v-if="row.url"
-        :src="row.url"
-        @play="onAudioPlayEvent($event, row)"
-        controls
-        preload="auto"
-        autobuffer
-      ></audio>
-    </template>
-    <template #local_audio="{ row }">
-      <audio
-        v-if="row.localAudioUrl"
-        :src="row.localAudioUrl"
-        @play="onAudioPlayEvent($event, row)"
-        controls
-      ></audio>
-    </template>
-    <template #record_audio="{ row }">
-      <div class="flex items-center">
-        <audio-recorder :row="row" :demo="demo" class="mr-1"></audio-recorder>
+      <template #source_audio="{ row }">
         <audio
-          v-if="row.recordUrl"
-          :src="row.recordUrl"
+          v-if="row.url"
+          :src="row.url"
+          @play="onAudioPlayEvent($event, row)"
+          controls
+          preload="auto"
+          autobuffer
+        ></audio>
+      </template>
+      <template #local_audio="{ row }">
+        <audio
+          v-if="row.localAudioUrl"
+          :src="row.localAudioUrl"
           @play="onAudioPlayEvent($event, row)"
           controls
         ></audio>
-      </div>
-    </template>
-  </vxe-grid>
+      </template>
+      <template #record_audio="{ row }">
+        <div class="flex items-center">
+          <audio-recorder :row="row" :demo="demo" class="mr-1"></audio-recorder>
+          <audio
+            v-if="row.recordUrl"
+            :src="row.recordUrl"
+            @play="onAudioPlayEvent($event, row)"
+            controls
+          ></audio>
+        </div>
+      </template>
+    </vxe-grid>
+  </content-layout>
 </template>
 
 <style scoped>
@@ -204,6 +206,7 @@ import { defineComponent, nextTick, onMounted, reactive, ref } from "vue";
 import { VXETable, VxeGridInstance, VxeGridProps } from "vxe-table";
 import XEUtils from "xe-utils";
 import axios from "axios";
+import ContentLayout from "@/Layouts/ContentLayout.vue";
 
 import AudioRecorder from "./AudioRecorder.vue";
 
@@ -217,6 +220,7 @@ export default defineComponent({
   components: {
     Link,
     AudioRecorder,
+    ContentLayout,
   },
   setup(props, context) {
     const xGrid = ref({});

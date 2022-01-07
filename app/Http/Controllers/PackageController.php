@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use App\Http\Traits\CommonInfoTrait;
 
 class PackageController extends Controller
 {
+    use CommonInfoTrait;
+
     public function index()
     {
         $package = PackageResource::collection(
@@ -78,45 +81,9 @@ class PackageController extends Controller
 
     public function show(Package $package)
     {
+        $data = $this->commonInfo($package);
 
-        // $commitId = request()->query('commit');
-
-        // $commits = $package->commits()->latest()->get();
-
-        // $commit = null;
-        // if ($commitId){
-        //     $commit = $commits->find($commitId);
-        //     if(!$commit) throw new Exception('error commit', 404);
-        // }else if($commits->isNotEmpty()){
-        //     $commit = $commits->first();
-        // }
-
-        // $package->loadCount('children');
-
-        // $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
-
-        // $favoritesCount = $package->favoritesCount;
-
-        // $isFavorited = auth()->user() ? $package->isFavorited() : null;
-
-        // $tab = request()->query('tab') ?? 'info';
-
-        // $data = compact('package', 'canEdit', 'favoritesCount', 'isFavorited', 'tab', 'commits');
-
-        // if ($commit) {
-        //     $data['commit'] = $commit;
-        // }
-
-        // return Inertia::render('Package/Show', $data);
-        $favoritesCount = $package->favoritesCount;
-
-        $isFavorited = auth()->user() ? $package->isFavorited() : null;
-
-        $data = compact('package', 'favoritesCount', 'isFavorited');
-
-        $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
-
-        if ($canEdit) {
+        if ($data['canEdit']) {
             return Inertia::render('Package/EditBasicInfo', $data);
         } else {
             return Inertia::render('Package/ShowBasicInfo', $data);
@@ -124,10 +91,18 @@ class PackageController extends Controller
 
     }
 
-    public function audio(Package $package)
-    {
-        return Audio::toBase()->where('package_id', $package->id)->get();
-        return [['name' => 'file1'], ['name' => 'file2'], ['name' => 'file3']];
+    public function audio(Package $package){
+        $data = $this->commonInfo($package);
+
+        $data['commits'] = $package->commits()->latest()->get();
+
+        $data['commit'] = $data['commits']->first();
+
+        if ($data['canEdit']) {
+            return Inertia::render('Package/EditAudio', $data);
+        } else {
+            return Inertia::render('Package/ShowAudio', $data);
+        }
     }
 
     function clone (Package $package) {

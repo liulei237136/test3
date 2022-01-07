@@ -10,6 +10,7 @@ use Inertia\Inertia;
 
 class CommitController extends Controller
 {
+
     public function store(Package $package, Commit $commit, Request $request)
     {
         if (auth()->id() !== $package->author->id) return;
