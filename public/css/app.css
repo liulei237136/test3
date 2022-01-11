@@ -2115,6 +2115,11 @@ select {
 .my-bg-gray{
     background-color: #F6F8FA;
 }
+a.active {
+	font-weight: 700;
+	--tw-text-opacity: 1;
+	color: rgba(0, 0, 0, var(--tw-text-opacity));
+}
 .hover\:rounded-lg:hover {
 	border-radius: 0.5rem;
 }

@@ -11,12 +11,13 @@
       <div class="rounded border my-bg-gray p-4">
         <!-- list header -->
         <div class="flex items-center justify-between">
-          <div class="flex items-center">
+          <div class="flex items-center text-gray-500">
             <!-- <div class="flex items-center mr-4"> -->
             <!-- <a href="#" class="flex items-center mr-4"> -->
             <Link
               :href="route('package.pulls', { package: this.package.id, status: 'open' })"
-              class="flex items-center mr-4"
+              class="flex items-center  pulls-status mr-4"
+              :class="{active: status === 'open'}"
             >
               <Icon name="pull" class="w-5 h-5 mr-2"></Icon>
               1 Open
@@ -27,7 +28,8 @@
               :href="
                 route('package.pulls', { package: this.package.id, status: 'closed' })
               "
-              class="flex items-center"
+              class="flex items-center pulls-status"
+              :class="{active: status === 'closed'}"
             >
               <Icon name="check" class="w-5 h-5 mr-1"></Icon>
               9 Closed
@@ -59,6 +61,7 @@ export default defineComponent({
     package: Object,
     canEdit: Boolean,
     pulls: Array,
+    status: String,
   },
   components: {
     Link,

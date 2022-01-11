@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
         // Package::factory()->count(10)->create(['author_id' => 1]);
         // Package::factory()->count(10)->create(['author_id' => 2]);
 
-        // Pull::factory()->count(10)->create();
+        Pull::factory()->count(10)->create();
         // Package::factory()->count(1)->create(['author_id' => 1]);
         // Audio::factory()->count(3000)->create(['package_id' => 1, 'author_id' => 1]);
 

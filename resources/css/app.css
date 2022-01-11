@@ -30,3 +30,7 @@
 .my-bg-gray{
     background-color: #F6F8FA;
 }
+
+a.active {
+    @apply text-black font-bold;
+}
