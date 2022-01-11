@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Audio;
+use App\Models\Commit;
 use App\Models\Package;
 use App\Models\Pull;
 use App\Models\User;
@@ -32,6 +33,11 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
+        // Package::factory()->count(10)->create();
+        // Package::factory()->count(10)->create(['author_id' => 1]);
+        // Package::factory()->count(10)->create(['author_id' => 2]);
+
+        // Pull::factory()->count(10)->create();
         // Package::factory()->count(1)->create(['author_id' => 1]);
         // Audio::factory()->count(3000)->create(['package_id' => 1, 'author_id' => 1]);
 

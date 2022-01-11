@@ -39,15 +39,24 @@ class Package extends Model
         return $builder;
     }
 
+    public function clone($author){
+        //todo validate
+
+        $child = new Package();
+        $child->name = $this->name;
+        $child->description = $this->description;
+        $child->author()->associate($author);
+        $child->parent()->associate($this);
+        $child->save();
+
+        $child->commits()->attach($this->commits);
+
+        return $child;
+    }
+
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
-    }
-
-
-    public function audio()
-    {
-        return $this->hasMany(Audio::class);
     }
 
     public function parent()
@@ -68,4 +77,6 @@ class Package extends Model
     public function pulls(){
         return $this->hasMany(Pull::class, 'to_package');
     }
+
+
 }

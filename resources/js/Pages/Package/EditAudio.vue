@@ -327,7 +327,7 @@ export default defineComponent({
         record.file_name && data.append("file_name", record.file_name);
         record.size && data.append("size", record.size);
         const result = await axios.post(
-          route("package.audio.store", { package: props.package.id }),
+          route("audio.store"),
           data,
           {
             headers: {
@@ -362,10 +362,8 @@ export default defineComponent({
           }
         );
         await Inertia.get(
-          route("package.show", {
+          route("package.audio", {
             package: props.package.id,
-            commit: result.data.data.id,
-            tab: "audio",
           })
         );
       } catch (e) {

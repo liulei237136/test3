@@ -3,7 +3,7 @@
 use App\Http\Controllers\CommitController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MediaController;
-use App\Http\Controllers\PackageAudioController;
+use App\Http\Controllers\AudioController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PullController;
 use App\Http\Controllers\SearchController;
@@ -28,6 +28,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     if (auth()->user()) {
         return Redirect::route('dashboard');
+
     }
     return Inertia::render('Index');
 });
@@ -63,10 +64,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
     Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');
-    Route::post('/packages/{package}/audio', [PackageAudioController::class, 'store'])->name('package.audio.store');
-    Route::post('/packages/{package}/audio/init_upload', [PackageAudioController::class, 'initUpload'])->name('package.audio.init_upload');
-    Route::delete('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'destroy'])->name('package.audio.destroy');
-    Route::patch('/packages/{package}/audio/{audio}', [PackageAudioController::class, 'update'])->name('package.audio.update');
+    Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 
 
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');

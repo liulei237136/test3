@@ -28,7 +28,7 @@ class PackageFactory extends Factory
         return [
             'name' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(30),
-            'author_id' => User::factory()->create()->id,
+            'author_id' => User::factory()->create(),
             'created_at' => $created_at,
             'updated_at' => $updated_at,
         ];

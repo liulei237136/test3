@@ -92,7 +92,7 @@ export default defineComponent({
         data.append("name", file.name);
         try {
           const result = await axios.post(
-            route("package.audio.store", { package: this.p.id }),
+            route("audio.store"),
             data,
             {
               headers: {
@@ -111,7 +111,7 @@ export default defineComponent({
       try {
         const result = await axios.post(
           route("package.commit.store", { package: this.package.id }),
-          { title: "初次保存", path: [], ids }
+          { title: "初次保存", path: [], ids },
         );
         await this.$inertia.get(
           route("package.audio", {

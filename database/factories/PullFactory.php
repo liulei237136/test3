@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Commit;
 use App\Models\Pull;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PullFactory extends Factory
@@ -31,12 +33,26 @@ class PullFactory extends Factory
         // $table->unsignedBigInteger('to_commit');
         // $table->string('status');//open closed
         // $table->timestamps();
+        $to_commit = Commit::factory()->create();
+        $to_package = $to_commit->package;
+        $to_package->commits()->attach($to_commit);
+
+
+        $from_package = $to_package->clone(User::factory()->create());
+        $from_commit = $from_package->commits->first();
+
         return [
-            'title' => 'pull ' + $this->faker->randomNumber(1000),
+            'title' => 'pull ' . $this->faker->randomNumber(),
             'description' => $this->faker->paragraph(30),
-            'author_id' => User::factory()->create()->id,
-            'created_at' => $created_at,
-            'updated_at' => $updated_at,
+            // 'description' => 'descripion',
+            'author_id' => $from_package->author,
+            'from_package' => $from_package,
+            'from_commit' => $from_commit,
+            'to_package' => $to_package,
+            'to_commit' => $to_commit,
+            'status' => rand(0,9) > 5 ? 'open' : 'closed',
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

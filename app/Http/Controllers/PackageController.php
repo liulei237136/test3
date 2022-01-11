@@ -116,22 +116,9 @@ class PackageController extends Controller
     }
 
     function clone (Package $package) {
-        $clonedPackageId = null;
+       $child = $package->clone(auth()->user());
 
-        DB::transaction(function () use ($package, &$clonedPackageId) {
-            $newPackage = new Package();
-            $newPackage->name = $package->name;
-            $newPackage->description = $package->description;
-            $newPackage->author()->associate(auth()->user());
-            $newPackage->parent()->associate($package);
-            $newPackage->save();
-
-            $newPackage->commits()->attach($package->commits);
-
-            $clonedPackageId = $newPackage->id;
-        });
-
-        return Redirect::route('package.show', ['package' => $clonedPackageId, 'tab' => 'audio']);
+       return Redirect::route('package.show', ['package' => $child->id, 'tab' => 'audio']);
     }
 
     public function toggleFavorite(Package $package)

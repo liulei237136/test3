@@ -13,4 +13,8 @@ class Commit extends Model
         'audio' => 'array',
         'path' => 'array',
     ];
+
+    public function package(){
+        return $this->belongsTo(Package::class);
+    }
 }

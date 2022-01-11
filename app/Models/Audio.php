@@ -9,6 +9,8 @@ class Audio extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $guarded = [];
 
     protected $appends = ['url'];
@@ -16,11 +18,6 @@ class Audio extends Model
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
-    }
-
-    public function package()
-    {
-        return $this->belongsTo(Package::class, 'package_id');
     }
 
     public function getUrlAttribute()

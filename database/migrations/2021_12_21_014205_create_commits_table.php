@@ -18,7 +18,7 @@ class CreateCommitsTable extends Migration
             $table->unsignedBigInteger('package_id');
             $table->unsignedBigInteger('author_id');
             $table->string('title');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->json('audio')->nullable();
             $table->json('path')->nullable();
             $table->timestamps();

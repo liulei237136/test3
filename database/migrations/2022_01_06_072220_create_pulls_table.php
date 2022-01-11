@@ -17,7 +17,7 @@ class CreatePullsTable extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->unsignedBigInteger('author');
+            $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('from_package');
             $table->unsignedBigInteger('from_commit');
             $table->unsignedBigInteger('to_package');

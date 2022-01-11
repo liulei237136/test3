@@ -20,11 +20,9 @@ class CreateAudioTable extends Migration
             $table->string('book_name')->nullable();
             $table->text('audio_text')->nullable();
             $table->integer('size')->nullable();
-            $table->unsignedBigInteger('package_id');
             $table->unsignedBigInteger('author_id');
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
 
-            $table->foreign('package_id')->references('id')->on('packages');
             $table->foreign('author_id')->references('id')->on('users');
         });
     }
