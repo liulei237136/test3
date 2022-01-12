@@ -13,7 +13,10 @@ use function PHPUnit\Framework\assertEquals;
 class PackageTest extends TestCase
 {
     use RefreshDatabase;
-
+    public function test_faker2()
+    {
+        $this->assertTrue(true);
+    }
     // public function test_user_can_view_package_list_page(){
     //     $response = $this->get("/packages");
 
@@ -43,7 +46,7 @@ class PackageTest extends TestCase
     //     $response->assertStatus(200);
     // }
 
-    public function test_authenticated_user_can_create_package(){
+    // public function test_authenticated_user_can_create_package(){
         // $this->actingAs(User::factory()->create());
 
         // $package = Package::factory()->make()->toArray();
@@ -53,7 +56,7 @@ class PackageTest extends TestCase
         // $response->assertRedirect(route('package.audio.edit', ['package' => '1']));
 
         // $this->assertEquals(1, Package::all()->count());
-    }
+    // }
 
 
 }

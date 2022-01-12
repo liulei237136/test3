@@ -32,21 +32,20 @@ class CommitFactory extends Factory
         // $table->json('audio')->nullable();
         // $table->json('path')->nullable();
         // $table->timestamps();
-        $package = Package::factory()->create();
+        $user = User::factory()->create();
         $ids = array();
-         Audio::factory()->count(2)->create(['author_id' => 1])->each(function($audio) use( &$ids){
-            array_push($ids, $audio->id);
-         });
+        Audio::factory()->count(10)->create(['author_id' => $user->id])->each(function($audio) use( &$ids){
+           array_push($ids, $audio->id);
+        });
 
         return [
-           'package_id' => $package->id,
+           'package_id' => Package::factory()->create(),
            'author_id' => $package->author->id,
            'title' => 'commit-title-' . $this->faker->title(),
            'description' => 'commit-description-' . $this->faker->paragraph(),
-           'path' => '[]',
+        //    'path' => '[]',
            'audio' => json_encode($ids),
-        //    'audio' => json_encode('[0]'),
-           'created_at' => now(),
+        //    'created_at' => now(),
         ];
     }
 }

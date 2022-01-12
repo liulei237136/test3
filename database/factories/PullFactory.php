@@ -42,9 +42,8 @@ class PullFactory extends Factory
         $from_commit = $from_package->commits->first();
 
         return [
-            'title' => 'pull ' . $this->faker->randomNumber(),
-            'description' => $this->faker->paragraph(30),
-            // 'description' => 'descripion',
+            'title' => $this->faker->title(),
+            'description' => $this->faker->paragraph(),
             'author_id' => $from_package->author,
             'from_package' => $from_package,
             'from_commit' => $from_commit,
