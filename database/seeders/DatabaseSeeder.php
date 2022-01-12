@@ -35,6 +35,9 @@ class DatabaseSeeder extends Seeder
 
         Pull::factory()->count(10)->create();
 
-        Commit::factory()->count(20)->create(['package_id' => Package::factory()->create()->id]);
+        $package = Package::factory()->create();
+        $commits = Commit::factory()->count(20)->create(['package_id' =>$package->id]);
+        $package->commits()->attach($commits);
+
     }
 }

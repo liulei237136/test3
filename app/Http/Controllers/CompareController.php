@@ -28,14 +28,15 @@ class CompareController extends Controller
     }
 
     protected function diffPackage(Package $toPackage, Package $fromPackage){
-        // $diff = array();
-        // $toPath =array_diff( $toPackage->path);
-        // $fromPath = $fromPackage->path;
-        $fromCommits = $fromPackage->commits()->latest()->get(['id']);
-        info(json_encode($fromCommits));
-        // $childDiffParent = array_diff($fromPackage->path, $toPackage->path);
-        // $arr2 = array(1,2,3,5);
-        // $diff = array_diff($arr)
+        $fromPackageCommitIds = $fromPackage->commits()->oldest()->get()->map(function($commit){
+            return $commit->id;
+        })->toArray();
+        $toPackageCommitIds = $toPackage->commits()->oldest()->get()->map(function($commit){
+            return $commit->id;
+        })->toArray();
+        $diff_from_to = array_diff($fromPackageCommitIds, $toPackageCommitIds);
+        $diff_to_from = array_diff($toPackageCommitIds, $fromPackageCommitIds);
 
+        return compact('diff_from_to', 'diff_to_from');
     }
 }
