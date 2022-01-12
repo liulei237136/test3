@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Package;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PackageFactory extends Factory
@@ -24,13 +23,12 @@ class PackageFactory extends Factory
     public function definition()
     {
 
-        $updated_at = $created_at = Carbon::now()->subDay(random_int(1,1000))->subHour(random_int(1,100))->subMinute(random_int(1,100));
         return [
-            'name' => $this->faker->sentence(),
-            'description' => $this->faker->paragraph(30),
+            'title' => $this->faker->title(),
+            'description' => $this->faker->paragraph(),
             'author_id' => User::factory()->create(),
-            'created_at' => $created_at,
-            'updated_at' => $updated_at,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

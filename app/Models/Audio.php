@@ -9,8 +9,6 @@ class Audio extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-
     protected $guarded = [];
 
     protected $appends = ['url'];
@@ -22,10 +20,8 @@ class Audio extends Model
 
     public function getUrlAttribute()
     {
-        if($this->file_name){
+        if ($this->file_name) {
             return url("storage/{$this->file_name}");
-        }else{
-            return;
         }
     }
 }

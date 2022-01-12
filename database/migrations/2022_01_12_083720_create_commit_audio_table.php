@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePackageCommitTable extends Migration
+class CreateCommitAudioTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,15 @@ class CreatePackageCommitTable extends Migration
      */
     public function up()
     {
-        Schema::create('package_commit', function (Blueprint $table) {
-            $table->unsignedBigInteger('package_id');
+        Schema::create('commit_audio', function (Blueprint $table) {
             $table->unsignedBigInteger('commit_id');
-
-            $table->timestamps();
-            $table->unique(['package_id', 'commit_id']);
-            $table->foreign('package_id')->references('id')->on('packages')
-                ->onDelete('cascade');
+            $table->unsignedBigInteger('audio_id');
+            $table->unique(['commit_id', 'audio_id']);
             $table->foreign('commit_id')->references('id')->on('commits')
                 ->onDelete('cascade');
-        });
+            $table->foreign('audio_id')->references('id')->on('audio')
+                ->onDelete('cascade');
+            });
     }
 
     /**
@@ -33,6 +31,6 @@ class CreatePackageCommitTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('package_commit');
+        Schema::dropIfExists('commit_audio');
     }
 }

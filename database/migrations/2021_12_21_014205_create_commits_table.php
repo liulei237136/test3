@@ -15,18 +15,13 @@ class CreateCommitsTable extends Migration
     {
         Schema::create('commits', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('package_id');
             $table->unsignedBigInteger('author_id');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->json('audio')->nullable();
-            $table->json('path')->nullable();
             $table->timestamps();
 
-            $table->foreign('package_id')->references('id')->on('packages');
             $table->foreign('author_id')->references('id')->on('users');
         });
-
 
     }
 

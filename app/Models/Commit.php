@@ -9,12 +9,20 @@ class Commit extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'audio' => 'array',
-        'path' => 'array',
-    ];
+    protected $guarded = [];
 
-    public function package(){
-        return $this->belongsTo(Package::class);
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function package()
+    {
+        return $this->belongsTo(Package::class, 'package_id');
+    }
+
+    public function audio()
+    {
+        return $this->belongsToMany(audio::class, 'commit_audio')->withTimestamps();
     }
 }

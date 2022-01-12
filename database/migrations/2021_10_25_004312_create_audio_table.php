@@ -21,7 +21,7 @@ class CreateAudioTable extends Migration
             $table->text('audio_text')->nullable();
             $table->integer('size')->nullable();
             $table->unsignedBigInteger('author_id');
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('users');
         });
