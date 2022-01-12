@@ -1,15 +1,13 @@
 <?php
 
+use App\Http\Controllers\AudioController;
 use App\Http\Controllers\CommitController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MediaController;
-use App\Http\Controllers\AudioController;
 use App\Http\Controllers\PackageController;
-use App\Http\Controllers\PullController;
 use App\Http\Controllers\SearchController;
 use App\Http\Resources\AudioResource;
 use App\Models\Package;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,7 +21,7 @@ use Inertia\Inertia;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
+ */
 
 Route::get('/', function () {
     if (auth()->user()) {
@@ -35,8 +33,6 @@ Route::get('/', function () {
 Route::get('/test', function () {
     return view('test');
 });
-
-
 
 Route::get('/packages/{package}', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
@@ -50,9 +46,6 @@ Route::get('/commits/{commit}/audio', [CommitController::class, 'audio'])->name(
 // Route::get('/package/{package}/compare', [CompareController::class, 'compare'])->name('compare.compare');
 
 Route::get('/packages/{toPackage}/compare/packages/{fromPackage}', [CompareController::class, 'package'])->name('compare.package');
-
-
-
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -69,10 +62,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');
     Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 
-
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
 
     Route::post('/package/{package}/commits', [CommitController::class, 'store'])->name('package.commit.store');
+
+    Route::post('/commits', [CommitController::class, 'store'])->name('commit.store');
 
 });
 

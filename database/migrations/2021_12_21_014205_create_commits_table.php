@@ -18,6 +18,7 @@ class CreateCommitsTable extends Migration
             $table->unsignedBigInteger('author_id');
             $table->string('title');
             $table->text('description')->nullable();
+            $table->string('file_path');
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('users');
