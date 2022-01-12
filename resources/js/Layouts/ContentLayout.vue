@@ -246,15 +246,7 @@
   <header class="bg-white px-4 sm:px-6 lg:px-8">
     <!-- package标题行  -->
     <div class="flex item-center justify-between">
-      <div class="inline-flex items-center space-x-1 text-blue-500 text-xl">
-        <a href="#" class="hover:underline">{{ package.author.name }}</a>
-        <div class="text-black text-lg">/</div>
-        <Link
-          :href="route('package.show', { package: this.package.id })"
-          class="hover:underline"
-          >{{ package.name }}</Link
-        >
-      </div>
+      <package-link :package="package" classes="text-lg"></package-link>
 
       <div class="inline-flex items-center space-x-4">
         <div class="inline-flex shadow-sm rounded-md" role="group">
@@ -290,8 +282,7 @@
     </div>
     <!-- 显示forkfrom行 -->
     <div v-if="package.parent" class="text-xs">
-      克隆于
-      <user-and-package-link :package="package.parent"></user-and-package-link>
+      克隆于 <package-link :package="package.parent" classes="text-sm"></package-link>
     </div>
     <!-- tabs -->
     <div class="flex items-center space-x-2 mt-4 text-lg content-tab">
@@ -323,7 +314,7 @@
         :href="route('package.pulls', { package: this.package.id })"
         class="px-4 py-2 flex items-center"
         :class="{
-          active: componentName === 'Package/ShowPulls'
+          active: componentName === 'Package/ShowPulls',
         }"
       >
         <Icon name="pull" class="d-none sm:inline w-5 h-5 mr-1"></Icon>
@@ -355,6 +346,7 @@ import JetNavLink from "@/Jetstream/NavLink.vue";
 import JetResponsiveNavLink from "@/Jetstream/ResponsiveNavLink.vue";
 import { Head, Link } from "@inertiajs/inertia-vue3";
 import Icon from "@/Components/Icon.vue";
+import PackageLink from "@/Components/PackageLink.vue";
 
 export default defineComponent({
   props: {
@@ -371,6 +363,7 @@ export default defineComponent({
     JetResponsiveNavLink,
     Link,
     Icon,
+    PackageLink,
   },
 
   data() {

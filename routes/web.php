@@ -49,6 +49,9 @@ Route::get('/commits/{commit}/audio', [CommitController::class, 'audio'])->name(
 
 // Route::get('/package/{package}/compare', [CompareController::class, 'compare'])->name('compare.compare');
 
+Route::get('/packages/{toPackage}/compare/packages/{fromPackage}', [CompareController::class, 'package'])->name('compare.package');
+
+
 
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
@@ -71,7 +74,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post('/package/{package}/commits', [CommitController::class, 'store'])->name('package.commit.store');
 
-    // Route::get('/package/{toPackage}/compare/package/{fromPackage}', [CompareController::class, 'package'])->route('compare.package');
 });
 
 Route::get('/test/{package}', function ($package) {

@@ -3,9 +3,12 @@
     <div class="max-w-7xl mx-auto">
       <!-- 新建拉取行 -->
       <div class="flex justify-between mb-4">
-        <button class="bg-green-500 px-4 py-2 rounded" @click="onNewPull">
+        <!-- <button class="bg-green-500 px-4 py-2 rounded" @click="onNewPull">
           新建一个拉取
-        </button>
+        </button> -->
+        <Link as="button" class="bg-green-500 px-4 py-2 rounded" :href="newPullHref">
+          新建一个拉取</Link
+        >
       </div>
       <!-- 列表头和列表体 -->
       <div class="rounded border my-bg-gray p-4">
@@ -16,8 +19,8 @@
             <!-- <a href="#" class="flex items-center mr-4"> -->
             <Link
               :href="route('package.pulls', { package: this.package.id, status: 'open' })"
-              class="flex items-center  pulls-status mr-4"
-              :class="{active: status === 'open'}"
+              class="flex items-center pulls-status mr-4"
+              :class="{ active: status === 'open' }"
             >
               <Icon name="pull" class="w-5 h-5 mr-2"></Icon>
               1 Open
@@ -29,7 +32,7 @@
                 route('package.pulls', { package: this.package.id, status: 'closed' })
               "
               class="flex items-center pulls-status"
-              :class="{active: status === 'closed'}"
+              :class="{ active: status === 'closed' }"
             >
               <Icon name="check" class="w-5 h-5 mr-1"></Icon>
               9 Closed
@@ -81,10 +84,11 @@ export default defineComponent({
       }
       // Inertia.get(route('compare.package', {toPackage:}));
     };
-    onMounted(() => {});
+    const newPullHref = "#";
     return {
       demo,
       onNewPull,
+      newPullHref,
     };
   },
 });
