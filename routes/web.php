@@ -60,13 +60,14 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
     Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');
-    Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
 
     Route::post('/package/{package}/commits', [CommitController::class, 'store'])->name('package.commit.store');
 
     Route::post('/commits', [CommitController::class, 'store'])->name('commit.store');
+
+    Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 
 });
 

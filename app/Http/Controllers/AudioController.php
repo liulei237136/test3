@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Audio;
+use App\Models\Commit;
 use Illuminate\Http\Request;
-
-use function Psy\debug;
 
 class AudioController extends Controller
 {
-    public function store(Audio $audio,Request $request)
+    public function store(Audio $audio, Request $request)
     {
-
+        //todo commit validate
         $request->validate([
             'file' => ['file', 'max:512000'],
             'name' => ['string', 'max:100'],
@@ -23,10 +22,13 @@ class AudioController extends Controller
             'book_name' => '所属书名不能长于100个字',
             'audio_text' => '音频的文字内容不能长于1000个字',
         ]);
-        if($request->file_name && $request->size){
+
+        $commit = Commit::findOrFail($request->input('commit'));
+
+        if ($request->file_name && $request->size) {
             $audio->file_name = $request->file_name;
             $audio->size = $request->size;
-        }else if ($file = $request->file('file')) {
+        } else if ($file = $request->file('file')) {
             $directory = "audio/" . date('Y/m/d');
             $file_name = $file->store($directory, 'public');
             if (!$file_name) {
@@ -40,10 +42,11 @@ class AudioController extends Controller
 
         $audio->name = $request->name;
         $audio->book_name = $request->book_name;
-        $audio->audio_text =$request->audio_text;
+        $audio->audio_text = $request->audio_text;
         $audio->author_id = auth()->id();
 
         if ($audio->save()) {
+
             return [
                 'success' => true,
                 'data' => $audio,

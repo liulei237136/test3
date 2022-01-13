@@ -15,11 +15,11 @@ class CreateAudioTable extends Migration
     {
         Schema::create('audio', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
             $table->string('file_name')->nullable();
+            $table->string('file_path')->nullable();
             $table->string('book_name')->nullable();
-            $table->text('audio_text')->nullable();
-            $table->integer('size')->nullable();
+            $table->text('original_text')->nullable();;
+            $table->integer('file_size')->nullable();
             $table->unsignedBigInteger('author_id');
             $table->timestamps();
 
