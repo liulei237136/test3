@@ -20,18 +20,11 @@ class AudioTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
-    public function test_authorized_user_can_create_audio()
+    public function test_authorized_user_can_create_audio_with_only_file()
     {
         $this->actingAs($user = User::factory()->create());
 
-        // $table->string('file_name')->nullable();
-        // $table->string('file_path')->nullable();
-        // $table->string('book_name')->nullable();
-        // $table->text('original_text')->nullable();;
-        // $table->integer('file_size')->nullable();
-        // $table->unsignedBigInteger('author_id');
-        // $table->timestamps();
-        Storage::fake('audio');
+        $public = Storage::fake('public');
 
         $file = UploadedFile::fake()->create('65001.mp3', 20, 'audio/mpeg');
 
@@ -39,17 +32,61 @@ class AudioTest extends TestCase
             'file' => $file,
         ]);
 
-        Storage::disk('audio')->assertExists($file->hashName());
+        $file_path = "audio/" . date('Y/m/d') . '/' . $file->hashName();
 
-        //3 the database has new commit
+        $public->assertExists($file_path);
+
         $this->assertEquals(Audio::count(), 1);
         $first = Audio::first();
-        $this->assertEquals($first->file_name, '65001.mp3');
-        $this->assertEquals($first->file_path, "audio/" . date('Y/m/d') . $file->hashName());
+        $this->assertEquals($first->file_name, null);
+        $this->assertEquals($first->file_path, $file_path);
         $this->assertEquals($first->file_size, 20 * 1024);
         $this->assertEquals($first->author_id, $user->id);
+        $response->assertSessionHasNoErrors();
+    }
 
-        //4 session has no error
+    public function test_authorized_user_can_create_audio_without_file()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->actingAs($user = User::factory()->create());
+
+        $response = $this->post(route('audio.store'), [
+            'file_name' => '65001.mp3',
+        ]);
+
+        $this->assertEquals(Audio::count(), 1);
+
+        $first = Audio::first();
+        $this->assertEquals($first->file_name, '65001.mp3');
+        $this->assertEquals($first->file_path, null);
+        $this->assertEquals($first->file_size, null);
+        $this->assertEquals($first->author_id, $user->id);
+        $response->assertSessionHasNoErrors();
+    }
+
+    public function test_authorized_user_can_create_audio_from_import()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->actingAs($user = User::factory()->create());
+
+        $file = UploadedFile::fake()->create('65001.mp3', 20, 'audio/mpeg');
+        $file_path = "audio/" . date('Y/m/d') . '/' . $file->hashName();
+        $file_size = $file->getSize();
+        $response = $this->post(route('audio.store'), [
+            'file_path' => $file_path,
+            'file_size' => $file_size,
+
+        ]);
+
+        $this->assertEquals(Audio::count(), 1);
+
+        $first = Audio::first();
+        $this->assertEquals($first->file_name, null);
+        $this->assertEquals($first->file_path, $file_path);
+        $this->assertEquals($first->file_size, $file_size);
+        $this->assertEquals($first->author_id, $user->id);
         $response->assertSessionHasNoErrors();
     }
 }

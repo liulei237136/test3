@@ -6,8 +6,6 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\SearchController;
-use App\Http\Resources\AudioResource;
-use App\Models\Package;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,10 +28,8 @@ Route::get('/', function () {
     }
     return Inertia::render('Index');
 });
-Route::get('/test', function () {
-    return view('test');
-});
 
+Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
 Route::get('/packages/{package}/pulls', [PackageController::class, 'pulls'])->name('package.pulls');
@@ -69,10 +65,4 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 
-});
-
-Route::get('/test/{package}', function ($package) {
-    $p = Package::without('audio')->findOrFail($package);
-    $audio = AudioResource::collection($p->audio);
-    return ['package' => $p, 'audio' => $audio];
 });

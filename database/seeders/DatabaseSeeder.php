@@ -2,13 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Audio;
-use App\Models\Commit;
 use App\Models\Package;
-use App\Models\Pull;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -33,11 +29,11 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        Pull::factory()->count(10)->create();
+        Package::factory()->count(16)->create();
 
-        $package = Package::factory()->create();
-        $commits = Commit::factory()->count(20)->create(['package_id' =>$package->id]);
-        $package->commits()->attach($commits);
+        // Package::factory()->count(16)->create();
+        // $commits = Commit::factory()->count(20)->create(['package_id' =>$package->id]);
+        // $package->commits()->attach($commits);
 
     }
 }

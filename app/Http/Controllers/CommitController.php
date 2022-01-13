@@ -22,6 +22,7 @@ class CommitController extends Controller
         $commit->author_id = auth()->id();
         $commit->title = $request->input('title');
         $commit->description = $request->input('description');
+        $commit->audio_ids = $request->input('audio_ids');
         if ($commit->save()) {
             $package->commits()->attach($commit);
             return [

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\PackageResource;
+use App\Http\Traits\CommonInfoTrait;
 use App\Models\Audio;
 use App\Models\Package;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use App\Http\Traits\CommonInfoTrait;
 
 class PackageController extends Controller
 {
@@ -20,20 +19,12 @@ class PackageController extends Controller
     {
         $package = PackageResource::collection(
             Package::with('author')
-                ->month(request('month'))
-                ->search(request('term'))
-                ->paginate()
+                ->latest()
+                ->paginate(15)
         );
-
-        $months = DB::table('packages')
-            ->selectRaw('distinct DATE_FORMAT(created_at, "01-%m-%Y") as value, DATE_FORMAT(created_at, "%M %Y") as label, created_at as sort')
-            ->orderByDesc('sort')
-            ->get();
 
         return Inertia::render('Package/Index', [
             'package' => $package,
-            'months' => $months,
-            'queryParams' => request()->all(['month', 'term']),
         ]);
     }
 
@@ -50,7 +41,7 @@ class PackageController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:3000'],
             'private' => Rule::in([true, false]),
         ]);
@@ -91,7 +82,8 @@ class PackageController extends Controller
 
     }
 
-    public function audio(Package $package){
+    public function audio(Package $package)
+    {
         $data = $this->commonInfo($package);
 
         $data['commits'] = $package->commits()->latest()->get();
@@ -105,7 +97,8 @@ class PackageController extends Controller
         }
     }
 
-    public function pulls(Package $package, Request $request){
+    public function pulls(Package $package, Request $request)
+    {
         $data = $this->commonInfo($package);
 
         $data['status'] = $request->query('status') ?? 'open';
@@ -116,9 +109,9 @@ class PackageController extends Controller
     }
 
     function clone (Package $package) {
-       $child = $package->clone(auth()->user());
+        $child = $package->clone(auth()->user());
 
-       return Redirect::route('package.show', ['package' => $child->id, 'tab' => 'audio']);
+        return Redirect::route('package.show', ['package' => $child->id, 'tab' => 'audio']);
     }
 
     public function toggleFavorite(Package $package)
