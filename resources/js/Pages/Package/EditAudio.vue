@@ -82,13 +82,12 @@
               >
                 <Link
                   :to="
-                    route('package.show', {
+                    route('package.audio', {
                       package: package.id,
                       commit: commit.id,
-                      tab: 'audio',
                     })
                   "
-                  :title="commit.description ? commit.description : commit.title"
+                  :title="commit.title"
                   >{{ commit.title }}</Link
                 >
               </div>
@@ -243,7 +242,7 @@ export default defineComponent({
       saveFormRules: {
         title: [
           { required: true, message: "请输入本次保存的名称" },
-          { min: 3, max: 56, message: "长度在 3 到 56 个字符" },
+          { min: 3, max: 256, message: "长度在 3 到 256 个字符" },
         ],
         description: [{ max: 1000, message: "长度小于1000个字符" }],
       },
@@ -272,21 +271,6 @@ export default defineComponent({
         : props.commits;
     };
 
-    const commitSelectEvent = (commit) => {
-      const $pulldown = xDown.value;
-      //   demo1.value1 = item.label;
-      $pulldown.hidePanel().then(() => {
-        // demo1.list1 = data1;
-        Inertia.get(
-          route("package.show", {
-            package: props.package.id,
-            commit: commit.id,
-            tab: "audio",
-          })
-        );
-      });
-    };
-
     const onSave = async () => {
       const { insertRecords, updateRecords, removeRecords } = xGrid.value.getRecordset();
       // 如果没有改变
@@ -313,18 +297,21 @@ export default defineComponent({
         removeAudioIds.push(record.id);
         insertRecords.push(record);
       });
-      console.log("insertRecords", insertRecords);
 
       //2.开始新增audio
       for (let record of insertRecords) {
         const data = new FormData();
-        console.log("new record", record);
-        record.file && data.append("file", record.file);
-        record.name && data.append("name", record.name);
-        record.book_name && data.append("book_name", record.book_name);
-        record.audio_text && data.append("audio_text", record.audio_text);
+        // console.log("new record", record);
+        //优先级 recordFile > localFile
+        const fileToUpload = record.audioFile || record.localFile;
+        if (fileToUpload) {
+          data.append("file", fileToUpload);
+        }
         record.file_name && data.append("file_name", record.file_name);
-        record.size && data.append("size", record.size);
+        record.book_name && data.append("book_name", record.book_name);
+        record.original_text && data.append("original_text", record.original_text);
+        record.file_path && data.append("file_path", record.file_path);
+        record.file_size && data.append("file_size", record.file_size);
         const result = await axios.post(route("audio.store"), data, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -338,8 +325,8 @@ export default defineComponent({
       demo.audioList.forEach((audio) => {
         if (!removeAudioIds.includes(audio.id)) unchangedAudioIds.push(audio.id);
       });
-      console.log("unchangedAudioIds", unchangedAudioIds);
-      console.log("insertAudioIds", insertAudioIds);
+      //   console.log("unchangedAudioIds", unchangedAudioIds);
+      //   console.log("insertAudioIds", insertAudioIds);
       audio_ids = unchangedAudioIds.concat(insertAudioIds);
       console.log(audio_ids);
 
@@ -349,27 +336,6 @@ export default defineComponent({
         description: demo.saveFormData.description,
         audio_ids,
       });
-      //   try {
-      //     const path = props.commit
-      //       ? JSON.parse(props.commit.path).concat([props.commit.id])
-      //       : [];
-      //     const result = await axios.post(
-      //       route("package.commit.store", { package: props.package.id }),
-      //       {
-      //         title: demo.saveFormData.title,
-      //         description: demo.saveFormData.description,
-      //         path,
-      //         audio_ids,
-      //       }
-      //     );
-      //     await Inertia.get(
-      //       route("package.audio", {
-      //         package: props.package.id,
-      //       })
-      //     );
-      //   } catch (e) {
-      //     console.log(e);
-      //   }
     };
 
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
@@ -381,14 +347,14 @@ export default defineComponent({
     };
 
     const nameSortBy = ({ row, column }) => {
-      const name = XEUtils.toValueString(row.name).trim();
-      if (!name) return -1;
+      const file_name = XEUtils.toValueString(row.file_name).trim();
+      if (!file_name) return -1;
       //todo
-      const matchMp3 = name.match("^([0-9]{1,8}).mp3$");
+      const matchMp3 = file_name.match("^([0-9]{1,8}).mp3$");
       if (matchMp3) {
         return parseInt(matchMp3[1]);
       } else {
-        const matchNumber = name.match("^[0-9]{1,8}$");
+        const matchNumber = file_name.match("^[0-9]{1,8}$");
         if (matchNumber) {
           return parseInt(matchNumber[1]);
         }
@@ -437,8 +403,8 @@ export default defineComponent({
         { type: "checkbox", width: 40 },
         { type: "seq", width: 60 },
         {
-          field: "name",
-          title: "文件名",
+          field: "file_name",
+          title: "音频文件名",
           sortable: true,
           sortBy: nameSortBy,
           titleHelp: { message: "注意要加上文件后缀" },
@@ -449,10 +415,10 @@ export default defineComponent({
           filterRender: { name: "$input" },
         },
         //for export only
-        { field: "file_name", visible: false },
-        { field: "size", visible: false },
+        { field: "file_path", title: "原音频文件路径", visible: false },
+        { field: "file_size", title: "原音频文件大小", visible: false },
         {
-          title: "源音频",
+          title: "原音频",
           width: 210,
           slots: {
             default: "source_audio",
@@ -466,7 +432,7 @@ export default defineComponent({
           },
         },
         {
-          title: "本次录音",
+          title: "本次插入录音",
           width: 370,
           slots: {
             default: "record_audio",
@@ -487,17 +453,10 @@ export default defineComponent({
         ajax: {
           // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
           query: async ({ page, sorts, filters, form }) => {
-            const audioList = getCommitAudio();
+            demo.audioList = getCommitAudio();
             resetAll();
-            return audioList;
+            return demo.audioList;
           },
-          //   delete: ({ body }) => {
-          //     return xGrid.value.removeCheckboxRow();
-          //   },
-          //   save: async (item) => {
-          //     console.log(item);
-          //     return;
-          //   },
         },
       },
       checkboxConfig: {
@@ -505,7 +464,7 @@ export default defineComponent({
         range: true,
       },
       editRules: {
-        name: [{ min: 3, max: 50, message: "名称长度在 3 到 50 个字符" }],
+        // file_name: [{ min: 3, max: 225, message: "名称长度在 3 到 225 个字符" }],
       },
       editConfig: {
         trigger: "click",
@@ -517,7 +476,7 @@ export default defineComponent({
     const insertEmptyAt = async (index) => {
       const grid = xGrid.value;
       const { row } = await grid.insertAt({}, index);
-      await grid.setActiveCell(row, "name");
+      await grid.setActiveCell(row, "file_name");
     };
 
     const insertEmptyBeforeSelected = async () => {
@@ -619,9 +578,9 @@ export default defineComponent({
               mode: "all", //	urrent, selected, all
               original: true,
               columns: [
-                { field: "name" },
                 { field: "file_name" },
-                { field: "size" },
+                { field: "file_path" },
+                { field: "file_size" },
                 { field: "book_name" },
               ],
             });
@@ -676,7 +635,6 @@ export default defineComponent({
       gridEvents,
       commitFocusEvent,
       commitKeyupEvent,
-      commitSelectEvent,
       onAudioPlayEvent,
     };
   },

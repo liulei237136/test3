@@ -23,7 +23,7 @@ class CommitController extends Controller
             [
                 'title' => ['required', 'string', 'min:3', 'max:256'],
                 'description' => ['nullable', 'string'],
-                'audio_ids' => ['required', 'array'],
+                'audio_ids' => ['required', 'string'],
             ],
             [
                 'title.min' => '保存名最短3个字符',
@@ -32,7 +32,6 @@ class CommitController extends Controller
         );
 
         $validated['author_id'] = auth()->id();
-        $validated['audio_ids'] = json_encode($validated['audio_ids']);
 
         $package->commits()->create($validated);
 

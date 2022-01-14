@@ -20,13 +20,12 @@
               >
                 <Link
                   :to="
-                    route('package.show', {
+                    route('package.audio', {
                       package: package.id,
                       commit: commit.id,
-                      tab: 'audio',
                     })
                   "
-                  :title="commit.description ? commit.description : commit.title"
+                  :title="commit.title"
                   >{{ commit.title }}</Link
                 >
               </div>
@@ -123,20 +122,6 @@ export default defineComponent({
         : props.commits;
     };
 
-    const commitSelectEvent = (commit) => {
-      const $pulldown = xDown.value;
-      //   demo1.value1 = item.label;
-      $pulldown.hidePanel().then(() => {
-        // demo1.list1 = data1;
-        Inertia.get(
-          route("package.show", {
-            package: props.package.id,
-            commit: commit.id,
-            tab: "audio",
-          })
-        );
-      });
-    };
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
       return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
     };
@@ -201,8 +186,8 @@ export default defineComponent({
         { type: "checkbox", width: 40 },
         { type: "seq", width: 60 },
         {
-          field: "name",
-          title: "文件名",
+          field: "file_name",
+          title: "音频文件名",
           width: 120,
           sortable: true,
           sortBy: nameSortBy,
@@ -213,8 +198,8 @@ export default defineComponent({
           filterRender: { name: "$input" },
         },
         //for export only
-        { field: "file_name", visible: false },
-        { field: "size", visible: false },
+        { field: "file_path", title: "音频文件路径", visible: false },
+        { field: "size", title: "音频文件大小(字节)", visible: false },
         {
           title: "音频",
           width: 300,
@@ -236,9 +221,9 @@ export default defineComponent({
         ajax: {
           // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
           query: async ({ page, sorts, filters, form }) => {
-            const audioList = await getCommitAudio();
+            demo.audioList = await getCommitAudio();
             resetAll();
-            return audioList;
+            return demo.audioList;
           },
         },
       },
@@ -293,7 +278,6 @@ export default defineComponent({
       gridEvents,
       commitFocusEvent,
       commitKeyupEvent,
-      commitSelectEvent,
       onAudioPlayEvent,
     };
   },

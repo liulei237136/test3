@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PackageResource;
 use App\Http\Traits\CommonInfoTrait;
 use App\Models\Audio;
+use App\Models\Commit;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -91,13 +92,19 @@ class PackageController extends Controller
 
     }
 
-    public function audio(Package $package)
+    public function audio(Package $package, Request $request)
     {
         $data = $this->commonInfo($package);
 
-        $data['commits'] = $package->commits()->latest()->get();
+        $data['commits'] = $package->commits()->latest('commits.created_at')->get(['id', 'title']);
 
-        $data['commit'] = $data['commits']->first();
+        $commit_id = $request->input('commit');
+
+        if ($commit_id) {
+            $data['commit'] = Commit::findOrFail($commit_id);
+        } else if ($data['commits']->isNotEmpty()) {
+            $data['commit'] = Commit::findOrFail($data['commits']->first()['id']);
+        }
 
         if ($data['canEdit']) {
             return Inertia::render('Package/EditAudio', $data);
