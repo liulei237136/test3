@@ -1,36 +1,22 @@
 <template>
   <div>
-    <header class="mb-1 text-lg font-bold text-blue-600">
+    <header class="mb-1 text-lg">
       <h2 class="truncate">
-        <Link :href="route('package.show', { package: package.id, tab: 'info' })">{{
-          package.name
+        <Link :href="route('package.show', { package: package.id})">{{
+          package.title
         }}</Link>
       </h2>
     </header>
-    <p :title="package.description" class="truncate text-sm text-gray-500">
-      {{ package.description }}
-    </p>
+
     <footer>
-      <div class="flex items-center space-x-4 mt-2">
-        <div>
-          <a href="#">
-            <img
-              class="rounded-full"
-              :src="package.author.profile_photo_url"
-              :alt="package.author.name"
-              width="32"
-              height="32"
-          /></a>
-        </div>
-        <div class="text-sm flex space-x-2">
-          <span class="text-gray-500 ">由 </span>
-          <a class="" href="#" style="outline: currentcolor none medium">{{
+        <div class="text-sm text-gray-500 ">
+            作者:
+          <a href="#" class="hover:underline">{{
             package.author.name
           }}</a>
-          <span class="text-gray-500 ">创立于 </span>
-          <span class="ml-2 text-gray-500">{{ package.updated_at.substr(0,10) }}</span>
+          <span class="ml-4">创建于{{ ' ' + package.created_at.substr(0,10)}} </span>
+          <span v-if="package.created_at !== package.updated_at" class="ml-4">最后更新于{{ ' ' + package.updated_at.substr(0,10) + ' ' +  package.updated_at.substr(11,8) }}</span>
         </div>
-      </div>
     </footer>
   </div>
 </template>

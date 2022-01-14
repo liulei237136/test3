@@ -81,7 +81,7 @@ export default defineComponent({
         count++;
         const data = new FormData();
         data.append("file", file);
-        data.append("name", file.name);
+        data.append("file_name", file.name);
         try {
           const result = await axios.post(route("audio.store"), data, {
             headers: {
@@ -97,10 +97,16 @@ export default defineComponent({
         this.percent = Math.ceil((count / lengthOfFiles) * 100);
       }
 
-      this.$inertia.post(route("commit.store"), {
+      console.log({
         package: this.package.id,
         title: "初次保存",
         audio_ids,
+      });
+    //   return;
+      this.$inertia.post(route("commit.store"), {
+        package: this.package.id,
+        title: "初次保存",
+        audio_ids: JSON.stringify(audio_ids),
       });
       //   try {
       //     const result = await axios.post(route("commit.store"), {

@@ -9,7 +9,6 @@
       min-height="320"
       show-zoom
       resize
-      remember
       storage
       transfer
     >
@@ -88,6 +87,7 @@
                     })
                   "
                   :title="commit.title"
+                  class="inline-block w-full"
                   >{{ commit.title }}</Link
                 >
               </div>
@@ -317,7 +317,6 @@ export default defineComponent({
             "Content-Type": "multipart/form-data",
           },
         });
-        console.log("result", result);
         insertAudioIds.push(result.data.data.id);
       }
 
@@ -330,12 +329,23 @@ export default defineComponent({
       audio_ids = unchangedAudioIds.concat(insertAudioIds);
       console.log(audio_ids);
 
-      Inertia.post(route("commit.store"), {
-        package: props.package.id,
-        title: demo.saveFormData.title,
-        description: demo.saveFormData.description,
-        audio_ids,
-      });
+      await Inertia.post(
+        route("commit.store"),
+        {
+          package: props.package.id,
+          title: demo.saveFormData.title,
+          description: demo.saveFormData.description,
+          audio_ids: JSON.stringify(audio_ids),
+        },
+        {
+          onSuccess() {
+            demo.showSaveModal = false;
+          },
+          onFinish() {
+            demo.saveFormLoading = false;
+          },
+        }
+      );
     };
 
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
@@ -405,6 +415,7 @@ export default defineComponent({
         {
           field: "file_name",
           title: "音频文件名",
+          width:210,
           sortable: true,
           sortBy: nameSortBy,
           titleHelp: { message: "注意要加上文件后缀" },
@@ -415,10 +426,10 @@ export default defineComponent({
           filterRender: { name: "$input" },
         },
         //for export only
-        { field: "file_path", title: "原音频文件路径", visible: false },
-        { field: "file_size", title: "原音频文件大小", visible: false },
+        { field: "file_path", title: "音频文件路径", visible: false },
+        { field: "file_size", title: "音频文件大小", visible: false },
         {
-          title: "原音频",
+          title: "音频",
           width: 210,
           slots: {
             default: "source_audio",
@@ -432,7 +443,7 @@ export default defineComponent({
           },
         },
         {
-          title: "本次插入录音",
+          title: "本次录音",
           width: 370,
           slots: {
             default: "record_audio",
@@ -453,7 +464,7 @@ export default defineComponent({
         ajax: {
           // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
           query: async ({ page, sorts, filters, form }) => {
-            demo.audioList = getCommitAudio();
+            demo.audioList = await getCommitAudio();
             resetAll();
             return demo.audioList;
           },
@@ -464,7 +475,7 @@ export default defineComponent({
         range: true,
       },
       editRules: {
-        // file_name: [{ min: 3, max: 225, message: "名称长度在 3 到 225 个字符" }],
+        file_name: [{ max: 225, message: "名称长度最长 225 个字符" }],
       },
       editConfig: {
         trigger: "click",
@@ -550,7 +561,7 @@ export default defineComponent({
     };
 
     const resetAll = () => {
-      console.log("reset all");
+      //   console.log("reset all");
     };
 
     const gridEvents = {
@@ -561,7 +572,7 @@ export default defineComponent({
             $grid.importData({
               mode: "insert",
               afterImportMethod: () => {
-                console.log($grid.getRecordset());
+                // console.log($grid.getRecordset());
               },
             });
             // $grid.openImport();
@@ -588,33 +599,7 @@ export default defineComponent({
       },
     };
 
-    onMounted(async () => {
-      //    1. get commits
-      //2. try to get commitId
-      //3. use the id to get audios
-      //   const r = url.parse(this.$inertia.url, true);
-      //   console.log(r.query);
-      //   demo.commits = await getCommits();
-      //   console.log(item);
-      //   getCommitAudio();
-      //   const sexList = [
-      //     { label: "女", value: "0" },
-      //     { label: "男", value: "1" },
-      //   ];
-      //   const { formConfig, columns } = gridOptions;
-      //   if (columns) {
-      //     const sexColumn = columns[5];
-      //     if (sexColumn && sexColumn.editRender) {
-      //       sexColumn.editRender.options = sexList;
-      //     }
-      //   }
-      //   if (formConfig && formConfig.items) {
-      //     const sexItem = formConfig.items[4];
-      //     if (sexItem && sexItem.itemRender) {
-      //       sexItem.itemRender.options = sexList;
-      //     }
-      //   }
-    });
+    onMounted(async () => {});
 
     return {
       xGrid,

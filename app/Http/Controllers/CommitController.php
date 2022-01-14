@@ -23,7 +23,7 @@ class CommitController extends Controller
             [
                 'title' => ['required', 'string', 'min:3', 'max:256'],
                 'description' => ['nullable', 'string'],
-                'audio_ids' => ['required', 'string'],
+                'audio_ids' => ['required'],
             ],
             [
                 'title.min' => '保存名最短3个字符',
@@ -33,9 +33,9 @@ class CommitController extends Controller
 
         $validated['author_id'] = auth()->id();
 
-        $package->commits()->create($validated);
+        $commit = $package->commits()->create($validated);
 
-        return Redirect::route('package.audio', ['package' => $package->id])->with('success', '保存成功');
+        return Redirect::route('package.audio', ['package' => $package->id,'commit'=>$commit->id])->with('success', '保存成功');
     }
 
     public function audio(Commit $commit)

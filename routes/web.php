@@ -29,6 +29,7 @@ Route::get('/', function () {
     return Inertia::render('Index');
 });
 
+
 Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');

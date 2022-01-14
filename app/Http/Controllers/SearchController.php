@@ -58,7 +58,7 @@ class SearchController extends Controller
             $o = $queryParams['o'] = 'desc';
         }
         //todo
-        $package = Package::query()->where('name', 'like', '%' . $q . '%');
+        $package = Package::query()->where('title', 'like', '%' . $q . '%');
         switch($s){
             case 'match':
                 //todo match is the highest points not latest()
