@@ -33,7 +33,6 @@
                 @change="saveForm.clearValidate('title')"
                 v-model="data.title"
                 placeholder=""
-
                 clearable
               ></vxe-input>
             </template>
@@ -307,7 +306,7 @@ export default defineComponent({
       const removeAudioIds = [];
       const insertAudioIds = [];
       const unchangedAudioIds = [];
-      let ids = [];
+      let audio_ids = [];
       //1清理需要'删除'和新增的
       removeRecords.forEach((record) => removeAudioIds.push(record.id));
       updateRecords.forEach((record) => {
@@ -326,15 +325,11 @@ export default defineComponent({
         record.audio_text && data.append("audio_text", record.audio_text);
         record.file_name && data.append("file_name", record.file_name);
         record.size && data.append("size", record.size);
-        const result = await axios.post(
-          route("audio.store"),
-          data,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const result = await axios.post(route("audio.store"), data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
         console.log("result", result);
         insertAudioIds.push(result.data.data.id);
       }
@@ -345,30 +340,36 @@ export default defineComponent({
       });
       console.log("unchangedAudioIds", unchangedAudioIds);
       console.log("insertAudioIds", insertAudioIds);
-      ids = unchangedAudioIds.concat(insertAudioIds);
-      console.log(ids);
+      audio_ids = unchangedAudioIds.concat(insertAudioIds);
+      console.log(audio_ids);
 
-      try {
-        const path = props.commit
-          ? JSON.parse(props.commit.path).concat([props.commit.id])
-          : [];
-        const result = await axios.post(
-          route("package.commit.store", { package: props.package.id }),
-          {
-            title: demo.saveFormData.title,
-            description: demo.saveFormData.description,
-            path,
-            ids,
-          }
-        );
-        await Inertia.get(
-          route("package.audio", {
-            package: props.package.id,
-          })
-        );
-      } catch (e) {
-        console.log(e);
-      }
+      Inertia.post(route("commit.store"), {
+        package: props.package.id,
+        title: demo.saveFormData.title,
+        description: demo.saveFormData.description,
+        audio_ids,
+      });
+      //   try {
+      //     const path = props.commit
+      //       ? JSON.parse(props.commit.path).concat([props.commit.id])
+      //       : [];
+      //     const result = await axios.post(
+      //       route("package.commit.store", { package: props.package.id }),
+      //       {
+      //         title: demo.saveFormData.title,
+      //         description: demo.saveFormData.description,
+      //         path,
+      //         audio_ids,
+      //       }
+      //     );
+      //     await Inertia.get(
+      //       route("package.audio", {
+      //         package: props.package.id,
+      //       })
+      //     );
+      //   } catch (e) {
+      //     console.log(e);
+      //   }
     };
 
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
@@ -486,7 +487,7 @@ export default defineComponent({
         ajax: {
           // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
           query: async ({ page, sorts, filters, form }) => {
-            const audioList = await getCommitAudio();
+            const audioList = getCommitAudio();
             resetAll();
             return audioList;
           },
@@ -581,18 +582,12 @@ export default defineComponent({
     };
 
     const getCommitAudio = async () => {
-      if (props.package && props.package.id && props.commit && props.commit.id) {
-        const result = await axios(
-          route("commit.audio", {
-            commit: props.commit.id,
-          })
-        );
-        console.log("result.data", result.data);
-        demo.audioList = result.data.audio;
-      } else {
-        demo.audioList = [];
-      }
-      return demo.audioList;
+      const $result = await axios(
+        route("commit.audio", {
+          commit: props?.commit?.id,
+        })
+      );
+      return $result.data.audio_list;
     };
 
     const resetAll = () => {

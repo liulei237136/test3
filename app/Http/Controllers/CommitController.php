@@ -6,38 +6,45 @@ use App\Models\Audio;
 use App\Models\Commit;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 
 class CommitController extends Controller
 {
 
-    public function store(Commit $commit, Request $request)
+    public function store(Request $request)
     {
-        //todo validate
         $package = Package::findOrFail($request->input('package'));
 
         if (auth()->id() !== $package->author->id) {
             abort(401);
         }
 
-        $commit->author_id = auth()->id();
-        $commit->title = $request->input('title');
-        $commit->description = $request->input('description');
-        $commit->audio_ids = $request->input('audio_ids');
-        if ($commit->save()) {
-            $package->commits()->attach($commit);
-            return [
-                'success' => true,
-                'data' => $commit,
-            ];
-        }
-        return ['success' => false];
+        $validated = $request->validate(
+            [
+                'title' => ['required', 'string', 'min:3', 'max:256'],
+                'description' => ['nullable', 'string'],
+                'audio_ids' => ['required', 'array'],
+            ],
+            [
+                'title.min' => '保存名最短3个字符',
+                'title.max' => '保存名最长256个字符',
+            ]
+        );
+
+        $validated['author_id'] = auth()->id();
+        $validated['audio_ids'] = json_encode($validated['audio_ids']);
+
+        $package->commits()->create($validated);
+
+        return Redirect::route('package.audio', ['package' => $package->id])->with('success', '保存成功');
     }
 
     public function audio(Commit $commit)
     {
         //todo the package is not private or the use is the author of commit
-        $audio = Audio::find(json_decode($commit->audio));
+        // $audio = Audio::find(json_decode($commit->audio));
+        $audio_list = $commit->audioList;
 
-        return compact('audio');
+        return compact('audio_list');
     }
 }

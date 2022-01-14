@@ -1,24 +1,24 @@
 <template>
   <content-layout>
     <form @submit.prevent="updatePackage" class="ml-2">
-      <!-- Name -->
+      <!-- title -->
       <div class="mb-5">
-        <jet-label for="name" value="名称" />
+        <jet-label for="title" value="名称" />
         <jet-input
-          id="name"
+          id="title"
           type="text"
           class="mt-2 block w-full max-w-lg"
-          v-model="form.name"
-          autocomplete="name"
+          v-model="form.title"
+          autocomplete="title"
           required
         />
-        <jet-input-error :message="form.errors.name" class="mt-2" />
+        <jet-input-error :message="form.errors.title" class="mt-2" />
       </div>
       <!-- private -->
       <div>
         <div class="mb-2">
           <label for="public">
-            <input id="public" type="radio" v-model="form.isPrivate" :value="false" />
+            <input id="public" type="radio" v-model="form.private" value="0" />
             <span class="ml-2"
               >公开<span class="text-sm text-gray-600"
                 >(任何人都可以看到这个点读包,您可以选择谁可以向它提交)</span
@@ -28,7 +28,7 @@
         </div>
         <div>
           <label for="private">
-            <input id="private" type="radio" v-model="form.isPrivate" :value="true" />
+            <input id="private" type="radio" v-model="form.private" value="1" />
             <span class="ml-2"
               >私有<span class="text-sm text-gray-600"
                 >(您可以选择谁可以查看并提交到这个点读包)</span
@@ -43,7 +43,6 @@
         <div>
           <textarea
             id="description"
-            name="description"
             v-model="form.description"
             autocomplete="description"
             rows="3"
@@ -87,7 +86,7 @@ export default defineComponent({
     return {
       form: this.$inertia.form({
         _method: "PATCH",
-        name: this.package.name,
+        title: this.package.title,
         private: this.package.private,
         description: this.package.description,
       }),

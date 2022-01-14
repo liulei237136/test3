@@ -25,4 +25,9 @@ class Commit extends Model
     {
         return $this->belongsToMany(audio::class, 'commit_audio')->withTimestamps();
     }
+
+    public function getAudioListAttribute()
+    {
+        return Audio::find(json_decode($this->audio_ids));
+    }
 }

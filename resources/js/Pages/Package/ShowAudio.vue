@@ -249,18 +249,12 @@ export default defineComponent({
     });
 
     const getCommitAudio = async () => {
-      if (props.package && props.package.id && props.commit && props.commit.id) {
-        const result = await axios(
-          route("commit.audio", {
-            commit: props.commit.id,
-          })
-        );
-        console.log("result.data", result.data);
-        demo.audioList = result.data.audio;
-      } else {
-        demo.audioList = [];
-      }
-      return demo.audioList;
+      const result = await axios(
+        route("commit.audio", {
+          commit: props?.commit?.id,
+        })
+      );
+      return result.data.audio_list;
     };
 
     const resetAll = () => {

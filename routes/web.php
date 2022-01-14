@@ -52,7 +52,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/media', [MediaController::class, 'store'])->name('media.store');
 
     Route::post('/packages/{package}/clone', [PackageController::class, 'clone'])->name('package.clone');
-    Route::get('/create_package', [PackageController::class, 'create'])->name('package.create');
+    Route::get('/package_create', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');
     Route::patch('/packages/{package}', [PackageController::class, 'update'])->name('package.update');

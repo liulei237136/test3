@@ -79,39 +79,52 @@ class PackageTest extends TestCase
         $response->assertDontSee($latestTitle);
     }
 
-    // public function test_user_can_view_package_if_it_exist(){
-    //     $package = Package::factory()->create();
+    public function test_guest_can_view_package_if_it_exist()
+    {
+        $package = Package::factory()->create();
 
-    //     $response = $this->get("/packages");
+        $response = $this->get("/packages");
 
-    //     $response->assertStatus(200);
-    //     $response->assertSee($package->title);
-    // }
+        $response->assertStatus(200);
 
-    // public function test_unauthenticated_user_can_not_view_package_create_page(){
-    //     $response = $this->get("/packages/create");
+        $response->assertSee($package->title);
+    }
 
-    //     $response->assertRedirect(route('login'));
-    // }
+    public function test_unauthenticated_user_can_not_view_package_create_page()
+    {
+        $response = $this->get(route('package.create'));
 
-    // public function test_authenticated_user_can_view_package_create_page(){
-    //     $this->actingAs(User::factory()->create());
+        $response->assertRedirect(route('login'));
+    }
 
-    //     $response = $this->get(route('package.create'));
+    public function test_authenticated_user_can_view_package_create_page()
+    {
+        $this->actingAs(User::factory()->create());
 
-    //     $response->assertStatus(200);
-    // }
+        $response = $this->get(route('package.create'));
 
-    // public function test_authenticated_user_can_create_package(){
-    // $this->actingAs(User::factory()->create());
+        $response->assertStatus(200);
+    }
 
-    // $package = Package::factory()->make()->toArray();
+    public function test_authenticated_user_can_create_package()
+    {
+        $this->actingAs($user = User::factory()->create());
 
-    // $response = $this->post(route('package.store'), $package);
+        $package = Package::factory()->make()->toArray();
 
-    // $response->assertRedirect(route('package.audio.edit', ['package' => '1']));
+        $response = $this->post(route('package.store'), $package);
 
-    // $this->assertEquals(1, Package::all()->count());
-    // }
+        $response->assertRedirect(route('package.init', ['package' => '1']));
+
+        $this->assertEquals(1, Package::count());
+
+        $packageInMysql = Package::first();
+
+        $this->assertEquals($packageInMysql->title, $package['title']);
+
+        $this->assertEquals($packageInMysql->description, $package['description']);
+
+        $this->assertEquals($packageInMysql->author->id, $user->id);
+    }
 
 }

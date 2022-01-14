@@ -41,9 +41,13 @@ class PackageController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:3000'],
-            'private' => Rule::in([true, false]),
+            'title' => ['required', 'string', 'max:255', 'min:3'],
+            'description' => ['required', 'string', 'max:3000', 'min:3'],
+            'private' => Rule::in(["0", "1"]),
+        ], [
+            'title.min' => '名称最少3个字符长',
+            'description.min' => '描述最少3个字符长',
+            'private' => '是否私有只能是或否',
         ]);
 
         $validated['author_id'] = auth()->id();
@@ -56,18 +60,23 @@ class PackageController extends Controller
     public function update(Request $request, Package $package)
     {
         if ($package->author_id != auth()->id()) {
-            return;
+            abort(401);
         }
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:3000'],
+            'title' => ['required', 'string', 'max:255', 'min:3'],
+            'description' => ['required', 'string', 'max:3000', 'min:3'],
+            'private' => Rule::in(["0", "1"]),
+        ], [
+            'title.min' => '名称最少3个字符长',
+            'description.min' => '描述最少3个字符长',
+            'private' => '是否私有只能是或否',
         ]);
 
-        $success = $package->update($validated);
-        //todo error handling
+        $package->update($validated);
+        // return Redirect::route('package.show', ['package' => $package->id, 'tab' => 'info']);
 
-        return Redirect::route('package.show', ['package' => $package->id, 'tab' => 'info']);
+        return Redirect::back();
     }
 
     public function show(Package $package)

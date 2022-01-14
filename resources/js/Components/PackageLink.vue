@@ -8,7 +8,7 @@
       :as="as ? as : 'a'"
       :href="route('package.show', { package: package.id })"
       class="hover:underline"
-      >{{ package.name }}</Link
+      >{{ package.title }}</Link
     >
   </div>
 </template>
