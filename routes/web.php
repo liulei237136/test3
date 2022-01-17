@@ -29,7 +29,6 @@ Route::get('/', function () {
     return Inertia::render('Index');
 });
 
-
 Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}', [PackageController::class, 'show'])->name('package.show');
 Route::get('/packages/{package}/audio', [PackageController::class, 'audio'])->name('package.audio');
@@ -39,10 +38,10 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/commits/{commit}/audio', [CommitController::class, 'audio'])->name('commit.audio');
 
 // Route::get('/package{package}/pulls',[PullController::class,'index']);
+//空比较
+Route::get('/package/{package}/compare', [CompareController::class, 'compare'])->name('compare.compare');
 
-// Route::get('/package/{package}/compare', [CompareController::class, 'compare'])->name('compare.compare');
-
-Route::get('/packages/{toPackage}/compare/packages/{fromPackage}', [CompareController::class, 'package'])->name('compare.package');
+Route::get('/packages/{parent}/compare/packages/{child}', [CompareController::class, 'package'])->name('compare.package');
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function () {

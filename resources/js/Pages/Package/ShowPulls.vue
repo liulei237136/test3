@@ -6,7 +6,12 @@
         <!-- <button class="bg-green-500 px-4 py-2 rounded" @click="onNewPull">
           新建一个拉取
         </button> -->
-        <Link as="button" class="bg-green-500 px-4 py-2 rounded" :href="newPullHref">
+        <Link
+          v-if="package.parent"
+          as="button"
+          class="bg-green-500 px-4 py-2 rounded"
+          :href="comparePackageUrl"
+        >
           新建一个拉取</Link
         >
       </div>
@@ -84,11 +89,20 @@ export default defineComponent({
       }
       // Inertia.get(route('compare.package', {toPackage:}));
     };
-    const newPullHref = "#";
+    let comparePackageUrl = "#";
+    if (props.package.parent) {
+      comparePackageUrl = route("compare.package", {
+        parent: props.package.parent.id,
+        child: props.package.id,
+      });
+    } else {
+      comparePackageUrl = route("compare.compare", { package: props.package.id });
+    }
+
     return {
       demo,
       onNewPull,
-      newPullHref,
+      comparePackageUrl,
     };
   },
 });

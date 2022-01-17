@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-use ChristianKuri\LaravelFavorite\Traits\Favoriteable;
 
 class Package extends Model
 {
@@ -39,11 +38,11 @@ class Package extends Model
         return $builder;
     }
 
-    public function clone($author){
+    function clone ($author) {
         //todo validate
 
         $child = new Package();
-        $child->name = $this->name;
+        $child->title = $this->title;
         $child->description = $this->description;
         $child->author()->associate($author);
         $child->parent()->associate($this);
@@ -71,12 +70,12 @@ class Package extends Model
 
     public function commits()
     {
-        return $this->belongsToMany(Commit::class,'package_commit')->withTimestamps();
+        return $this->belongsToMany(Commit::class, 'package_commit')->withTimestamps();
     }
 
-    public function pulls(){
+    public function pulls()
+    {
         return $this->hasMany(Pull::class, 'to_package');
     }
-
 
 }

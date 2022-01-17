@@ -3,9 +3,9 @@
     <div>
       <h1>比较改变</h1>
       <div>
-        <package-link as="button" :package="toPackage"></package-link>
+        <package-link as="button" :package="parent"></package-link>
         <i class="fas fa-arrow-left text-gray-500 mx-4 text-sm"></i>
-        <package-link as="button" :package="fromPackage"></package-link>
+        <package-link as="button" :package="child"></package-link>
       </div>
     </div>
   </content-layout>
@@ -19,8 +19,9 @@ import PackageLink from "@/Components/PackageLink.vue";
 
 export default defineComponent({
   props: {
-    fromPackage: Object,
-    toPackage: Object,
+    parent: Object,
+    child: Object,
+    package: Object,
     canEdit: Boolean,
   },
   components: {

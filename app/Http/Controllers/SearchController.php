@@ -31,7 +31,6 @@ class SearchController extends Controller
     //     ->orderByDesc('value')
     //     ->get();
 
-
     //     return Inertia::render('Media/Index', [
     //         'media' => $media,
     //         'fileTypes' => $fileTypes,
@@ -45,40 +44,42 @@ class SearchController extends Controller
 
         //todo 验证参数
 
-        //q=term, s=sort, o=order(desc, asc)
-        $queryParams = request()->all(['q','s','o']);
+        //q=term, sort=sort, order=order(desc, asc)
+        $queryParams = request()->all(['q', 'sort', 'order']);
         $q = $queryParams['q'];
-        $s = $queryParams['s'];
-        $o = $queryParams['o'];
+        $sort = $queryParams['sort'];
+        $order = $queryParams['order'];
 
-        if(!$q) return Inertia::render('Search', ['queryParams' => $queryParams]);
+        if (!$q) {
+            return Inertia::render('Search', ['queryParams' => $queryParams]);
+        }
 
-        if(!$s) {
-            $s = $queryParams['s'] = 'match';
-            $o = $queryParams['o'] = 'desc';
+        if (!$sort) {
+            $sort = $queryParams['sort'] = 'match';
+            $order = $queryParams['order'] = 'desc';
         }
         //todo
         $package = Package::query()->where('title', 'like', '%' . $q . '%');
-        switch($s){
+        switch ($sort) {
             case 'match':
                 //todo match is the highest points not latest()
                 $package->latest();
                 break;
-                //todo
+            //todo
             case 'stars':
                 $package->has('star')
-                ->withCount('star')
-                ->orderBy('star_count', $o);
+                    ->withCount('star')
+                    ->orderBy('star_count', $order);
             case 'clones':
                 $package->has('clone')
-                ->withCount('star')
-                ->orderBy('clone_count', $o);
+                    ->withCount('star')
+                    ->orderBy('clone_count', $order);
             case 'updated':
                 //todo update a audio should touch a package
                 $package->latest('updated_at');
         }
         $package = $package->paginate(6);
 
-        return Inertia::render('Search', ['package'=> $package,'queryParams' => $queryParams]);
+        return Inertia::render('Search', ['package' => $package, 'queryParams' => $queryParams]);
     }
 }

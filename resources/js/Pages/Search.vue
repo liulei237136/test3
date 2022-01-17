@@ -10,36 +10,22 @@
 
     <div class="max-w-3xl mt-1 mx-auto bg-white overflow-hidden">
       <section class="flex items-center justify-between border-b py-4">
-        <div class="text-lg font-bold">
-          {{ package ? package.total : 0 }}条结果
-        </div>
+        <div class="text-lg font-bold">{{ package ? package.total : 0 }}条结果</div>
         <div>
           <select
             @change="filter"
             aria-label="package sort"
             v-model="query"
-            class="
-              h-11
-              rounded
-              border-gray-300
-              shadow-sm
-              lg:h-9 lg:text-sm
-              sm:w-44
-              focus:outline-none focus:ring-blue-500 focus:border-blue-500
-            "
+            class="h-11 rounded border-gray-300 shadow-sm lg:h-9 lg:text-sm sm:w-44 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           >
             <option disabled value="">请选择排序方法</option>
-            <option :value="{ s: 'match', o: 'desc' }">最匹配</option>
-            <option :value="{ s: 'stars', o: 'desc' }">最多收藏</option>
-            <option :value="{ s: 'stars', o: 'asc' }">最少收藏</option>
-            <option :value="{ s: 'clones', o: 'desc' }">最多克隆</option>
-            <option :value="{ s: 'clones', o: 'asc' }">最少克隆</option>
-            <option :value="{ s: 'updated', o: 'desc' }">
-              最近更新
-            </option>
-            <option :value="{ s: 'updated', o: 'asc' }">
-              最少更新
-            </option>
+            <option :value="{ sort: 'match', order: 'desc' }">最匹配</option>
+            <option :value="{ sort: 'stars', order: 'desc' }">最多收藏</option>
+            <option :value="{ sort: 'stars', order: 'asc' }">最少收藏</option>
+            <option :value="{ sort: 'clones', order: 'desc' }">最多克隆</option>
+            <option :value="{ sort: 'clones', order: 'asc' }">最少克隆</option>
+            <option :value="{ sort: 'updated', order: 'desc' }">最近更新</option>
+            <option :value="{ sort: 'updated', order: 'asc' }">最少更新</option>
           </select>
         </div>
       </section>
@@ -126,8 +112,8 @@ export default defineComponent({
   data() {
     return {
       query: {
-        s: this.queryParams.s,
-        o: this.queryParams.o,
+        sort: this.queryParams.sort,
+        order: this.queryParams.order,
       },
     };
   },

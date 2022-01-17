@@ -2,41 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Package;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Http\Traits\CommonInfoTrait;
+use App\Models\Package;
+use Inertia\Inertia;
 
 class CompareController extends Controller
 {
     use CommonInfoTrait;
     //
-    public function compare(){
-        return Inertia::render('Test.vue');
+    public function compare(Package $package)
+    {
+        return Inertia::render('Compare/Compare', compact('package'));
     }
 
-    public function package(Package $toPackage, Package $fromPackage){
-        $data = $this->commonInfo($toPackage);
+    public function package(Package $parent, Package $child)
+    {
+        $data = $this->commonInfo($parent);
 
-        $diff = $this->diffPackage($toPackage, $fromPackage);
+        // $diff = $this->diffPackage($parent, $child);
 
-        $data['toPackage'] = $toPackage;
-        $data['fromPackage'] = $fromPackage;
-        $data['diff'] = $diff;
+        $data['parent'] = $parent;
+        $data['child'] = $child;
+        // $data['diff'] = $diff;
 
         return Inertia::render('Compare/ComparePackage', $data);
     }
 
-    protected function diffPackage(Package $toPackage, Package $fromPackage){
-        $fromPackageCommitIds = $fromPackage->commits()->oldest()->get()->map(function($commit){
-            return $commit->id;
-        })->toArray();
-        $toPackageCommitIds = $toPackage->commits()->oldest()->get()->map(function($commit){
-            return $commit->id;
-        })->toArray();
-        $diff_from_to = array_diff($fromPackageCommitIds, $toPackageCommitIds);
-        $diff_to_from = array_diff($toPackageCommitIds, $fromPackageCommitIds);
+    protected function diffPackage(Package $parent, Package $child)
+    {
+        $parentCommits = $parent->commits()->oldest()->get()->toArray();
+        $parentCommitIdStr = array_map(function ($commit) {return $commit['id'];}, $parentCommits);
+        $childCommits = $child->commits()->oldest()->get()->toArray();
+        $childCommitIdStr = array_map(function ($commit) {return $commit['id'];}, $childCommits);
 
-        return compact('diff_from_to', 'diff_to_from');
+        //todo
+        // $diff_from_to = array_diff($childCommitIds, $parentCommitIds);
+        // $diff_to_from = array_diff($parentCommitIds, $childCommitIds);
+
+        // return compact('diff_from_to', 'diff_to_from');
+
     }
 }

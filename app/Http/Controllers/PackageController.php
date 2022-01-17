@@ -115,6 +115,8 @@ class PackageController extends Controller
 
     public function pulls(Package $package, Request $request)
     {
+        $package->load('parent');
+
         $data = $this->commonInfo($package);
 
         $data['status'] = $request->query('status') ?? 'open';
@@ -127,7 +129,7 @@ class PackageController extends Controller
     function clone (Package $package) {
         $child = $package->clone(auth()->user());
 
-        return Redirect::route('package.show', ['package' => $child->id, 'tab' => 'audio']);
+        return Redirect::route('package.show', ['package' => $child]);
     }
 
     public function toggleFavorite(Package $package)
