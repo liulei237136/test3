@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Traits\CommonInfoTrait;
+use App\Models\Commit;
 use App\Models\Package;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class CompareController extends Controller
@@ -19,21 +21,54 @@ class CompareController extends Controller
     {
         $data = $this->commonInfo($parent);
 
-        // $diff = $this->diffPackage($parent, $child);
-
         $data['parent'] = $parent;
         $data['child'] = $child;
-        // $data['diff'] = $diff;
+        $data['diff'] = $this->diffPackage($parent, $child);
 
         return Inertia::render('Compare/ComparePackage', $data);
     }
 
     protected function diffPackage(Package $parent, Package $child)
     {
-        $parentCommits = $parent->commits()->oldest()->get()->toArray();
-        $parentCommitIdStr = array_map(function ($commit) {return $commit['id'];}, $parentCommits);
-        $childCommits = $child->commits()->oldest()->get()->toArray();
-        $childCommitIdStr = array_map(function ($commit) {return $commit['id'];}, $childCommits);
+        $parentCommitIds = $parent->commits()->oldest()->get(['id'])->map(function ($commit) {return $commit->id;});
+        $parentStr = $parentCommitIds->implode('-');
+        $childCommitIds = $child->commits()->oldest()->get(['id'])->map(function ($commit) {return $commit->id;});
+        $childStr = $childCommitIds->implode('-');
+        info('111111111111111');
+        info($parentCommitIds);
+        info($childCommitIds);
+        info($parentStr);
+        info($childStr);
+
+        // if($parentCommitIds->isEmpty() )
+        //parent 领先或者相等与child
+        if ($childStr == '' || Str::contains($parentStr, $childStr)) {
+            return [
+                'pass' => false,
+                'message' => 'up_to_date',
+                'id' => '123',
+            ];
+            //child 领先 parent
+        } else if ($parentStr == '' || Str::contains($childStr, $parentStr)) {
+            $newCommitIds = collect(explode('-', ltrim($childStr, $parentStr . '-')))->map(function ($id) {
+                return (int) $id;
+            })->toArray();
+
+            $newCommits = Commit::find($newCommitIds);
+            return [
+                'pass' => true,
+                'newCommits' => $newCommits,
+                'id' => '456',
+            ];
+        } else {
+            //有不一致
+            // $parentInserts = $parentCommitIds->diff($childCommitIds);
+            return [
+                'pass' => false,
+                'message' => 'conflict',
+                'id' => '789',
+            ];
+        }
 
         //todo
         // $diff_from_to = array_diff($childCommitIds, $parentCommitIds);

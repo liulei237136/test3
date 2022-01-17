@@ -17,7 +17,7 @@ class CreatePackageCommitTable extends Migration
             $table->unsignedBigInteger('package_id');
             $table->unsignedBigInteger('commit_id');
 
-            $table->timestamps();
+            // $table->timestamps();
             $table->unique(['package_id', 'commit_id']);
             $table->foreign('package_id')->references('id')->on('packages')
                 ->onDelete('cascade');

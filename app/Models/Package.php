@@ -70,7 +70,8 @@ class Package extends Model
 
     public function commits()
     {
-        return $this->belongsToMany(Commit::class, 'package_commit')->withTimestamps();
+        // return $this->belongsToMany(Commit::class, 'package_commit')->withTimestamps();
+        return $this->belongsToMany(Commit::class, 'package_commit');
     }
 
     public function pulls()
