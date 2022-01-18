@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Traits\CommonInfoTrait;
+use App\Models\Audio;
 use App\Models\Commit;
 use App\Models\Package;
 use Illuminate\Support\Str;
@@ -50,14 +51,26 @@ class CompareController extends Controller
             ];
             //child 领先 parent
         } else if ($parentStr == '' || Str::contains($childStr, $parentStr)) {
-            $newCommitIds = collect(explode('-', ltrim($childStr, $parentStr . '-')))->map(function ($id) {
+            $diffCommitIds = collect(explode('-', ltrim($childStr, $parentStr . '-')))->map(function ($id) {
                 return (int) $id;
             })->toArray();
 
-            $newCommits = Commit::find($newCommitIds);
+            $diffCommits = Commit::with('author.id')->find($diffCommitIds, ["id", "title", "author_id"]);
+            $latestChildCommit = $diffCommits->last();
+            $latestParentCommit = Commit::find($parentCommitIds->last());
+            info('child' . $latestChildCommit);
+            info('parent' . $latestParentCommit);
+            $childAudioIds = $latestChildCommit ? json_decode($latestChildCommit->audio_ids) : array();
+            $parentAudioIds = $latestParentCommit ? json_decode($latestParentCommit->audio_ids) : array([]);
+            info('child' . $childAudioIds);
+            info('parent' . $parentAudioIds);
+            $insertAudio = Audio::find(array_diff($childAudioIds, $parentAudioIds));
+            $deleteAudio = Audio::find(array_diff($parentAudioIds, $childAudioIds));
             return [
                 'pass' => true,
-                'newCommits' => $newCommits,
+                'commits' => $diffCommits,
+                'deleteAudio' => $deleteAudio,
+                'insertAudio' => $insertAudio,
                 'id' => '456',
             ];
         } else {

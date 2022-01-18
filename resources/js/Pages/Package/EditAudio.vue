@@ -338,12 +338,8 @@ export default defineComponent({
           audio_ids: JSON.stringify(audio_ids),
         },
         {
-          onSuccess() {
-            demo.showSaveModal = false;
-          },
-          onFinish() {
-            demo.saveFormLoading = false;
-          },
+          replace: true,
+          preserveState: false,
         }
       );
     };
@@ -415,7 +411,7 @@ export default defineComponent({
         {
           field: "file_name",
           title: "音频文件名",
-          width:210,
+          width: 210,
           sortable: true,
           sortBy: nameSortBy,
           titleHelp: { message: "注意要加上文件后缀" },

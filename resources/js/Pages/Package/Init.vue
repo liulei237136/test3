@@ -102,29 +102,12 @@ export default defineComponent({
         title: "初次保存",
         audio_ids,
       });
-    //   return;
+      //   return;
       this.$inertia.post(route("commit.store"), {
         package: this.package.id,
         title: "初次保存",
         audio_ids: JSON.stringify(audio_ids),
       });
-      //   try {
-      //     const result = await axios.post(route("commit.store"), {
-      //       package: this.package.id,
-      //       title: "初次保存",
-      //       path: [],
-      //       ids,
-      //     });
-      //     // await this.$inertia.get(
-      //     //   route("package.audio", {
-      //     //     package: this.package.id,
-      //     //   }),
-      //     //   {},
-      //     //   { replace: true }
-      //     // );
-      //   } catch (e) {
-      //     console.log(e);
-      //   }
     },
   },
 });

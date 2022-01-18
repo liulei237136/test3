@@ -23,6 +23,9 @@ export default defineComponent({
     // fromPackage: Object,
     // toPackage: Object,
     // canEdit: Boolean,
+    // parent: Object,
+    // child: Object,
+    // diff: Object,
   },
   components: {
     Link,

@@ -84,29 +84,33 @@ class CompareTest extends TestCase
         $child = $parent->clone($user);
 
         //when child create a new commit
-        $commit = Commit::factory()->make()->toArray();
+        $first = Commit::factory()->make()->toArray();
 
-        $child->commits()->create($commit);
+        $child->commits()->create($first);
 
         $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
 
         $response->assertStatus(200);
 
-        $response->assertSee($commit['title']);
+        $response->assertSee($first['title']);
 
-        $response->assertSee($commit['description']);
+        $response->assertSee($first['description']);
 
         //when child create a second commit
-        $commit = Commit::factory()->make()->toArray();
+        $second = Commit::factory()->make()->toArray();
 
-        $child->commits()->create($commit);
+        $child->commits()->create($second);
 
         $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
 
         $response->assertStatus(200);
 
-        $response->assertSee($commit['title']);
+        $response->assertSee($first['title']);
 
-        $response->assertSee($commit['description']);
+        $response->assertSee($first['description']);
+
+        $response->assertSee($second['title']);
+
+        $response->assertSee($second['description']);
     }
 }
