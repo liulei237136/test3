@@ -1,102 +1,31 @@
 <template>
-  <content-layout>
-    <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
-      <template #toolbar_buttons>
-        <vxe-pulldown ref="xDown" class="mr-4">
-          <template #default>
-            <vxe-input
-              v-model="demo.filterCommitTitle"
-              :placeholder="commit ? commit.title : '还没有保存过'"
-              @focus="commitFocusEvent"
-              @keyup="commitKeyupEvent"
-            ></vxe-input>
-          </template>
-          <template #dropdown>
-            <div class="my-dropdown">
-              <div
-                class="list-item"
-                v-for="commit in demo.filteredCommitsList"
-                :key="commit.id"
-              >
-                <Link
-                  :to="
-                    route('package.audio', {
-                      package: package.id,
-                      commit: commit.id,
-                    })
-                  "
-                  :title="commit.title"
-                  >{{ commit.title }}</Link
-                >
-              </div>
-            </div>
-          </template>
-        </vxe-pulldown>
-      </template>
-
-      <template #source_audio="{ row }">
-        <audio
-          v-if="row.url"
-          :src="row.url"
-          @play="onAudioPlayEvent($event, row)"
-          controls
-        ></audio>
-      </template>
-    </vxe-grid>
-  </content-layout>
+  <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
+    <template #source_audio="{ row }">
+      <audio
+        v-if="row.url"
+        :src="row.url"
+        @play="onAudioPlayEvent($event, row)"
+        controls
+      ></audio>
+    </template>
+  </vxe-grid>
 </template>
 
-<style scoped>
-.my-dropdown {
-  padding: 4px;
-  height: auto;
-  max-height: 300px;
-  min-width: 300px;
-  max-width: 600px;
-  overflow-y: auto;
-  border-radius: 4px;
-  border: 1px solid #dcdfe6;
-  background-color: #fff;
-}
-.list-item {
-  padding: 2px;
-  line-height: 22px;
-  font-size: 16px;
-}
-.list-item:hover {
-  background-color: #f5f7fa;
-}
-</style>
-
 <script>
-import { Inertia } from "@inertiajs/inertia";
-import { Link } from "@inertiajs/inertia-vue3";
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import XEUtils from "xe-utils";
-import axios from "axios";
-import ContentLayout from "@/Layouts/ContentLayout.vue";
 
 export default defineComponent({
   props: {
-    package: Object,
-    canEdit: Boolean,
-    commit: Object,
-    commits: Array,
+    // audio: Object,
+    audioList: Array,
   },
-  components: {
-    Link,
-    ContentLayout,
-  },
+
   setup(props, context) {
     const xGrid = ref({});
 
-    const xDown = ref({});
-
     const demo = reactive({
-      filterAllString: "",
       audioList: [],
-      filterCommitTitle: "",
-      filteredCommitsList: props.commits,
       playingAudio: {},
     });
 
@@ -107,19 +36,6 @@ export default defineComponent({
         // audio.fastSeek(0);
       }
       demo.playingAudio = { audio: e.target };
-    };
-
-    const commitFocusEvent = () => {
-      const $pulldown = xDown.value;
-      $pulldown.showPanel();
-    };
-
-    const commitKeyupEvent = () => {
-      demo.filteredCommitsList = demo.filterCommitTitle
-        ? props.commits.filter(
-            (commit) => commit.title.indexOf(demo.filterCommitTitle) > -1
-          )
-        : props.commits;
     };
 
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
@@ -147,13 +63,14 @@ export default defineComponent({
     };
 
     const gridOptions = reactive({
+      data: props.audioList,
       border: true,
       resizable: true,
       showHeaderOverflow: true,
       showOverflow: true,
+      id: "audio_table" + Math.random(),
       highlightHoverRow: true,
-      id: "full_edit_1",
-      height: 600,
+      maxHeight: 400,
       rowId: "id",
       customConfig: {
         storage: true,
@@ -165,9 +82,6 @@ export default defineComponent({
       filterConfig: {},
 
       toolbarConfig: {
-        slots: {
-          buttons: "toolbar_buttons",
-        },
         tools: [{ code: "myExport", name: "导出" }],
         print: true,
         zoom: true,
@@ -175,7 +89,12 @@ export default defineComponent({
       },
 
       columns: [
-        { type: "checkbox", width: 40 },
+        {
+          type: "checkbox",
+          width: 40,
+          className: ({ row }) =>
+            row.status === "deleted" ? "bg-red-500" : "bg-green-500",
+        },
         { type: "seq", width: 60 },
         {
           field: "file_name",
@@ -209,30 +128,21 @@ export default defineComponent({
           filterRender: { name: "$input" },
         },
       ],
-      proxyConfig: {
-        ajax: {
-          // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
-          query: async ({ page, sorts, filters, form }) => {
-            demo.audioList = await getCommitAudio();
-            resetAll();
-            return demo.audioList;
-          },
-        },
-      },
+      //   proxyConfig: {
+      // ajax: {
+      //   // 当点击工具栏查询按钮或者手动提交指令 query或reload 时会被触发
+      //   query: async ({ page, sorts, filters, form }) => {
+      //     demo.audioList = props.audioList;
+      //     resetAll();
+      //     return demo.audioList;
+      //   },
+      // },
+      //   },
       checkboxConfig: {
         highlight: true,
         range: true,
       },
     });
-
-    const getCommitAudio = async () => {
-      const result = await axios(
-        route("commit.audio", {
-          commit: props?.commit?.id,
-        })
-      );
-      return result.data.audio_list;
-    };
 
     const resetAll = () => {
       console.log("reset all");
@@ -250,7 +160,8 @@ export default defineComponent({
               columns: [
                 { field: "name" },
                 { field: "file_name" },
-                { field: "size" },
+                { field: "file_path" },
+                { field: "file_size" },
                 { field: "book_name" },
               ],
             });
@@ -260,16 +171,12 @@ export default defineComponent({
 
     return {
       xGrid,
-      xDown,
       gridOptions,
       demo,
-      getCommitAudio,
       resetAll,
       filterNameMethod,
       filterBookNameMethod,
       gridEvents,
-      commitFocusEvent,
-      commitKeyupEvent,
       onAudioPlayEvent,
     };
   },
