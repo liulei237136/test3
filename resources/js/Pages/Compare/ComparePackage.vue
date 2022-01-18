@@ -8,14 +8,29 @@
         <package-link as="button" :package="child"></package-link>
         <span v-if="diff.pass === true">这个求拉可以自动融合</span>
       </div>
-      <div>
-        <Link
-          as="button"
-          class="bg-green-500 px-4 py-2 rounded text-white"
+      <div v-if="!demo.open">
+        <button
           type="button"
-          href="#"
-          >创建拉取</Link
+          class="bg-green-500 px-4 py-2 rounded text-white"
+          @click="demo.open = true"
         >
+          创建拉取
+        </button>
+      </div>
+      <div v-else class="flex">
+        <button
+          v-if="$page.props.jetstream.managesProfilePhotos"
+          class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
+        >
+          <img
+            class="h-8 w-8 rounded-full object-cover"
+            :src="$page.props.user.profile_photo_url"
+            :alt="$page.props.user.name"
+          />
+        </button>
+        <div>
+          <form action=""></form>
+        </div>
       </div>
       <div v-if="diff.pass === true" class="mt-2 flex justify-around">
         <div>{{ diff.commits.length }}个保存</div>
@@ -68,6 +83,9 @@ export default defineComponent({
   },
   setup(props, context) {
     const xGrid = ref({});
+    const demo = reactive({
+      open: false,
+    });
     const audioList = [];
     if (props.diff.pass) {
       props.diff.deleteAudio.forEach((audio) => {
@@ -82,6 +100,7 @@ export default defineComponent({
     return {
       xGrid,
       audioList,
+      demo,
     };
   },
 });
