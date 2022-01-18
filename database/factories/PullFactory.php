@@ -38,7 +38,7 @@ class PullFactory extends Factory
         $to_package->commits()->attach($to_commit);
 
 
-        $from_package = $to_package->clone(User::factory()->create());
+        $from_package = $to_package->clone();
         $from_commit = $from_package->commits->first();
 
         return [

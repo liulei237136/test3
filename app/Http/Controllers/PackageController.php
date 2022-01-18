@@ -127,7 +127,7 @@ class PackageController extends Controller
     }
 
     function clone (Package $package) {
-        $child = $package->clone(auth()->user());
+        $child = $package->clone();
 
         return Redirect::route('package.show', ['package' => $child]);
     }

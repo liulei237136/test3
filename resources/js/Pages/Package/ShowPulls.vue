@@ -9,7 +9,7 @@
         <Link
           v-if="package.parent"
           as="button"
-          class="bg-green-500 px-4 py-2 rounded"
+          class="bg-green-500 px-4 py-2 rounded text-white"
           :href="comparePackageUrl"
         >
           新建一个拉取</Link

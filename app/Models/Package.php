@@ -38,13 +38,13 @@ class Package extends Model
         return $builder;
     }
 
-    function clone ($author) {
+    function clone () {
         //todo validate
 
         $child = new Package();
         $child->title = $this->title;
         $child->description = $this->description;
-        $child->author()->associate($author);
+        $child->author()->associate(auth()->user());
         $child->parent()->associate($this);
         $child->save();
 

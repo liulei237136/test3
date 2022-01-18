@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Audio;
 use App\Models\Commit;
 use App\Models\Package;
 use App\Models\User;
@@ -25,7 +26,7 @@ class CompareTest extends TestCase
         $this->actingAs($user = User::factory()->create());
 
         //clone it
-        $child = $parent->clone($user);
+        $child = $parent->clone();
 
         //when parent and child all have no commit
         $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
@@ -69,48 +70,52 @@ class CompareTest extends TestCase
         $response->assertStatus(200);
 
         $response->assertSee('conflict');
-
     }
 
     public function test_child_longer_than_parent_return_more_commits()
     {
+        $this->withoutExceptionHandling();
         // there is a package
-        $parent = Package::factory()->create();
+        $parentPackage = Package::factory()->create();
 
         //and a user
         $this->actingAs($user = User::factory()->create());
 
         //clone it
-        $child = $parent->clone($user);
+        $childPackage = $parentPackage->clone();
 
-        //when child create a new commit
-        $first = Commit::factory()->make()->toArray();
+        //when childPackage create a new commit
+        $firstAudio = Audio::factory()->create();
 
-        $child->commits()->create($first);
+        $firstCommit = Commit::factory()->create(['audio_ids' => '[1]']);
 
-        $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
+        $childPackage->commits()->attach($firstCommit);
+
+        $response = $this->get(route('compare.package', ['parent' => $parentPackage, 'child' => $childPackage]));
 
         $response->assertStatus(200);
 
-        $response->assertSee($first['title']);
-
-        $response->assertSee($first['description']);
+        $response->assertSee($parentPackage->title);
+        $response->assertSee($childPackage->title);
+        $response->assertSee($firstCommit->title);
+        $response->assertSee($firstAudio->name);
 
         //when child create a second commit
-        $second = Commit::factory()->make()->toArray();
+        $secondAudio = Audio::factory()->create();
 
-        $child->commits()->create($second);
+        $secondCommit = Commit::factory()->create(['audio_ids' => '[1,2]']);
 
-        $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
+        $childPackage->commits()->attach($secondCommit);
+
+        $response = $this->get(route('compare.package', ['parent' => $parentPackage, 'child' => $childPackage]));
 
         $response->assertStatus(200);
 
-        $response->assertSee($first['title']);
-
-        $response->assertSee($first['description']);
-
-        $response->assertSee($second['title']);
-
-        $response->assertSee($second['description']);
+        $response->assertSee($parentPackage->title);
+        $response->assertSee($childPackage->title);
+        $response->assertSee($firstCommit->title);
+        $response->assertSee($secondCommit->title);
+        $response->assertSee($firstAudio->name);
+        $response->assertSee($secondAudio->name);
     }
 }
