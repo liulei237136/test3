@@ -5,6 +5,7 @@ use App\Http\Controllers\CommitController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PullController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,8 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/commits/{commit}/audio', [CommitController::class, 'audio'])->name('commit.audio');
 
+Route::get('/packages/{package}/pulls/{pull}', [PullController::class, 'show'])->name('pull.show');
+
 // Route::get('/package{package}/pulls',[PullController::class,'index']);
 //空比较
 Route::get('/package/{package}/compare', [CompareController::class, 'compare'])->name('compare.compare');
@@ -65,4 +68,5 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 
+    Route::post('/pulls', [PullController::class, 'store'])->name('pull.store');
 });

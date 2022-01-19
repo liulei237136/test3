@@ -17,10 +17,10 @@
           创建拉取
         </button>
       </div>
-      <div v-else class="flex">
+      <div v-else class="flex items-start">
         <button
           v-if="$page.props.jetstream.managesProfilePhotos"
-          class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
+          class="flex mt-1 mr-2 text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
         >
           <img
             class="h-8 w-8 rounded-full object-cover"
@@ -28,9 +28,57 @@
             :alt="$page.props.user.name"
           />
         </button>
-        <div>
-          <form action=""></form>
-        </div>
+        <form class="w-full max-w-3xl" @submit.prevent="onSubmit">
+          <!-- <input class="border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" ref="input"> -->
+          <jet-input
+            id="title"
+            type="text"
+            class="mt-2 block w-full"
+            v-model="form.title"
+            autocomplete="title"
+            required
+            placeholder="标题"
+          />
+          <jet-input-error :message="form.errors.title" class="mt-2" />
+          <!-- <textarea name="comment" id="comment" cols="30" rows="10"></textarea> -->
+          <textarea
+            id="description"
+            v-model="form.description"
+            autocomplete="description"
+            rows="3"
+            placeholder="描述"
+            class="mt-2 block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
+          >
+          </textarea>
+          <jet-input-error :message="form.errors.description" class="mt-2" />
+          <div class="w-full mt-2 max-w-3xl flex justify-end">
+            <!-- <jet-button
+              :class="{ 'opacity-25': form.processing }"
+              class="mt-3"
+              :disabled="form.processing"
+            >
+              保存
+            </jet-button> -->
+            <!-- <button
+              type="button"
+              class="bg-green-500 p-2 rounded"
+              :class="{ 'text-white': !form.title }"
+              :disabled="!form.title"
+            >
+              创建一个求拉
+            </button> -->
+            <!-- <Link href="#" class="bg-green-500 p-2 rounded text-white" :disabled="true">
+              创建一个求拉</Link
+            > -->
+            <button
+              type="submit"
+              class="bg-green-500 p-2 rounded text-white disabled:opacity-50 disabled:cursor-default"
+              :disabled="!form.title || form.processing"
+            >
+              创建一个求拉
+            </button>
+          </div>
+        </form>
       </div>
       <div v-if="diff.pass === true" class="mt-2 flex justify-around">
         <div>{{ diff.commits.length }}个保存</div>
@@ -66,6 +114,9 @@ import { defineComponent, nextTick, onMounted, reactive, ref } from "vue";
 import ContentLayout from "@/Layouts/ContentLayout.vue";
 import PackageLink from "@/Components/PackageLink.vue";
 import AudioTable from "@/Components/AudioTable.vue";
+import JetInput from "@/Jetstream/Input.vue";
+import JetInputError from "@/Jetstream/InputError.vue";
+import { useForm } from "@inertiajs/inertia-vue3";
 
 export default defineComponent({
   props: {
@@ -80,9 +131,15 @@ export default defineComponent({
     ContentLayout,
     PackageLink,
     AudioTable,
+    JetInput,
+    JetInputError,
   },
   setup(props, context) {
     const xGrid = ref({});
+    const form = useForm({
+      title: null,
+      description: null,
+    });
     const demo = reactive({
       open: false,
     });
@@ -97,10 +154,16 @@ export default defineComponent({
         audioList.push(audio);
       });
     }
+
+    const onSubmit = () => {
+      form.post(route("pull.store", { child: props.child.id }));
+    };
     return {
       xGrid,
       audioList,
       demo,
+      form,
+      onSubmit,
     };
   },
 });

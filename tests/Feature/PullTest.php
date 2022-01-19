@@ -18,4 +18,9 @@ class PullTest extends TestCase
     //     //3 get 200 ok
     //     $response->assertStatus(200);
     // }
+    public function test_guest_user_cannot_create_pull()
+    {
+        $response = $this->post(route('pull.store', {child: }));
+    }
+
 }

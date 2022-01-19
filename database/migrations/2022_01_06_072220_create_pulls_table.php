@@ -16,13 +16,10 @@ class CreatePullsTable extends Migration
         Schema::create('pulls', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('description');
             $table->unsignedBigInteger('author_id');
-            $table->unsignedBigInteger('from_package');
-            $table->unsignedBigInteger('from_commit');
-            $table->unsignedBigInteger('to_package');
-            $table->unsignedBigInteger('to_commit');
-            $table->string('status');//open closed
+            $table->unsignedBigInteger('child');
+            $table->unsignedBigInteger('parent');
+            $table->string('status'); //open closed
             $table->timestamps();
         });
     }

@@ -76,7 +76,7 @@ class Package extends Model
 
     public function pulls()
     {
-        return $this->hasMany(Pull::class, 'to_package');
+        return $this->hasMany(Pull::class, 'parent');
     }
 
 }
