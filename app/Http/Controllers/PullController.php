@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\CommonInfoTrait;
 use App\Models\Package;
 use App\Models\Pull;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Traits\CommonInfoTrait;
 use Inertia\Inertia;
 
 class PullController extends Controller
@@ -17,9 +17,6 @@ class PullController extends Controller
     public function store(Request $request)
     {
         //todo validate
-
-        info('0000000000');
-
         $child = Package::findOrFail($request->input('child'));
 
         if ($child->author->id !== auth()->id()) {
@@ -31,13 +28,11 @@ class PullController extends Controller
             'comment' => ['nullable', 'string', 'max:1024'],
         ]);
 
-        $parent = $child->parent;
-
-        if ($parent) {
+        if (!$child->parent) {
             abort(403);
         }
 
-        $hasOpenPull = DB::table('pulls')->where(['parent' => $parent->id, 'child' => $child->id, 'status' => 'open'])->exists();
+        $hasOpenPull = DB::table('pulls')->where(['parent' => $child->parent->id, 'child' => $child->id, 'status' => 'open'])->exists();
 
         if ($hasOpenPull) {
             abort(403);
@@ -51,17 +46,52 @@ class PullController extends Controller
 
         $data['author_id'] = auth()->id();
 
-        info(json_encode($data));
-        $pull = $parent->pulls()->create($data);
+        $pull = $child->parent->pulls()->create($data);
 
-        // if ($request->comment) {
-        //     $pull->comments()->create([
-        //         'content' => $request->comment,
-        //         'author_id' => auth()->user(),
-        //     ]);
-        // }
+        if ($request->comment) {
+            $pull->comments()->create([
+                'content' => $request->comment,
+                'author_id' => auth()->id(),
+            ]);
+        }
 
-        return Redirect::route('pull.show', ['package' => $parent->id, 'pull' => $pull->id]);
+        return Redirect::route('pull.show', ['package' => $child->parent->id, 'pull' => $pull->id]);
+    }
+
+    public function close(Pull $pull)
+    {
+        //todo validate
+        if (auth()->id() !== $pull->childPackage->author->id && auth()->id() !== $pull->parentPackage->author->id) {
+            abort(401);
+        }
+
+        if ($pull->status !== 'open') {
+            abort(403);
+        }
+
+        $pull->status = 'closed';
+
+        $pull->save();
+
+        return Redirect::route('pull.show', ['package' => $pull->parentPackage->id, 'pull' => $pull]);
+    }
+
+    public function open(Pull $pull)
+    {
+        //todo validate
+        if (auth()->id() !== $pull->childPackage->author->id && auth()->id() !== $pull->parentPackage->author->id) {
+            abort(401);
+        }
+
+        if ($pull->status !== 'closed') {
+            abort(403);
+        }
+
+        $pull->status = 'open';
+
+        $pull->save();
+
+        return Redirect::route('pull.show', ['package' => $pull->parentPackage->id, 'pull' => $pull]);
     }
 
     public function show(Package $package, Pull $pull)

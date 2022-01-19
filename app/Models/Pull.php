@@ -11,8 +11,25 @@ class Pull extends Model
 
     protected $guarded = [];
 
+    protected $with = ['author', 'parentPackage', 'childPackage', 'comments'];
+
     public function comments()
     {
         return $this->hasMany(PullComment::class, 'pull_id');
+    }
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function parentPackage()
+    {
+        return $this->belongsTo(Package::class, 'parent');
+    }
+
+    public function childPackage()
+    {
+        return $this->belongsTo(Package::class, 'child');
     }
 }

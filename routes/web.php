@@ -5,6 +5,7 @@ use App\Http\Controllers\CommitController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PullCommentController;
 use App\Http\Controllers\PullController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Redirect;
@@ -25,7 +26,6 @@ use Inertia\Inertia;
 Route::get('/', function () {
     if (auth()->user()) {
         return Redirect::route('dashboard');
-
     }
     return Inertia::render('Index');
 });
@@ -69,4 +69,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 
     Route::post('/pulls', [PullController::class, 'store'])->name('pull.store');
+
+    Route::post('/pulls/{pull}/close', [PullController::class, 'close'])->name('pull.close');
+
+    Route::post('/pulls/{pull}/open', [PullController::class, 'open'])->name('pull.open');
+
+    Route::post('/pulls/{pull}/comments', [PullCommentController::class, 'store'])->name('pull.comment.store');
 });

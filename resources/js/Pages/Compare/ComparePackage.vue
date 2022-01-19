@@ -40,36 +40,17 @@
             placeholder="标题"
           />
           <jet-input-error :message="form.errors.title" class="mt-2" />
-          <!-- <textarea name="comment" id="comment" cols="30" rows="10"></textarea> -->
           <textarea
-            id="description"
-            v-model="form.description"
-            autocomplete="description"
+            id="comment"
+            v-model="form.comment"
+            autocomplete="comment"
             rows="3"
-            placeholder="描述"
+            placeholder="评论"
             class="mt-2 block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
           >
           </textarea>
-          <jet-input-error :message="form.errors.description" class="mt-2" />
+          <jet-input-error :message="form.errors.comment" class="mt-2" />
           <div class="w-full mt-2 max-w-3xl flex justify-end">
-            <!-- <jet-button
-              :class="{ 'opacity-25': form.processing }"
-              class="mt-3"
-              :disabled="form.processing"
-            >
-              保存
-            </jet-button> -->
-            <!-- <button
-              type="button"
-              class="bg-green-500 p-2 rounded"
-              :class="{ 'text-white': !form.title }"
-              :disabled="!form.title"
-            >
-              创建一个求拉
-            </button> -->
-            <!-- <Link href="#" class="bg-green-500 p-2 rounded text-white" :disabled="true">
-              创建一个求拉</Link
-            > -->
             <button
               type="submit"
               class="bg-green-500 p-2 rounded text-white disabled:opacity-50 disabled:cursor-default"
@@ -138,7 +119,7 @@ export default defineComponent({
     const xGrid = ref({});
     const form = useForm({
       title: null,
-      description: null,
+      comment: null,
     });
     const demo = reactive({
       open: false,
