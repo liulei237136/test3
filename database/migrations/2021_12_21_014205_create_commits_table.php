@@ -18,12 +18,11 @@ class CreateCommitsTable extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->unsignedBigInteger('author_id');
-            $table->json('audio_ids')->default('[]');
+            $table->string('audio_ids')->default('[]');
             $table->timestamps();
 
             $table->foreign('author_id')->references('id')->on('users');
         });
-
     }
 
     /**

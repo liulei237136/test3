@@ -19,7 +19,7 @@ class CreatePullsTable extends Migration
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('child');
             $table->unsignedBigInteger('parent');
-            $table->string('status'); //open closed
+            $table->string('status')->default('open'); //open closed merged
             $table->timestamps();
         });
     }

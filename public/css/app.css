@@ -1191,14 +1191,14 @@ select {
 .mb-4 {
 	margin-bottom: 1rem;
 }
-.-mt-px {
-	margin-top: -1px;
-}
 .mr-1 {
 	margin-right: 0.25rem;
 }
 .mb-1 {
 	margin-bottom: 0.25rem;
+}
+.-mt-px {
+	margin-top: -1px;
 }
 .mb-2 {
 	margin-bottom: 0.5rem;
@@ -1323,17 +1323,14 @@ select {
 .max-w-xl {
 	max-width: 36rem;
 }
-.max-w-6xl {
-	max-width: 72rem;
-}
 .max-w-3xl {
 	max-width: 48rem;
 }
+.max-w-6xl {
+	max-width: 72rem;
+}
 .max-w-lg {
 	max-width: 32rem;
-}
-.max-w-5xl {
-	max-width: 64rem;
 }
 .flex-1 {
 	flex: 1 1 0%;
@@ -1607,13 +1604,13 @@ select {
 	--tw-bg-opacity: 1;
 	background-color: rgba(229, 231, 235, var(--tw-bg-opacity));
 }
-.bg-green-500 {
-	--tw-bg-opacity: 1;
-	background-color: rgba(16, 185, 129, var(--tw-bg-opacity));
-}
 .bg-red-500 {
 	--tw-bg-opacity: 1;
 	background-color: rgba(239, 68, 68, var(--tw-bg-opacity));
+}
+.bg-green-500 {
+	--tw-bg-opacity: 1;
+	background-color: rgba(16, 185, 129, var(--tw-bg-opacity));
 }
 .bg-opacity-25 {
 	--tw-bg-opacity: 0.25;
@@ -1733,9 +1730,6 @@ select {
 .pb-1 {
 	padding-bottom: 0.25rem;
 }
-.pt-8 {
-	padding-top: 2rem;
-}
 .pl-2 {
 	padding-left: 0.5rem;
 }
@@ -1744,6 +1738,9 @@ select {
 }
 .pr-10 {
 	padding-right: 2.5rem;
+}
+.pt-8 {
+	padding-top: 2rem;
 }
 .text-left {
 	text-align: left;
@@ -1877,14 +1874,6 @@ select {
 	--tw-text-opacity: 1;
 	color: rgba(16, 185, 129, var(--tw-text-opacity));
 }
-.text-gray-200 {
-	--tw-text-opacity: 1;
-	color: rgba(229, 231, 235, var(--tw-text-opacity));
-}
-.text-gray-300 {
-	--tw-text-opacity: 1;
-	color: rgba(209, 213, 219, var(--tw-text-opacity));
-}
 .text-blue-500 {
 	--tw-text-opacity: 1;
 	color: rgba(59, 130, 246, var(--tw-text-opacity));
@@ -1892,6 +1881,14 @@ select {
 .text-black {
 	--tw-text-opacity: 1;
 	color: rgba(0, 0, 0, var(--tw-text-opacity));
+}
+.text-gray-200 {
+	--tw-text-opacity: 1;
+	color: rgba(229, 231, 235, var(--tw-text-opacity));
+}
+.text-gray-300 {
+	--tw-text-opacity: 1;
+	color: rgba(209, 213, 219, var(--tw-text-opacity));
 }
 .underline {
 	text-decoration: underline;
@@ -2339,12 +2336,6 @@ a.active {
 .active\:text-gray-800:active {
 	--tw-text-opacity: 1;
 	color: rgba(31, 41, 55, var(--tw-text-opacity));
-}
-.disabled\:cursor-not-allowed:disabled {
-	cursor: not-allowed;
-}
-.disabled\:cursor-pointer:disabled {
-	cursor: pointer;
 }
 .disabled\:cursor-default:disabled {
 	cursor: default;
