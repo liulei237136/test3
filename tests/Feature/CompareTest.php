@@ -13,115 +13,134 @@ class CompareTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_empty_child_and_parent_should_nav_to_package_package()
+
+    protected function prepare($prepareACommit = false)
     {
-        // there is a package and clone it
-        $parent = Package::factory()->create();
-        $this->actingAs($user = User::factory()->create());
-        $child = $parent->clone();
-
-        //when
-    }
-
-    public function test_child_later_than_or_equal_to_parent_return_up_to_date_or_conflict()
-    {
-        // there is a package
-        $parent = Package::factory()->create();
-
-        //and a user
-        $this->actingAs($user = User::factory()->create());
-
-        //clone it
-        $child = $parent->clone();
-
-        //when parent and child all have no commit
-        $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
-
-        $response->assertStatus(200);
-
-        $response->assertSee('up_to_date');
-
-        //when parent create a new commit
-        $parent->commits()->create(Commit::factory()->make()->toArray());
-
-        $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
-
-        $response->assertStatus(200);
-
-        $response->assertSee('up_to_date');
-
-        //when parent create a second commit
-        $parent->commits()->create(Commit::factory()->make()->toArray());
-
-        $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
-
-        $response->assertStatus(200);
-
-        $response->assertSee('up_to_date');
-
-        //when child create a new commit
-        $child->commits()->create(Commit::factory()->make()->toArray());
-
-        $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
-
-        $response->assertStatus(200);
-
-        $response->assertSee('conflict');
-
-        //when child create a second commit
-        $child->commits()->create(Commit::factory()->make()->toArray());
-
-        $response = $this->get(route('compare.package', ['parent' => $parent, 'child' => $child]));
-
-        $response->assertStatus(200);
-
-        $response->assertSee('conflict');
-    }
-
-    public function test_child_longer_than_parent_return_more_commits()
-    {
-        $this->withoutExceptionHandling();
-        // there is a package
         $parentPackage = Package::factory()->create();
 
-        //and a user
-        $this->actingAs($user = User::factory()->create());
+        if ($prepareACommit) {
+            $commit = Commit::factory()->create(['author_id' => $parentPackage->author->id]);
+            $parentPackage->commits()->attach($commit);
+        }
 
-        //clone it
+        $this->actingAs($child = User::factory()->create());
+
         $childPackage = $parentPackage->clone();
 
-        //when childPackage create a new commit
-        $firstAudio = Audio::factory()->create();
+        $data = compact('parentPackage', 'childPackage');
 
-        $firstCommit = Commit::factory()->create(['audio_ids' => '[1]']);
+        if (isset($commit)) {
+            $commit['commit'] = $commit;
+        };
 
-        $childPackage->commits()->attach($firstCommit);
+        return $data;
+    }
 
-        $response = $this->get(route('compare.package', ['parent' => $parentPackage, 'child' => $childPackage]));
+    public function test_compare_result_identical()
+    {
+        $empty = $this->prepare();
 
-        $response->assertStatus(200);
+        $response = $this->get(route('compare.package', ['parent' => $empty['parentPackage'], 'child' => $empty['childPackage']]));
 
-        $response->assertSee($parentPackage->title);
-        $response->assertSee($childPackage->title);
-        $response->assertSee($firstCommit->title);
-        $response->assertSee($firstAudio->name);
+        $response->assertSessionDoesntHaveErrors();
 
-        //when child create a second commit
-        $secondAudio = Audio::factory()->create();
+        $response->assertSee('identical');
 
-        $secondCommit = Commit::factory()->create(['audio_ids' => '[1,2]']);
+        $notEmpty = $this->prepare(true);
 
-        $childPackage->commits()->attach($secondCommit);
+        $response = $this->get(route('compare.package', ['parent' => $notEmpty['parentPackage'], 'child' => $notEmpty['childPackage']]));
 
-        $response = $this->get(route('compare.package', ['parent' => $parentPackage, 'child' => $childPackage]));
+        $response->assertSessionDoesntHaveErrors();
 
-        $response->assertStatus(200);
+        $response->assertSee('identical');
+    }
 
-        $response->assertSee($parentPackage->title);
-        $response->assertSee($childPackage->title);
-        $response->assertSee($firstCommit->title);
-        $response->assertSee($secondCommit->title);
-        $response->assertSee($firstAudio->name);
-        $response->assertSee($secondAudio->name);
+    public function test_parent_package_ahead_compare_result_hehind()
+    {
+        $empty = $this->prepare();
+
+        //parent add a commit
+        $commit = Commit::factory()->create(['author_id' => $empty['parentPackage']->author->id]);
+        $empty['parentPackage']->commits()->attach($commit);
+
+        $response = $this->get(route('compare.package', ['parent' => $empty['parentPackage'], 'child' => $empty['childPackage']]));
+
+        $response->assertSessionDoesntHaveErrors();
+
+        $response->assertSee('behind');
+
+        $notEmpty = $this->prepare(true);
+
+        $commit = Commit::factory()->create(['author_id' => $notEmpty['parentPackage']->author->id]);
+
+        $notEmpty['parentPackage']->commits()->attach($commit);
+
+        $response = $this->get(route('compare.package', ['parent' => $empty['parentPackage'], 'child' => $empty['childPackage']]));
+
+        $response->assertSessionDoesntHaveErrors();
+
+        $response->assertSee('behind');
+    }
+
+    public function test_child_package_ahead_compare_result_before()
+    {
+        $empty = $this->prepare();
+
+        //child add a commit
+        $commit = Commit::factory()->create(['author_id' => $empty['childPackage']->author->id]);
+        $empty['childPackage']->commits()->attach($commit);
+
+        $response = $this->get(route('compare.package', ['parent' => $empty['parentPackage'], 'child' => $empty['childPackage']]));
+
+        $response->assertSessionDoesntHaveErrors();
+
+        $response->assertSee('before');
+
+        $notEmpty = $this->prepare(true);
+
+        //child add a commit
+        $commit = Commit::factory()->create(['author_id' => $empty['childPackage']->author->id]);
+        $empty['childPackage']->commits()->attach($commit);
+
+        $response = $this->get(route('compare.package', ['parent' => $empty['parentPackage'], 'child' => $empty['childPackage']]));
+
+        $response->assertSessionDoesntHaveErrors();
+
+        $response->assertSee('before');
+    }
+
+    public function test_compare_result_conflict()
+    {
+        $empty = $this->prepare();
+
+        //parent add a commit
+        $commit = Commit::factory()->create(['author_id' => $empty['parentPackage']->author->id]);
+        $empty['parentPackage']->commits()->attach($commit);
+
+        //child add a commit
+        $commit = Commit::factory()->create(['author_id' => $empty['childPackage']->author->id]);
+        $empty['childPackage']->commits()->attach($commit);
+
+        $response = $this->get(route('compare.package', ['parent' => $empty['parentPackage'], 'child' => $empty['childPackage']]));
+
+        $response->assertSessionDoesntHaveErrors();
+
+        $response->assertSee('conflict');
+
+        $notEmpty = $this->prepare(true);
+
+        //parent add a commit
+        $commit = Commit::factory()->create(['author_id' => $notEmpty['parentPackage']->author->id]);
+        $notEmpty['parentPackage']->commits()->attach($commit);
+
+        //child add a commit
+        $commit = Commit::factory()->create(['author_id' => $empty['childPackage']->author->id]);
+        $empty['childPackage']->commits()->attach($commit);
+
+        $response = $this->get(route('compare.package', ['parent' => $empty['parentPackage'], 'child' => $empty['childPackage']]));
+
+        $response->assertSessionDoesntHaveErrors();
+
+        $response->assertSee('conflict');
     }
 }

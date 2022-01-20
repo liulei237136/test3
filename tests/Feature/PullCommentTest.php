@@ -18,7 +18,7 @@ class PullCommentTest extends TestCase
 
     public function test_guest_user_cannot_create_pull_comment()
     {
-        $response = $this->post(route('pullComment.store'), []);
+        $response = $this->post(route('pull.comment.store', ['pull' => 1]));
 
         $response->assertRedirect(route('login'));
     }

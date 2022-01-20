@@ -1122,6 +1122,10 @@ select {
 	margin-left: 1rem;
 	margin-right: 1rem;
 }
+.mx-2 {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
 .ml-3 {
 	margin-left: 0.75rem;
 }
@@ -1209,6 +1213,9 @@ select {
 .mb-5 {
 	margin-bottom: 1.25rem;
 }
+.mt-12 {
+	margin-top: 3rem;
+}
 .block {
 	display: block;
 }
@@ -1263,6 +1270,15 @@ select {
 .h-11 {
 	height: 2.75rem;
 }
+.h-2\/3 {
+	height: 66.666667%;
+}
+.h-3\/4 {
+	height: 75%;
+}
+.h-64 {
+	height: 16rem;
+}
 .min-h-screen {
 	min-height: 100vh;
 }
@@ -1310,6 +1326,12 @@ select {
 }
 .w-11 {
 	width: 2.75rem;
+}
+.w-2\/3 {
+	width: 66.666667%;
+}
+.w-64 {
+	width: 16rem;
 }
 .min-w-0 {
 	min-width: 0px;
@@ -1424,6 +1446,10 @@ select {
 }
 .gap-2 {
 	gap: 0.5rem;
+}
+.gap-x-2 {
+	-moz-column-gap: 0.5rem;
+	     column-gap: 0.5rem;
 }
 .space-x-8 > :not([hidden]) ~ :not([hidden]) {
 	--tw-space-x-reverse: 0;
@@ -1559,6 +1585,10 @@ select {
 	--tw-border-opacity: 1;
 	border-color: rgba(156, 163, 175, var(--tw-border-opacity));
 }
+.border-gray-500 {
+	--tw-border-opacity: 1;
+	border-color: rgba(107, 114, 128, var(--tw-border-opacity));
+}
 .bg-white {
 	--tw-bg-opacity: 1;
 	background-color: rgba(255, 255, 255, var(--tw-bg-opacity));
@@ -1615,6 +1645,10 @@ select {
 	--tw-bg-opacity: 1;
 	background-color: rgba(16, 185, 129, var(--tw-bg-opacity));
 }
+.bg-gray-300 {
+	--tw-bg-opacity: 1;
+	background-color: rgba(209, 213, 219, var(--tw-bg-opacity));
+}
 .bg-opacity-25 {
 	--tw-bg-opacity: 0.25;
 }
@@ -1642,6 +1676,12 @@ select {
 }
 .p-4 {
 	padding: 1rem;
+}
+.p-1 {
+	padding: 0.25rem;
+}
+.p-3 {
+	padding: 0.75rem;
 }
 .px-4 {
 	padding-left: 1rem;

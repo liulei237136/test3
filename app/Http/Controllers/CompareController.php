@@ -45,58 +45,55 @@ class CompareController extends Controller
         info('$childStr');
         info($childStr);
 
+        //parent 领先或者相等与child
         if ($childStr === $parentStr) {
             info('identical');
             return [
-                'compare' => 'identical',
+                'result' => 'identical',
             ];
-        } else if (Str::contains($parentStr, $childStr)) {
+        } else if (str_contains($parentStr, $childStr)) {
             info('behind');
             return [
-                'message' => 'behind',
+                'result' => 'behind',
             ];
-        } else if (Str::contains($childStr, $parentStr)) {
+            //child 领先 parent
+        } else if (str_contains($childStr, $parentStr)) {
             info('front');
-            $diffCommitIds = collect(explode('-', ltrim($childStr, $parentStr . '-')))->map(function ($id) {
-                return (int) $id;
-            })->toArray();
-
-            $diffCommits = Commit::with('author')->findMany($diffCommitIds, ['id', 'title', 'author_id', 'audio_ids', 'created_at']);
-            $contributers_count = $diffCommits->map(function ($commit) {
-                return $commit->author_id;
-            })->count();
-            info('$contributers_count');
-            info($contributers_count);
-            $latestChildCommit = $diffCommits->last();
-            $latestParentCommit = Commit::find($parentCommitIds->last());
-            info('child' . $latestChildCommit);
-            info('parent' . $latestParentCommit);
-            $childAudioIds = $latestChildCommit ? json_decode($latestChildCommit->audio_ids) : array();
-            $parentAudioIds = $latestParentCommit ? json_decode($latestParentCommit->audio_ids) : array();
-            info('child');
-            info($childAudioIds);
-            info('parent');
-            info($parentAudioIds);
-            $insertAudio = Audio::find(array_diff($childAudioIds, $parentAudioIds));
-            $deleteAudio = Audio::find(array_diff($parentAudioIds, $childAudioIds));
-            info('insertAudio');
-            info($insertAudio);
-            info('deleteAudio');
-            info($deleteAudio);
-            return [
-                'compare' => 'front',
-                'commits' => $diffCommits,
-                'deleteAudio' => $deleteAudio,
-                'insertAudio' => $insertAudio,
-                'contributers_count' => $contributers_count,
-                'id' => '456',
-            ];
+            $data = $this->diffCommits($parentCommitIds, $childCommitIds);
+            $data['result'] = 'front';
+            return $data;
         } else {
-            info('conflict');
             //有不一致
-            return [
-                'compare' => 'conflict',
-            ];
+            info('conflict');
+            $data = $this->diffCommits($parentCommitIds, $childCommitIds);
+            $data['result'] = 'conflict';
+            return $data;
         }
+    }
+
+    protected function diffCommits($parentCommitIds, $childCommitIds)
+    {
+        $childBeforeCommits = Commit::with('author')->findMany($childCommitIds->diff($parentCommitIds));
+        $latestParentCommit = Commit::find($parentCommitIds->last()); //todo use largest of
+
+        $contributersCount = $childBeforeCommits->map(function ($commit) {
+            return $commit->author_id;
+        })->unique()->count();
+
+        $latestChildCommit = $childBeforeCommits->sortByDesc(function ($c) {
+            return $c->id;
+        })->first();
+
+        $childAudioIds = json_decode($latestChildCommit->audio_ids);
+        $parentAudioIds = json_decode($latestParentCommit->audio_ids);
+        $insertAudio = Audio::find(array_diff($childAudioIds, $parentAudioIds));
+        $deleteAudio = Audio::find(array_diff($parentAudioIds, $childAudioIds));
+
+        $data = compact('childBeforeCommits', 'contributersCount');
+
+        !empty($insertAudio) && $data['insertAudio'] = $insertAudio;
+        !empty($deleteAudio) && $data['deleteAudio'] = $deleteAudio;
+
+        return $data;
     }
 }

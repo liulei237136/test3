@@ -2,6 +2,7 @@
   <vxe-grid ref="xGrid" v-bind="gridOptions" v-on="gridEvents">
     <template #source_audio="{ row }">
       <audio
+        class="w-64 h-8"
         v-if="row.url"
         :src="row.url"
         @play="onAudioPlayEvent($event, row)"
@@ -17,7 +18,6 @@ import XEUtils from "xe-utils";
 
 export default defineComponent({
   props: {
-    // audio: Object,
     audioList: Array,
   },
 
@@ -38,11 +38,7 @@ export default defineComponent({
       demo.playingAudio = { audio: e.target };
     };
 
-    const filterNameMethod = ({ value, option, cellValue, row, column }) => {
-      return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
-    };
-
-    const filterBookNameMethod = ({ value, option, cellValue, row, column }) => {
+    const filterStringMethod = ({ value, option, cellValue, row, column }) => {
       return XEUtils.toValueString(cellValue).toLowerCase().indexOf(option.data) > -1;
     };
 
@@ -98,21 +94,21 @@ export default defineComponent({
         { type: "seq", width: 60 },
         {
           field: "file_name",
-          title: "音频文件名",
-          width: 120,
+          title: "文件名",
+          width: 160,
           sortable: true,
           sortBy: nameSortBy,
           titleHelp: { message: "注意要加上文件后缀" },
           filters: [{ data: "" }],
-          filterMethod: filterNameMethod,
+          filterMethod: filterStringMethod,
           filterConfig: {},
           filterRender: { name: "$input" },
         },
         //for export only
         { field: "file_path", title: "音频文件路径", visible: false },
-        { field: "size", title: "音频文件大小(字节)", visible: false },
+        { field: "file_size", title: "音频文件大小(字节)", visible: false },
         {
-          title: "音频",
+          title: "播放",
           width: 300,
           slots: {
             default: "source_audio",
@@ -123,7 +119,16 @@ export default defineComponent({
           title: "书名",
           titleHelp: { message: "书的名字，便于过滤和查找" },
           filters: [{ data: "" }],
-          filterMethod: filterBookNameMethod,
+          filterMethod: filterStringMethod,
+          filterConfig: {},
+          filterRender: { name: "$input" },
+        },
+        {
+          field: "author.name",
+          title: "作者",
+          titleHelp: { message: "这行数据的作者" },
+          filters: [{ data: "" }],
+          filterMethod: filterStringMethod,
           filterConfig: {},
           filterRender: { name: "$input" },
         },
@@ -174,8 +179,7 @@ export default defineComponent({
       gridOptions,
       demo,
       resetAll,
-      filterNameMethod,
-      filterBookNameMethod,
+      filterStringMethod,
       gridEvents,
       onAudioPlayEvent,
     };

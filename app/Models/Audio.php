@@ -11,6 +11,8 @@ class Audio extends Model
 
     protected $guarded = [];
 
+    protected $with = ['author'];
+
     protected $appends = ['url'];
 
     public function author()
