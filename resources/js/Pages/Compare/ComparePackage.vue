@@ -2,13 +2,19 @@
   <content-layout>
     <div class="max-w-7xl mx-auto">
       <h1 class="text-xl mb-2">比较改变</h1>
-      <div class="mb-2">
+      <div class="mb-2 flex gap-2 items-center">
         <package-link as="button" :package="parent"></package-link>
-        <i class="fas fa-arrow-left text-gray-500 mx-4 text-sm"></i>
+        <i class="fas fa-arrow-left text-gray-500 text-sm"></i>
         <package-link as="button" :package="child"></package-link>
         <span v-if="diff.pass === true">这个求拉可以自动融合</span>
+        <span v-if="diff.pass === false && diff.message === 'up_to_date'"
+          >当前点读包和父包的保存是一致的，无法求拉</span
+        >
+        <span v-if="diff.pass === false && diff.message === 'conflict'"
+          >当前点读包和父包的保存有冲突，但任然可以新建求拉</span
+        >
       </div>
-      <div v-if="!demo.open">
+      <div v-if="diff.message !== 'up_to_date' && !demo.open">
         <button
           type="button"
           class="bg-green-500 px-4 py-2 rounded text-white"
@@ -17,7 +23,7 @@
           创建拉取
         </button>
       </div>
-      <div v-else class="flex items-start">
+      <div v-if="diff.message != 'up_to_date' && demo.open" class="flex items-start">
         <button
           v-if="$page.props.jetstream.managesProfilePhotos"
           class="flex mt-1 mr-2 text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
@@ -82,7 +88,24 @@
       </div>
       <!-- audios -->
       <div class="mt-4">
-        显示{{ diff.deleteAudio.length }}行删除和{{ diff.insertAudio.length }}行新增:
+        显示{{
+          diff.deleteAudio && diff.deleteAudio.length
+            ? diff.deleteAudio.length + "行删除"
+            : ""
+        }}
+        {{
+          diff.deleteAudio &&
+          diff.deleteAudio.length &&
+          diff.insertAudio &&
+          diff.insertAudio.length
+            ? "和"
+            : ""
+        }}
+        {{
+          diff.insertAudio && diff.insertAudio.length
+            ? diff.insertAudio.length + "行新增"
+            : ""
+        }}:
         <audio-table :audioList="audioList"></audio-table>
       </div>
     </div>

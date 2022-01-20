@@ -24,6 +24,6 @@ class PullCommentController extends Controller
 
         PullComment::create($validated);
 
-        return Redirect::route('pull.show', ['pull' => $pull]);
+        return Redirect::route('pull.show', ['package' => $pull->parentPackage->id, 'pull' => $pull]);
     }
 }

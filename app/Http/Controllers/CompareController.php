@@ -32,32 +32,39 @@ class CompareController extends Controller
 
     protected function diffPackage(Package $parent, Package $child)
     {
-        $parentCommitIds = $parent->commits()->oldest()->get(['id'])->map(function ($commit) {return $commit->id;});
+        $parentCommitIds = $parent->commits()->oldest()->get(['id'])->map(function ($commit) {
+            return $commit->id;
+        });
         $parentStr = $parentCommitIds->implode('-');
-        $childCommitIds = $child->commits()->oldest()->get(['id'])->map(function ($commit) {return $commit->id;});
+        $childCommitIds = $child->commits()->oldest()->get(['id'])->map(function ($commit) {
+            return $commit->id;
+        });
         $childStr = $childCommitIds->implode('-');
-        info('111111111111111');
-        info($parentCommitIds);
-        info($childCommitIds);
+        info('$parentStr');
         info($parentStr);
+        info('$childStr');
         info($childStr);
 
-        // if($parentCommitIds->isEmpty() )
-        //parent 领先或者相等与child
-        if ($childStr == '' || Str::contains($parentStr, $childStr)) {
+        if ($childStr === $parentStr) {
+            info('identical');
             return [
-                'pass' => false,
-                'message' => 'up_to_date',
-                'id' => '123',
+                'compare' => 'identical',
             ];
-            //child 领先 parent
-        } else if ($parentStr == '' || Str::contains($childStr, $parentStr)) {
+        } else if (Str::contains($parentStr, $childStr)) {
+            info('behind');
+            return [
+                'message' => 'behind',
+            ];
+        } else if (Str::contains($childStr, $parentStr)) {
+            info('front');
             $diffCommitIds = collect(explode('-', ltrim($childStr, $parentStr . '-')))->map(function ($id) {
                 return (int) $id;
             })->toArray();
 
-            $diffCommits = Commit::with('author')->findMany($diffCommitIds,['id','title','author_id','audio_ids', 'created_at']);
-            $contributers_count =$diffCommits->map(function($commit){return $commit->author_id;})->count();
+            $diffCommits = Commit::with('author')->findMany($diffCommitIds, ['id', 'title', 'author_id', 'audio_ids', 'created_at']);
+            $contributers_count = $diffCommits->map(function ($commit) {
+                return $commit->author_id;
+            })->count();
             info('$contributers_count');
             info($contributers_count);
             $latestChildCommit = $diffCommits->last();
@@ -77,7 +84,7 @@ class CompareController extends Controller
             info('deleteAudio');
             info($deleteAudio);
             return [
-                'pass' => true,
+                'compare' => 'front',
                 'commits' => $diffCommits,
                 'deleteAudio' => $deleteAudio,
                 'insertAudio' => $insertAudio,
@@ -85,20 +92,11 @@ class CompareController extends Controller
                 'id' => '456',
             ];
         } else {
+            info('conflict');
             //有不一致
-            // $parentInserts = $parentCommitIds->diff($childCommitIds);
             return [
-                'pass' => false,
-                'message' => 'conflict',
-                'id' => '789',
+                'compare' => 'conflict',
             ];
         }
-
-        //todo
-        // $diff_from_to = array_diff($childCommitIds, $parentCommitIds);
-        // $diff_to_from = array_diff($parentCommitIds, $childCommitIds);
-
-        // return compact('diff_from_to', 'diff_to_from');
-
     }
 }

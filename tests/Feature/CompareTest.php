@@ -12,11 +12,17 @@ use Tests\TestCase;
 class CompareTest extends TestCase
 {
     use RefreshDatabase;
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
+
+    public function test_empty_child_and_parent_should_nav_to_package_package()
+    {
+        // there is a package and clone it
+        $parent = Package::factory()->create();
+        $this->actingAs($user = User::factory()->create());
+        $child = $parent->clone();
+
+        //when
+    }
+
     public function test_child_later_than_or_equal_to_parent_return_up_to_date_or_conflict()
     {
         // there is a package
