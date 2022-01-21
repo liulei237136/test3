@@ -46,6 +46,8 @@ Route::get('/package/{package}/compare', [CompareController::class, 'compare'])-
 
 Route::get('/packages/{parent}/compare/packages/{child}', [CompareController::class, 'package'])->name('compare.package');
 
+Route::get('/packages/{package}/commits', [CommitController::class, 'index'])->name('package.commit.index');
+
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');

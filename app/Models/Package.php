@@ -17,17 +17,17 @@ class Package extends Model
 
     protected $with = ['author', 'parent'];
 
-    public function scopeMonth(Builder $builder, $date)
-    {
-        if (!is_null($date)) {
-            $builder->whereBetween('created_at', [
-                Carbon::createFromFormat('d-m-Y', $date)->startOfMonth(),
-                Carbon::createFromFormat('d-m-Y', $date)->endOfMonth(),
-            ]);
-        }
+    // public function scopeMonth(Builder $builder, $date)
+    // {
+    //     if (!is_null($date)) {
+    //         $builder->whereBetween('created_at', [
+    //             Carbon::createFromFormat('d-m-Y', $date)->startOfMonth(),
+    //             Carbon::createFromFormat('d-m-Y', $date)->endOfMonth(),
+    //         ]);
+    //     }
 
-        return $builder;
-    }
+    //     return $builder;
+    // }
 
     public function scopeSearch(Builder $builder, $term)
     {
@@ -38,7 +38,8 @@ class Package extends Model
         return $builder;
     }
 
-    function clone () {
+    function clone()
+    {
         //todo validate
 
         $child = new Package();
@@ -78,5 +79,4 @@ class Package extends Model
     {
         return $this->hasMany(Pull::class, 'parent');
     }
-
 }

@@ -7,9 +7,33 @@ use App\Models\Commit;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
+use App\Http\Traits\CommonInfoTrait;
+
 
 class CommitController extends Controller
 {
+    use CommonInfoTrait;
+
+    public function index(Package $package, Request $request)
+    {
+
+        $data = $this->commonInfo($package);
+
+        // $data['commits'] = $package->commits;
+        $author_id = $request->input('author');
+
+        if ($author_id) {
+            $data['package']->load(['commits' => function ($query) use ($author_id) {
+                $query->where('commits.author_id', $author_id);
+            }]);
+        } else {
+            $data['package']->load('commits');
+        }
+
+        info(json_encode($data));
+        return Inertia::render('Commit/CommitIndex', $data);
+    }
 
     public function store(Request $request)
     {
@@ -35,7 +59,7 @@ class CommitController extends Controller
 
         $commit = $package->commits()->create($validated);
 
-        return Redirect::route('package.audio', ['package' => $package->id,'commit'=>$commit->id])->with('success', '保存成功');
+        return Redirect::route('package.audio', ['package' => $package->id, 'commit' => $commit->id])->with('success', '保存成功');
     }
 
     public function audio(Commit $commit)

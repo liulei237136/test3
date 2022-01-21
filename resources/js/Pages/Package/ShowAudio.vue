@@ -226,12 +226,16 @@ export default defineComponent({
     });
 
     const getCommitAudio = async () => {
-      const result = await axios(
-        route("commit.audio", {
-          commit: props?.commit?.id,
-        })
-      );
-      return result.data.audio_list;
+      if (!props.commit) {
+        return [];
+      } else {
+        const result = await axios(
+          route("commit.audio", {
+            commit: props?.commit?.id,
+          })
+        );
+        return result.data.audio_list;
+      }
     };
 
     const resetAll = () => {
