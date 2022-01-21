@@ -1,23 +1,28 @@
 <template>
   <div :class="classes">
-    <h3>{{ commit.title }}</h3>
+    <h3>
+      <Link :href="route('commit.show', { package: p.id, commit: commit.id })">{{
+        commit.title
+      }}</Link>
+    </h3>
     <div class="flex items-center">
-      <Link href="#">
+      <Link :href="route('user.show', { user: commit.author.id })">
         <button
-          v-if="$page.props.jetstream.managesProfilePhotos"
           class="flex mt-1 mr-2 text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
         >
           <img
             class="h-8 w-8 rounded-full object-cover"
-            :src="$page.props.user.profile_photo_url"
-            :alt="$page.props.user.name"
+            :src="commit.author.profile_photo_url"
+            :alt="commit.author.name"
           />
         </button>
       </Link>
 
       <p class="text-sm">
         <Link
-          href="#"
+          :href="
+            route('package.commit.index', { package: p.id, author: commit.author.id })
+          "
           class="hover:underline"
           :title="`查看${commit.author.name}的所有保存`"
           >{{ commit.author.name }}</Link
@@ -39,6 +44,7 @@ export default defineComponent({
     Link,
   },
   props: {
+    p: Object,
     commit: Object,
     classes: String,
   },

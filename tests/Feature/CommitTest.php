@@ -15,7 +15,8 @@ class CommitTest extends TestCase
 
     public function test_guest_cannot_create_commit()
     {
-        $response = $this->post(route('commit.store'), []);
+
+        $response = $this->post(route('package.commit.store', ['package' => 1]), []);
 
         $response->assertRedirect(route('login'));
     }
@@ -38,8 +39,7 @@ class CommitTest extends TestCase
         $audio_ids = json_encode($audio_ids);
 
         //4 then he create a new commit
-        $response = $this->post(route('commit.store'), [
-            'package' => $package->id,
+        $response = $this->post(route('package.commit.store', ['package' => $package]), [
             'title' => 'title',
             'description' => 'description',
             'audio_ids' => $audio_ids,

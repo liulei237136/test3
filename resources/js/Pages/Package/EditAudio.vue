@@ -330,9 +330,8 @@ export default defineComponent({
       console.log(audio_ids);
 
       await Inertia.post(
-        route("commit.store"),
+        route("package.commit.store", { package: props.package.id }),
         {
-          package: props.package.id,
           title: demo.saveFormData.title,
           description: demo.saveFormData.description,
           audio_ids: JSON.stringify(audio_ids),

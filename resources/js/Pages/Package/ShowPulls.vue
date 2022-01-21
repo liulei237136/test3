@@ -3,9 +3,6 @@
     <div class="max-w-7xl mx-auto">
       <!-- 新建拉取行 -->
       <div class="flex justify-between mb-4">
-        <!-- <button class="bg-green-500 px-4 py-2 rounded" @click="onNewPull">
-          新建一个拉取
-        </button> -->
         <Link
           v-if="package.parent"
           as="button"
@@ -28,7 +25,7 @@
               :class="{ active: status === 'open' }"
             >
               <Icon name="pull" class="w-5 h-5 mr-2"></Icon>
-              1 Open
+              {{ openPullCount }} Open
             </Link>
             <!-- </a> -->
             <!-- </div> -->
@@ -40,7 +37,7 @@
               :class="{ active: status === 'closed' }"
             >
               <Icon name="check" class="w-5 h-5 mr-1"></Icon>
-              9 Closed
+              {{ closePullCount }} Closed
             </Link>
           </div>
           <div>right</div>
@@ -68,6 +65,8 @@ export default defineComponent({
   props: {
     package: Object,
     canEdit: Boolean,
+    openPullCount: Number,
+    closePullCount: Number,
     pulls: Array,
     status: String,
   },

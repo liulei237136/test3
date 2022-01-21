@@ -4,10 +4,12 @@ use App\Http\Controllers\AudioController;
 use App\Http\Controllers\CommitController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PackageCommitController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PullCommentController;
 use App\Http\Controllers\PullController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,7 +48,12 @@ Route::get('/package/{package}/compare', [CompareController::class, 'compare'])-
 
 Route::get('/packages/{parent}/compare/packages/{child}', [CompareController::class, 'package'])->name('compare.package');
 
-Route::get('/packages/{package}/commits', [CommitController::class, 'index'])->name('package.commit.index');
+Route::get('/packages/{package}/commits', [PackageCommitController::class, 'index'])->name('package.commit.index');
+
+Route::get('/packages/{package}/commits/{commit}', [PackageCommitController::class, 'show'])->name('package.commit.show');
+
+Route::get('/users/{user}', [UserController::class,  'show'])->name('user.show');
+
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -64,9 +71,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::post('/packages/{package}/toggle_favorite', [PackageController::class, 'toggleFavorite'])->name('package.toggle_favorite');
 
-    Route::post('/package/{package}/commits', [CommitController::class, 'store'])->name('package.commit.store');
 
-    Route::post('/commits', [CommitController::class, 'store'])->name('commit.store');
+    // Route::post('/commits', [CommitController::class, 'store'])->name('commit.store');
+    Route::post('/packages/{package}/commits', [PackageCommitController::class, 'store'])->name('package.commit.store');
 
     Route::post('/audio', [AudioController::class, 'store'])->name('audio.store');
 

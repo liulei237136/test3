@@ -1,13 +1,5 @@
 <template>
   <app-layout title="Package">
-    <!-- <template #header>
-      <div class="flex items-center justify-between">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-          搜索结果:
-        </h2>
-      </div>
-    </template> -->
-
     <div class="max-w-3xl mt-1 mx-auto bg-white overflow-hidden">
       <section class="flex items-center justify-between border-b py-4">
         <div class="text-lg font-bold">{{ package ? package.total : 0 }}条结果</div>

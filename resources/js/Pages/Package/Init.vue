@@ -103,8 +103,7 @@ export default defineComponent({
         audio_ids,
       });
       //   return;
-      this.$inertia.post(route("commit.store"), {
-        package: this.package.id,
+      this.$inertia.post(route("package.commit.store", { package: this.package.id }), {
         title: "初次保存",
         audio_ids: JSON.stringify(audio_ids),
       });

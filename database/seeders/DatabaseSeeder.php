@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Commit;
 use App\Models\Package;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -15,25 +16,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
-        User::factory()->create([
-            'name' => 'liulei237136',
+        $parent = User::factory()->create([
+            'name' => 'li',
             'email' => 'liulei237136@163.com',
             'password' => bcrypt('ll237136'),
             'email_verified_at' => now(),
         ]);
-        User::factory()->create([
-            'name' => 'liulei',
+        $child = User::factory()->create([
+            'name' => 'il',
             'email' => 'liulei237136@gmail.com',
             'password' => bcrypt('ll237136'),
             'email_verified_at' => now(),
         ]);
 
-        Package::factory()->count(16)->create();
+        $parentPackage = $parent->package()->create(Package::factory()->make()->toArray());
 
-        // Package::factory()->count(16)->create();
-        // $commits = Commit::factory()->count(20)->create(['package_id' =>$package->id]);
-        // $package->commits()->attach($commits);
+        $parentPackage->commits()->attach($parentCommit1 = Commit::factory()->create(['author_id' => $parent->id]));
 
+        $childPackage = $parentPackage->clone($child);
+
+        $childPackage->commits()->attach($childCommit1 = Commit::factory()->create(['author_id' => $child->id]));
+
+        $childPackage->commits()->attach($childCommit2 = Commit::factory()->create(['author_id' => $child->id]));
+
+        $
     }
 }

@@ -1,8 +1,11 @@
 <template>
   <div class="inline-flex items-center space-x-1 text-blue-500" :class="classes">
-    <Link :as="as ? as : 'a'" href="#" class="hover:underline">{{
-      package.author.name
-    }}</Link>
+    <Link
+      :as="as ? as : 'a'"
+      :href="route('user.show', { user: package.author.id })"
+      class="hover:underline"
+      >{{ package.author.name }}</Link
+    >
     <div class="text-black">/</div>
     <Link
       :as="as ? as : 'a'"

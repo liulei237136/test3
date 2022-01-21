@@ -89,7 +89,6 @@ class PackageController extends Controller
         } else {
             return Inertia::render('Package/ShowBasicInfo', $data);
         }
-
     }
 
     public function audio(Package $package, Request $request)
@@ -121,12 +120,17 @@ class PackageController extends Controller
 
         $data['status'] = $request->query('status') ?? 'open';
 
+        $data['openPullCount'] = $package->pulls()->where('status', 'open')->count();
+
+        $data['closePullCount'] = $package->pulls()->count() - $data['openPullCount']; //close include close and merge
+
         $data['pulls'] = $package->pulls()->where('status', $data['status'])->latest()->get();
 
         return Inertia::render('Package/ShowPulls', $data);
     }
 
-    function clone (Package $package) {
+    function clone(Package $package)
+    {
         $child = $package->clone();
 
         return Redirect::route('package.show', ['package' => $child]);
@@ -142,7 +146,6 @@ class PackageController extends Controller
         if (!url()->previous()) {
             return Redirect::back();
         }
-
     }
 
     public function toggleFavoriteAfterLogin(Package $package)

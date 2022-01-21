@@ -4,7 +4,7 @@
       点读包{{ package.title }}中{{ package.author.name }}的保存
       <ul class="mt-2">
         <li v-for="commit in package.commits" :key="commit.id">
-          <commit-list-item :commit="commit"></commit-list-item>
+          <commit-list-item :commit="commit" :p="package"></commit-list-item>
         </li>
       </ul>
     </div>

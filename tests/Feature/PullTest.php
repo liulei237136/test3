@@ -14,15 +14,6 @@ class PullTest extends TestCase
 {
     use RefreshDatabase;
 
-    // public function test_guest_can_see_package_pulls_page()
-    // {
-    //     //1 case a package
-    //     $package = Package::factory()->create();
-    //     //2 when get to the package pulls page
-    //     $response = $this->get(route('package.pulls', ['package' => $package]));
-    //     //3 get 200 ok
-    //     $response->assertStatus(200);
-    // }
     public function test_guest_user_cannot_create_pull()
     {
         $response = $this->post(route('pull.store', ['child' => 1]));
@@ -130,16 +121,14 @@ class PullTest extends TestCase
 
     public function test_create_pull_with_commment()
     {
-        $this->withoutExceptionHandling();
         //there is a parent package
         $parentPackage = Package::factory()->create();
         //a user clone it
-        $childAuthor = User::factory()->create();
-        $this->actingAs($childAuthor);
+        $this->actingAs($child = User::factory()->create());
         $childPackage = $parentPackage->clone();
 
         //child package create  a commit
-        $childPackage->commits()->attach(Commit::factory()->create(['author_id' => $childAuthor->id]));
+        $childPackage->commits()->attach(Commit::factory()->create(['author_id' => $child->id]));
 
         //child package create a pull
         $response = $this->post(route('pull.store'), [
