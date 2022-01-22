@@ -11,7 +11,7 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_can_see_user_home_page()
+    public function test_guest_can_see_user_overview_page()
     {
 
         $user = User::factory()->create();

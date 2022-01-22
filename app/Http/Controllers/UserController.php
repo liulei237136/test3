@@ -9,8 +9,18 @@ use Inertia\Inertia;
 class UserController extends Controller
 {
 
-    public function show(User $user)
+    public function show(User $user, Request $request)
     {
-        return Inertia('User/ShowUser', compact('user'));
+        //todo validate
+        $tab = $request->query('tab');
+        $data = ['targetUser' => $user];
+        switch ($tab) {
+            case null:
+                return Inertia('User/Overview', $data);
+            case 'packages':
+                return Inertia('User/Packages', $data);
+            case 'stars':
+                return Inertia('User/Stars', $data);
+        }
     }
 }
