@@ -38,6 +38,30 @@ class Package extends Model
         return $builder;
     }
 
+    public function scopeFilter($query, array $filters)
+    {
+        $query->when($filters['q'] ?? null,  function ($query, $q) {
+            $query->where('title', 'like', '%' . $q . '%');
+        })->when($filters['type'] ?? null, function ($query, $type) {
+            if ($type === 'public') {
+                $query->where('private', false);
+            } elseif ($type === 'private') {
+                $query->where('private', true);
+            } elseif ($type === 'clone') {
+                $query->whereNotNull('parent_id');
+            } elseif ($type === 'source') {
+                $query->whereNull('parent_id');
+            }
+        })->when($filters['sort'] ?? null, function ($query, $sort) {
+            if ($sort === 'last_updated') {
+                $query->orderBy('updated_at', 'desc');
+            } elseif ($sort === 'title') {
+                $query->orderBy('title');
+            };
+            //todo sortby stars
+        });
+    }
+
     function clone($user = null)
     {
         //todo validate
