@@ -31,7 +31,6 @@ class UserController extends Controller
         if (is_null($filters['sort'])) {
             $filters['sort'] = 'last_updated';
         }
-
         return  [
             'filters' => $filters,
             'packages' => $user->package()
