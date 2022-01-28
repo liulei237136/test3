@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -12,16 +13,25 @@ class UserController extends Controller
     public function show(User $user, Request $request)
     {
         //todo validate
-        $tab = $request->query('tab');
+        $request->validate(
+            [
+                'tab' => ['nullable', 'string', Rule::in(['packages'])]
+            ]
+        );
+
+        $tab = $request->query('tab') || 'overview';
+
         $data = ['targetUser' => $user];
-        switch ($tab) {
-            case null:
-                return Inertia('User/Overview', $data);
-            case 'packages':
-                return Inertia('User/Packages', $this->getPackages($user, $request));
-            case 'stars':
-                return Inertia('User/Stars', $data);
-        }
+
+        // switch ($tab) {
+        //     case null:
+        //         return Inertia('User/' . w', $data);
+        //     case 'packages':
+        //         return Inertia('User/Packages', $this->getPackages($user, $request));
+        //     case 'stars':
+        //         return Inertia('User/Stars', $data);
+        // }
+        return Inertia::render('User/' . ucfirst($tab), $data);
     }
 
     public function getPackages($user, $request)

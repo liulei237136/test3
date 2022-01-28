@@ -17,13 +17,13 @@ class UserTest extends TestCase
     {
         parent::setUp();
 
-        $this->userOne = User::factory()->create();
-        $this->userTwo =  User::factory()->create();
+        $this->userOne = create(User::class);
+        $this->userTwo =  create(User::class);
 
         $this->userOne->package()->create(
-            $this->publicPackage = Package::factory()->make()->toArray(),
-            $this->privatePackage = Package::factory()->make(['private' => true])->toArray(),
-            $this->clonePackage = Package::factory()->make(['parent_id' => 1])->toArray(),
+            $this->publicPackage = make(Package::class)->toArray(),
+            $this->privatePackage = make(Package::class, ['private' => true])->toArray(),
+            $this->clonePackage =  make(Package::class, ['parent_id' => 1])->toArray(),
         );
         $this->publicTitle = $this->publicPackage['title'];
         $this->privateTitle = $this->privatePackage['title'];
@@ -37,7 +37,7 @@ class UserTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_user_package_with_none_queryparam()
+    public function test_user_package_page_with_none_queryparam()
     {
         //when as guest
         $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages']));
@@ -57,18 +57,18 @@ class UserTest extends TestCase
         $response->assertDontSee($this->privateTitle);
     }
 
-    public function test_user_package_queryparam_q()
-    {
-        //when q euqal publicTitle
-        $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->publicTitle]));
-        $response->assertStatus(200);
-        $response->assertSee($this->publicTitle);
-        $response->assertDontSee($this->privateTitle, $this->cloneTitle);
-        //when q euqal privateTitle
-        $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->privateTitle]));
-        $response->assertStatus(200);
-        $response->assertDontSee($this->privateTitle, $this->privateTitle, $this->cloneTitle);
-    }
+    // public function test_user_package_queryparam_q()
+    // {
+    //     //when q euqal publicTitle
+    //     $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->publicTitle]));
+    //     $response->assertStatus(200);
+    //     $response->assertSee($this->publicTitle);
+    //     $response->assertDontSee($this->privateTitle, $this->cloneTitle);
+    //     //when q euqal privateTitle
+    //     $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->privateTitle]));
+    //     $response->assertStatus(200);
+    //     $response->assertDontSee($this->privateTitle, $this->privateTitle, $this->cloneTitle);
+    // }
 
     // public function test_user_package_queryparam_type_all()
     // {

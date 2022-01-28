@@ -25,6 +25,10 @@ use Inertia\Inertia;
 |
  */
 
+Route::get('/test', function () {
+    return Redirect::route('dashboard')->with(['success' => 'haha']);
+});
+
 Route::get('/', function () {
     if (auth()->user()) {
         return Redirect::route('dashboard');

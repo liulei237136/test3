@@ -10,10 +10,6 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_faker1()
-    {
-        $this->assertTrue(true);
-    }
     // public function test_two_factor_authentication_can_be_enabled()
     // {
     //     $this->actingAs($user = User::factory()->create());

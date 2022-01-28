@@ -13,16 +13,16 @@ class AudioTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_user_can_not_create_audio()
+    public function test_guest_can_not_create_audio()
     {
-        $response = $this->post(route('audio.store'), []);
+        $response = $this->post(route('audio.store'));
 
         $response->assertRedirect(route('login'));
     }
 
-    public function test_authorized_user_can_create_audio_with_only_file()
+    public function test_authenticated_user_can_create_audio_with_only_file()
     {
-        $this->actingAs($user = User::factory()->create());
+        $this->signIn($user = create(User::class));
 
         $public = Storage::fake('public');
 
@@ -32,22 +32,21 @@ class AudioTest extends TestCase
             'file' => $file,
         ]);
 
+
         $file_path = "audio/" . date('Y/m/d') . '/' . $file->hashName();
 
         $public->assertExists($file_path);
 
-        $this->assertEquals(Audio::count(), 1);
+        $this->assertCount(1, Audio::all());
         $first = Audio::first();
         $this->assertEquals($first->file_name, null);
         $this->assertEquals($first->file_path, $file_path);
         $this->assertEquals($first->file_size, 20 * 1024);
         $this->assertEquals($first->author_id, $user->id);
-        $response->assertSessionHasNoErrors();
     }
 
-    public function test_authorized_user_can_create_audio_without_file()
+    public function test_authenticated_user_can_create_audio_without_file()
     {
-        $this->withoutExceptionHandling();
 
         $this->actingAs($user = User::factory()->create());
 
@@ -62,7 +61,6 @@ class AudioTest extends TestCase
         $this->assertEquals($first->file_path, null);
         $this->assertEquals($first->file_size, null);
         $this->assertEquals($first->author_id, $user->id);
-        $response->assertSessionHasNoErrors();
     }
 
     public function test_authorized_user_can_create_audio_from_import()
