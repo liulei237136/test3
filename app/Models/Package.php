@@ -17,19 +17,7 @@ class Package extends Model
 
     protected $with = ['author', 'parent'];
 
-
-
-    // public function scopeMonth(Builder $builder, $date)
-    // {
-    //     if (!is_null($date)) {
-    //         $builder->whereBetween('created_at', [
-    //             Carbon::createFromFormat('d-m-Y', $date)->startOfMonth(),
-    //             Carbon::createFromFormat('d-m-Y', $date)->endOfMonth(),
-    //         ]);
-    //     }
-
-    //     return $builder;
-    // }
+    protected $appends = [];
 
     public function scopeSearch(Builder $builder, $term)
     {
@@ -40,23 +28,72 @@ class Package extends Model
         return $builder;
     }
 
+    public function scopePrivate(Builder $builder)
+    {
+        $builder->whereNotNull('private');
+    }
+
+    public function scopePublic(Builder $builder)
+    {
+        $builder->whereNull('private');
+    }
+
+    public function scopeResources(Builder $builder)
+    {
+        $builder->whereNull('parent_id');
+    }
+
+    public function scopeClones(Builder $builder)
+    {
+        $builder->whereNotNull('parent_id');
+    }
+
+
+    public function stars()
+    {
+        return $this->favorites();
+    }
+
+    public function star($userId)
+    {
+        $this->stars()->create(['user_id' => $userId]);
+
+        return $this;
+    }
+
+
+    public function unStar($userId)
+    {
+        $this->stars()->delete(['user_id' => $userId]);
+
+        return $this;
+    }
+
+    public function isStared($user_id = null)
+    {
+        if(is_null($user_id)){
+            return false;
+        }
+        return $this->isFavorited($user_id);
+    }
+
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['q'] ?? null,  function ($query, $q) {
             $query->where('title', 'like', '%' . $q . '%');
         })->when($filters['type'] ?? null, function ($query, $type) {
             if ($type === 'public') {
-                $query->where('private', false);
+                $query->whereNull('private');
             } elseif ($type === 'private') {
-                $query->where('private', true);
-            } elseif ($type === 'clone') {
+                $query->whereNotNull('private');
+            } elseif ($type === 'clones') {
                 $query->whereNotNull('parent_id');
-            } elseif ($type === 'source') {
+            } elseif ($type === 'sources') {
                 $query->whereNull('parent_id');
             }
         })->when($filters['sort'] ?? null, function ($query, $sort) {
             if ($sort === 'last_updated') {
-                $query->orderBy('updated_at', 'desc');
+                $query->latest('updated_at');
             } elseif ($sort === 'title') {
                 $query->orderBy('title');
             };
@@ -83,6 +120,20 @@ class Package extends Model
         return $child;
     }
 
+    public function clones()
+    {
+        return $this->hasMany(Package::class, 'parent_id');
+    }
+
+    public function isCloned($user_id = null){
+        if(is_null($user_id)) {
+            return false;
+        }
+        $user = User::find($user_id);
+        return $user->packages()->where('parent_id', $this->id)->exists();
+    }
+
+
     public function author()
     {
         return $this->belongsTo(User::class, 'author_id');
@@ -91,11 +142,6 @@ class Package extends Model
     public function parent()
     {
         return $this->belongsTo(Package::class, 'parent_id');
-    }
-
-    public function children()
-    {
-        return $this->hasMany(Package::class, 'parent_id');
     }
 
     public function commits()

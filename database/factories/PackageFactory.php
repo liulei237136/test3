@@ -22,7 +22,6 @@ class PackageFactory extends Factory
      */
     public function definition()
     {
-
         return [
             'title' => $this->faker->sentence(),
             'description' => $this->faker->paragraph(),
@@ -30,5 +29,23 @@ class PackageFactory extends Factory
             'created_at' => now(),
             'updated_at' => now(),
         ];
+    }
+
+    public function private()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'private' => true
+            ];
+        });
+    }
+
+    public function public()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'private' => null
+            ];
+        });
     }
 }

@@ -75,40 +75,39 @@ class PackageController extends Controller
         ]);
 
         $package->update($validated);
-        // return Redirect::route('package.show', ['package' => $package->id, 'tab' => 'info']);
 
         return Redirect::back();
     }
 
     public function show(Package $package)
     {
-        $data = $this->commonInfo($package);
+        $this->appendAttribute($package);
 
-        if ($data['canEdit']) {
-            return Inertia::render('Package/EditBasicInfo', $data);
+        if ($package['canEdit']) {
+            return Inertia::render('Package/EditBasicInfo', compact('package'));
         } else {
-            return Inertia::render('Package/ShowBasicInfo', $data);
+            return Inertia::render('Package/ShowBasicInfo', compact('package'));
         }
     }
 
     public function audio(Package $package, Request $request)
     {
-        $data = $this->commonInfo($package);
+        $this->appendAttribute($package);
 
-        $data['commits'] = $package->commits()->latest('commits.created_at')->get(['id', 'title']);
+        $package->commits = $package->commits()->latest('commits.created_at')->get(['id', 'title']);
 
         $commit_id = $request->input('commit');
 
         if ($commit_id) {
-            $data['commit'] = Commit::findOrFail($commit_id);
-        } else if ($data['commits']->isNotEmpty()) {
-            $data['commit'] = Commit::findOrFail($data['commits']->first()['id']);
+            $package->commit = Commit::findOrFail($commit_id);
+        } else if ($package->commits->isNotEmpty()) {
+            $package->commit = Commit::findOrFail($package->commits->first()['id']);
         }
 
-        if ($data['canEdit']) {
-            return Inertia::render('Package/EditAudio', $data);
+        if ($package->canEdit) {
+            return Inertia::render('Package/EditAudio', compact('package'));
         } else {
-            return Inertia::render('Package/ShowAudio', $data);
+            return Inertia::render('Package/ShowAudio', compact('package'));
         }
     }
 
@@ -152,5 +151,28 @@ class PackageController extends Controller
     {
         $package->toggleFavorite();
         return Redirect::back();
+    }
+    // public function commonInfo($package)
+    // {
+    //     $favoritesCount = $package->favoritesCount;
+
+    //     $isFavorited = auth()->user() ? $package->isFavorited() : null;
+
+    //     $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
+
+    //     $package->loadCount('children');
+
+    //     return compact('package', 'favoritesCount', 'isFavorited', 'canEdit');
+    // }
+    protected function appendAttribute($package)
+    {
+        $package->loadCount('stars');
+        $package->isStared = $package->isFavorited();
+        $package->loadCount('clones');
+        $package->isCloned = $package->isCloned(auth()->id());
+        $package->canEdit = auth()->check() && (int)auth()->id() === (int)$package->author->id;
+
+
+        return $package;
     }
 }

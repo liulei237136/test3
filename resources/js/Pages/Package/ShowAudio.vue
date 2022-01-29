@@ -6,7 +6,7 @@
           <template #default>
             <vxe-input
               v-model="demo.filterCommitTitle"
-              :placeholder="commit ? commit.title : '还没有保存过'"
+              :placeholder="package.commit ? package.commit.title : '还没有保存过'"
               @focus="commitFocusEvent"
               @keyup="commitKeyupEvent"
             ></vxe-input>
@@ -22,11 +22,11 @@
                   :to="
                     route('package.audio', {
                       package: package.id,
-                      commit: commit.id,
+                      commit: package.commit.id,
                     })
                   "
-                  :title="commit.title"
-                  >{{ commit.title }}</Link
+                  :title="package.commit.title"
+                  >{{ package.commit.title }}</Link
                 >
               </div>
             </div>
@@ -79,9 +79,6 @@ import ContentLayout from "@/Layouts/ContentLayout.vue";
 export default defineComponent({
   props: {
     package: Object,
-    canEdit: Boolean,
-    commit: Object,
-    commits: Array,
   },
   components: {
     Link,
@@ -96,7 +93,7 @@ export default defineComponent({
       filterAllString: "",
       audioList: [],
       filterCommitTitle: "",
-      filteredCommitsList: props.commits,
+      filteredCommitsList: props.package.commits,
       playingAudio: {},
     });
 
@@ -116,10 +113,10 @@ export default defineComponent({
 
     const commitKeyupEvent = () => {
       demo.filteredCommitsList = demo.filterCommitTitle
-        ? props.commits.filter(
+        ? props.package.commits.filter(
             (commit) => commit.title.indexOf(demo.filterCommitTitle) > -1
           )
-        : props.commits;
+        : props.package.commits;
     };
 
     const filterNameMethod = ({ value, option, cellValue, row, column }) => {
@@ -226,12 +223,12 @@ export default defineComponent({
     });
 
     const getCommitAudio = async () => {
-      if (!props.commit) {
+      if (!props.package.commit) {
         return [];
       } else {
         const result = await axios(
           route("commit.audio", {
-            commit: props?.commit?.id,
+            commit: props?.package?.commit?.id,
           })
         );
         return result.data.audio_list;

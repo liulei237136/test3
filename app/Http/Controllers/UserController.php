@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\UserPackagesFilter;
+use App\Models\Package;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -9,49 +11,75 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    protected $targetUser;
 
     public function show(User $user, Request $request)
     {
-        //todo validate
         $request->validate(
             [
                 'tab' => ['nullable', 'string', Rule::in(['packages'])]
             ]
         );
 
-        $tab = $request->query('tab') || 'overview';
+        $this->targetUser = $user;
 
-        $data = ['targetUser' => $user];
+        if(is_null($request->tab)){
+            $tab = 'overview';
+        }else{
+            $tab = $request->tab;
+        }
 
-        // switch ($tab) {
-        //     case null:
-        //         return Inertia('User/' . w', $data);
-        //     case 'packages':
-        //         return Inertia('User/Packages', $this->getPackages($user, $request));
-        //     case 'stars':
-        //         return Inertia('User/Stars', $data);
-        // }
-        return Inertia::render('User/' . ucfirst($tab), $data);
+        $data = $this->{$tab}();
+
+        $data['targetUser'] = $user;
+
+        $template = 'User/' . ucfirst($tab);
+
+        return Inertia::render($template, $data);
     }
 
-    public function getPackages($user, $request)
+    public function packages()
     {
-        $filters = $request->all('q', 'type', 'sort');
+        $filters = request()->all('q', 'type', 'sort');
 
-        if (is_null($filters['sort'])) {
+        $queryBuilder = $this->targetUser->package();
+
+        if(!auth()->check() || auth()->id() !== $this->targetUser->id){
+            $queryBuilder->whereNull('private');
+
+            if($filters['type'] === 'public' || $filters['type'] === 'private'){
+                unset($filters['type']);
+            }
+        }
+
+        if (empty($filters['sort'])) {
             $filters['sort'] = 'last_updated';
         }
+
+        // $userPackagesFilter = app(UserPackagesFilter::class);
+
         return  [
-            'filters' => $filters,
-            'packages' => $user->package()
+            'filters' => request()->all('q', 'type', 'sort'),
+            'packages' => $queryBuilder
                 ->filter($filters)
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn ($package) => [
                     'id' => $package->id,
                     'title' => $package->title,
-                    'updated_at' => $package->updated_at,
+                    'updated_at' => $package->updated_at->toDatetimeString(),
                 ])
         ];
+    }
+
+
+    public function overview()
+    {
+        return [];
+    }
+
+    public function stars()
+    {
+        return [];
     }
 }

@@ -9,6 +9,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
   props: {
     targetUser: Object,
+    packages: Object,
   },
   components: {
     UserLayout,

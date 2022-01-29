@@ -63,7 +63,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
-    public function package()
+    public function packages()
     {
         return  $this->hasMany(Package::class, 'author_id');
     }
