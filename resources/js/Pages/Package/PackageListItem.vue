@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <li>
     <header class="mb-1 text-lg">
       <h2 class="truncate">
         <Link
@@ -30,7 +30,7 @@
         >
       </div>
     </footer>
-  </div>
+  </li>
 </template>
 
 <script>

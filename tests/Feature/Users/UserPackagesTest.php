@@ -81,7 +81,6 @@ class UserPackagesTest extends TestCase
             );
     }
 
-    //q type sort
     public function test_can_fitler_with_q()
     {
         $this->signIn($this->user1)->get(route('user.show', ['user' => $this->user1, 'tab' => 'packages', 'q' => '2']))

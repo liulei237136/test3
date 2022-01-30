@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Filters\UserPackagesFilter;
 use App\Models\Package;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -64,11 +65,6 @@ class UserController extends Controller
                 ->filter($filters)
                 ->paginate(10)
                 ->withQueryString()
-                ->through(fn ($package) => [
-                    'id' => $package->id,
-                    'title' => $package->title,
-                    'updated_at' => $package->updated_at->toDatetimeString(),
-                ])
         ];
     }
 
@@ -77,11 +73,11 @@ class UserController extends Controller
         $filters = request()->all('q', 'type', 'sort');
 
         $queryBuilder = $this->targetUser->favorites()->where('favoriteable_type', Package::class)->with('favoriteable');
-        // $queryBuilder = $this->targetUser->favorites()
-        dd($queryBuilder->get()->toArray());
 
         if (!auth()->check() || auth()->id() !== $this->targetUser->id) {
-            $queryBuilder->whereNull('favoriteable.private');
+            $queryBuilder->whereHas('favoriteable', function (Builder $builder) {
+                $builder->whereNull('private');
+            });
 
             if ($filters['type'] === 'public' || $filters['type'] === 'private') {
                 unset($filters['type']);
@@ -95,13 +91,14 @@ class UserController extends Controller
         return  [
             'filters' => request()->all('q', 'type', 'sort'),
             'packages' => $queryBuilder
-                // ->filter($filters)
-                // ->filter($filters)
+                ->filter($filters)
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn ($item) => [
                     'id' => $item->favoriteable->id,
                     'title' => $item->favoriteable->title,
+                    'author' => $item->favoriteable->author,
+                    'created_at' => $item->favoriteable->created_at->toDatetimeString(),
                     'updated_at' => $item->favoriteable->updated_at->toDatetimeString(),
                 ])
         ];
