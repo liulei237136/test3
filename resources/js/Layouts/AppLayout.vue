@@ -22,12 +22,12 @@
                 v-if="$page.props.user"
                 class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex"
               >
-                <jet-nav-link
+                <!-- <jet-nav-link
                   :href="route('dashboard')"
                   :active="route().current('dashboard')"
                 >
                   {{ $t("Dashboard") }}
-                </jet-nav-link>
+                </jet-nav-link> -->
               </div>
             </div>
 
@@ -179,12 +179,12 @@
 
             <div class="border-t border-gray-100"></div>
 
-            <jet-responsive-nav-link
+            <!-- <jet-responsive-nav-link
               :href="route('dashboard')"
               :active="route().current('dashboard')"
             >
               {{ $t("Dashboard") }}
-            </jet-responsive-nav-link>
+            </jet-responsive-nav-link> -->
           </div>
           <div v-else class="pt-2 pb-3 space-y-1">
             <jet-responsive-nav-link

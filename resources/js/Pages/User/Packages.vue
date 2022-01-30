@@ -19,7 +19,7 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import { defineComponent } from "vue";
 import PackageListItem from "@/Pages/Package/PackageListItem";
-
+import Pagination from "@/Components/Pagination";
 export default defineComponent({
   props: {
     targetUser: Object,
@@ -28,6 +28,7 @@ export default defineComponent({
   components: {
     UserLayout,
     PackageListItem,
+    Pagination,
   },
 });
 </script>
