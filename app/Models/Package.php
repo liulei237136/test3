@@ -71,7 +71,7 @@ class Package extends Model
 
     public function isStared($user_id = null)
     {
-        if(is_null($user_id)){
+        if (is_null($user_id)) {
             return false;
         }
         return $this->isFavorited($user_id);
@@ -96,7 +96,9 @@ class Package extends Model
                 $query->latest('updated_at');
             } elseif ($sort === 'title') {
                 $query->orderBy('title');
-            };
+            } elseif ($sort === 'recently_starred') {
+                $query->latest('favorites.created_at');
+            }
             //todo sortby stars
         });
     }
@@ -125,8 +127,9 @@ class Package extends Model
         return $this->hasMany(Package::class, 'parent_id');
     }
 
-    public function isCloned($user_id = null){
-        if(is_null($user_id)) {
+    public function isCloned($user_id = null)
+    {
+        if (is_null($user_id)) {
             return false;
         }
         $user = User::find($user_id);

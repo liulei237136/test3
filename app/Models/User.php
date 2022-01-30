@@ -67,4 +67,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return  $this->hasMany(Package::class, 'author_id');
     }
+
+    public function starredPackages()
+    {
+        $packageIds = $this->favorite(Package::class)->map(fn ($item) => $item->id);
+
+        return  Package::query()->whereIn('id', $packageIds);
+    }
 }

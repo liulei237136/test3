@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Package;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Inertia\Testing\Assert;
 use Tests\TestCase;
 
 class UserStarsTest extends TestCase
@@ -15,10 +18,10 @@ class UserStarsTest extends TestCase
         parent::setUp();
 
         $this->user1 = create(User::class);
-        // $this->user2 =  create(User::class);
+        $this->user2 =  create(User::class);
         // $this->user3 = create(User::class);
 
-        $this->user1->package()->save(
+        $this->user1->packages()->save(
             $this->package1 = create(Package::class, [
                 'author_id' => $this->user1->id,
                 'title' => 'title1',
@@ -33,7 +36,7 @@ class UserStarsTest extends TestCase
                 'private' => true
             ]),
         );
-        $this->user2->package()->save(
+        $this->user2->packages()->save(
             $this->package3 = create(Package::class, [
                 'author_id' => $this->user2->id,
                 'title' => 'title3',
@@ -62,29 +65,27 @@ class UserStarsTest extends TestCase
             ]),
         );
 
+        $this->user1->addFavorite($this->package1);
+        $this->user1->addFavorite($this->package2);
         $this->user1->addFavorite($this->package3);
         $this->user1->addFavorite($this->package4);
         $this->user1->addFavorite($this->package6);
 
         $this->user2->addFavorite($this->package1);
-
+        $this->user2->addFavorite($this->package3);
+        $this->user2->addFavorite($this->package4);
+        $this->user2->addFavorite($this->package5);
+        $this->user2->addFavorite($this->package6);
     }
 
-    // public function test_guest_can_not_see_private()
-    // {
-    //     $this->get(route('user.show', ['user' => $this->user2, 'tab' => 'stars']))
-    //         ->assertInertia(
-    //             fn (Assert $assert) => $assert
-    //                 ->component('User/Stars')
-    //                 ->has('packages.data', 1)
-    //                 ->has(
-    //                     'packages.data.0',
-    //                     fn (Assert $assert) => $assert
-    //                         ->where('id', 1)
-    //                         ->where('title', 'title1')
-    //                         ->where('updated_at', $this->package1->updated_at->toDatetimeString())
-    //                 )
-    //         );
-    // }
-
+    public function test_guest_can_not_see_star_packages_which_are_private()
+    {
+        $this->withoutExceptionHandling();
+        $this->get(route('user.show', ['user' => $this->user1, 'tab' => 'stars']))
+            ->assertInertia(
+                fn (Assert $assert) => $assert
+                    ->component('User/Stars')
+                    ->has('packages.data', 4)
+            );
+    }
 }

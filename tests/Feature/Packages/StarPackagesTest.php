@@ -16,13 +16,13 @@ class StarPackagesTest extends TestCase
 
         $package = create(Package::class);
 
-        $this->post(route('star-packages.store',['package' => $package]))
+        $this->post(route('star-packages.store', ['package' => $package]))
             ->assertRedirect(route('login'));
 
-        $this->delete(route('star-packages.destroy',['package' => $package]))
+        $this->delete(route('star-packages.destroy', ['package' => $package]))
             ->assertRedirect(route('login'));
 
-        $this->assertEquals(1,1);
+        $this->assertEquals(1, 1);
     }
 
     public function test_a_authenticated_user_can_star_public_packages()
@@ -42,23 +42,34 @@ class StarPackagesTest extends TestCase
 
         $package = Package::factory()->public()->create();
 
-        try{
-            $this->post(route('star-packages.store',['package'=>$package]));
-            $this->post(route('star-packages.store',['package'=>$package]));
-        }catch(\Exception $e){
+        try {
+            $this->post(route('star-packages.store', ['package' => $package]));
+            $this->post(route('star-packages.store', ['package' => $package]));
+        } catch (\Exception $e) {
             $this->fail('Can not star same model twice.');
         }
 
         $this->assertCount(1, $package->stars);
     }
 
-    public function test_can_not_star_private_packages()
+    public function test_can_star_own_private_pacakge()
+    {
+        $this->signIn();
+
+        $package = Package::factory()->private()->create(['author_id' => auth()->id()]);
+
+        $this->post(route('star-packages.store', ['package' => $package]));
+
+        $this->assertCount(1, $package->stars);
+    }
+
+    public function test_can_not_star_private_packages_of_others()
     {
         $this->signIn();
 
         $package = Package::factory()->private()->create();
 
-        $this->post(route('star-packages.store',['package'=>$package]));
+        $this->post(route('star-packages.store', ['package' => $package]));
 
         $this->assertCount(0, $package->stars);
     }
@@ -76,7 +87,6 @@ class StarPackagesTest extends TestCase
         $this->assertCount(1, $package->stars);
         $this->delete(route('star-packages.store', ['package' => $package]));
         $this->assertCount(0, $package->fresh()->stars);
-
     }
 
     public function test_can_unstar_only_once()
@@ -84,20 +94,34 @@ class StarPackagesTest extends TestCase
         $this->signIn();
 
         $package = Package::factory()->public()->create();
-        $this->post(route('star-packages.store',['package'=>$package]));
+        $this->post(route('star-packages.store', ['package' => $package]));
         $this->assertCount(1, $package->stars);
 
-        try{
-            $this->delete(route('star-packages.store',['package'=>$package]));
-            $this->delete(route('star-packages.store',['package'=>$package]));
-        }catch(\Exception $e){
+        try {
+            $this->delete(route('star-packages.store', ['package' => $package]));
+            $this->delete(route('star-packages.store', ['package' => $package]));
+        } catch (\Exception $e) {
             $this->fail('Can not unstar same model twice.');
         }
 
         $this->assertCount(0, $package->fresh()->stars);
     }
 
-    public function test_can_not_unstar_private_packages()
+    public function test_can_unstar_own_private_packages()
+    {
+        $this->signIn();
+
+        $package = Package::factory()->private()->create(['author_id' => auth()->id()]);
+
+        $this->post(route('star-packages.store', ['package' => $package]));
+
+        $this->assertCount(1, $package->stars);
+        $this->delete(route('star-packages.store', ['package' => $package]));
+
+        $this->assertCount(0, $package->fresh()->stars);
+    }
+
+    public function test_can_not_unstar_private_packages_of_others()
     {
         $this->signIn();
 
@@ -107,7 +131,7 @@ class StarPackagesTest extends TestCase
 
         $this->assertCount(1, $package->stars);
 
-        $this->delete(route('star-packages.store',['package'=>$package]));
+        $this->delete(route('star-packages.store', ['package' => $package]));
 
         $this->assertCount(1, $package->fresh()->stars);
     }

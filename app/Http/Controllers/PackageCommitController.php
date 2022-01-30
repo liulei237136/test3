@@ -15,21 +15,22 @@ class PackageCommitController extends Controller
     public function index(Package $package, Request $request)
     {
 
-        $data = $this->commonInfo($package);
+        // $data = $this->commonInfo($package);
+
+        appendAttribute($package);
 
         // $data['commits'] = $package->commits;
         $author_id = $request->input('author');
 
         if ($author_id) {
-            $data['package']->load(['commits' => function ($query) use ($author_id) {
+            $package->load(['commits' => function ($query) use ($author_id) {
                 $query->where('commits.author_id', $author_id);
             }]);
         } else {
-            $data['package']->load('commits');
+            $package->load('commits');
         }
 
-        info(json_encode($data));
-        return Inertia::render('Commit/CommitIndex', $data);
+        return Inertia::render('Commit/CommitIndex', compact('package'));
     }
 
     public function store(Package $package, Request $request)

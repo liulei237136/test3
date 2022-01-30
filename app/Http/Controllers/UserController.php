@@ -17,15 +17,15 @@ class UserController extends Controller
     {
         $request->validate(
             [
-                'tab' => ['nullable', 'string', Rule::in(['packages'])]
+                'tab' => ['nullable', 'string', Rule::in(['packages', 'stars'])]
             ]
         );
 
         $this->targetUser = $user;
 
-        if(is_null($request->tab)){
+        if (is_null($request->tab)) {
             $tab = 'overview';
-        }else{
+        } else {
             $tab = $request->tab;
         }
 
@@ -42,12 +42,14 @@ class UserController extends Controller
     {
         $filters = request()->all('q', 'type', 'sort');
 
-        $queryBuilder = $this->targetUser->package();
+        $queryBuilder = $this->targetUser->packages();
 
-        if(!auth()->check() || auth()->id() !== $this->targetUser->id){
+        // dd(get_class($queryBuilder));
+
+        if (!auth()->check() || auth()->id() !== $this->targetUser->id) {
             $queryBuilder->whereNull('private');
 
-            if($filters['type'] === 'public' || $filters['type'] === 'private'){
+            if ($filters['type'] === 'public' || $filters['type'] === 'private') {
                 unset($filters['type']);
             }
         }
@@ -55,8 +57,6 @@ class UserController extends Controller
         if (empty($filters['sort'])) {
             $filters['sort'] = 'last_updated';
         }
-
-        // $userPackagesFilter = app(UserPackagesFilter::class);
 
         return  [
             'filters' => request()->all('q', 'type', 'sort'),
@@ -72,13 +72,42 @@ class UserController extends Controller
         ];
     }
 
-
-    public function overview()
+    public function stars()
     {
-        return [];
+        $filters = request()->all('q', 'type', 'sort');
+
+        $queryBuilder = $this->targetUser->favorites()->where('favoriteable_type', Package::class)->with('favoriteable');
+        // $queryBuilder = $this->targetUser->favorites()
+        dd($queryBuilder->get()->toArray());
+
+        if (!auth()->check() || auth()->id() !== $this->targetUser->id) {
+            $queryBuilder->whereNull('favoriteable.private');
+
+            if ($filters['type'] === 'public' || $filters['type'] === 'private') {
+                unset($filters['type']);
+            }
+        }
+
+        if (empty($filters['sort'])) {
+            $filters['sort'] = 'recently_starred';
+        }
+
+        return  [
+            'filters' => request()->all('q', 'type', 'sort'),
+            'packages' => $queryBuilder
+                // ->filter($filters)
+                // ->filter($filters)
+                ->paginate(10)
+                ->withQueryString()
+                ->through(fn ($item) => [
+                    'id' => $item->favoriteable->id,
+                    'title' => $item->favoriteable->title,
+                    'updated_at' => $item->favoriteable->updated_at->toDatetimeString(),
+                ])
+        ];
     }
 
-    public function stars()
+    public function overview()
     {
         return [];
     }
