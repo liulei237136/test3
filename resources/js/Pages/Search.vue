@@ -3,7 +3,7 @@
     <div class="max-w-3xl mt-1 mx-auto bg-white overflow-hidden">
       <section class="flex items-center justify-between border-b py-4">
         <div class="text-lg font-bold">{{ package ? package.total : 0 }}条结果</div>
-        <div>
+        <!-- <div>
           <select
             @change="filter"
             aria-label="package sort"
@@ -19,56 +19,16 @@
             <option :value="{ sort: 'updated', order: 'desc' }">最近更新</option>
             <option :value="{ sort: 'updated', order: 'asc' }">最少更新</option>
           </select>
-        </div>
+        </div> -->
       </section>
-      <!-- <section
-        class="
-          flex flex-col
-          space-y-4
-          bg-white
-          shadow
-          sm:rounded
-          lg:flex-row lg:items-center lg:justify-between lg:space-y-0 lg:p-2
-        "
-      >
-        <div
-          class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-2"
-        >
-          <select
-            aria-label="package date"
-            id="date"
-            v-model="query.month"
-            class="
-              pr-10
-              pl-3
-              w-full
-              h-11
-              rounded
-              border-gray-300
-              shadow-sm
-              lg:h-9 lg:text-sm
-              sm:w-44
-              focus:outline-none focus:ring-blue-500 focus:border-blue-500
-            "
-          >
-            <option
-              v-for="(month, index) in allMonths"
-              :value="month.value"
-              :key="index"
-            >
-              {{ month.label }}
-            </option>
-          </select>
-        </div>
-      </section> -->
 
       <section v-if="package" class="mt-2">
-        <search-item
+        <package-list-item
           class="mb-4"
           v-for="p in package.data"
           v-bind:key="p.id"
           :package="p"
-        ></search-item>
+        ></package-list-item>
       </section>
       <section v-if="!package" class="pt-4">请输入查询关键词</section>
 
@@ -88,7 +48,7 @@ import { Link } from "@inertiajs/inertia-vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { pickBy } from "lodash";
 import Pagination from "@/Components/Pagination";
-import SearchItem from "./SearchItem.vue";
+import PackageListItem from "@/Pages/Package/PackageListItem.vue";
 
 export default defineComponent({
   props: {
@@ -98,7 +58,7 @@ export default defineComponent({
   components: {
     AppLayout,
     Link,
-    SearchItem,
+    PackageListItem,
     Pagination,
   },
   data() {

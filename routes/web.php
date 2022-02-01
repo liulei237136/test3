@@ -3,6 +3,7 @@
 use App\Http\Controllers\AudioController;
 use App\Http\Controllers\CommitController;
 use App\Http\Controllers\CompareController;
+use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\PackageCommitController;
 use App\Http\Controllers\PackageController;
@@ -30,12 +31,7 @@ Route::get('/test', function () {
     return Redirect::route('dashboard')->with(['success' => 'haha']);
 });
 
-Route::get('/', function () {
-    if (auth()->user()) {
-        return Redirect::route('dashboard');
-    }
-    return Inertia::render('Index');
-});
+Route::get('/', [IndexController::class, 'index'])->name('index.index');
 
 Route::get('/packages', [PackageController::class, 'index'])->name('package.index');
 Route::get('/packages/{package}', [PackageController::class, 'show'])->name('package.show');

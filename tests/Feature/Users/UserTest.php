@@ -20,7 +20,7 @@ class UserTest extends TestCase
         $this->userOne = create(User::class);
         $this->userTwo =  create(User::class);
 
-        $this->userOne->package()->create(
+        $this->userOne->packages()->create(
             $this->publicPackage = make(Package::class)->toArray(),
             $this->privatePackage = make(Package::class, ['private' => true])->toArray(),
             $this->clonePackage =  make(Package::class, ['parent_id' => 1])->toArray(),
@@ -75,7 +75,7 @@ class UserTest extends TestCase
     //     $user = User::factory()->create();
     //     $antherUser = User::factory()->create();
 
-    //     $user->package()->create(
+    //     $user->packages()->create(
     //         $private = Package::factory()->make()->toArray(),
     //         $public = Package::factory()->make(['private' => true])->toArray(),
     //         $clone = Package::factory()->make(['parent_id' => 1])->toArray(),
