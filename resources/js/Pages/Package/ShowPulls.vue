@@ -40,7 +40,9 @@
               {{ closePullCount }} Closed
             </Link>
           </div>
-          <div>right</div>
+          <div>
+            <!-- right -->
+          </div>
         </div>
         <!-- list -->
         <ul v-if="pulls && pulls.length">
@@ -64,7 +66,6 @@ import Icon from "@/Components/Icon";
 export default defineComponent({
   props: {
     package: Object,
-    canEdit: Boolean,
     openPullCount: Number,
     closePullCount: Number,
     pulls: Array,

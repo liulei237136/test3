@@ -1,5 +1,5 @@
 <template>
-  <li>
+  <div>
     <header class="mb-1 text-lg">
       <h2 class="truncate">
         <Link
@@ -15,7 +15,7 @@
         由
         <!-- <a href="#" class="hover:underline">{{ package.author.name }}</a> -->
         <Link
-          :href="route('user.show', { user: package.author.id })"
+          :href="route('users.show', { user: package.author.id })"
           class="hover:underline"
           >{{ package.author.name }}</Link
         >
@@ -30,7 +30,7 @@
         >
       </div>
     </footer>
-  </li>
+  </div>
 </template>
 
 <script>

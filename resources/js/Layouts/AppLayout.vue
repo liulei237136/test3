@@ -90,9 +90,19 @@
 
                   <template #content>
                     <!-- Account Management -->
-                    <div class="block px-4 py-2 text-xs text-gray-400">
+                    <!-- <div class="block px-4 py-2 text-xs text-gray-400">
                       {{ $t("Manage Account") }}
-                    </div>
+                    </div> -->
+                    <jet-dropdown-link :href="route('users.show', {user: $page.props.user.id})">
+                      {{ $t("My Page") }}
+                    </jet-dropdown-link>
+                    <jet-dropdown-link :href="route('users.show', {user: $page.props.user.id,tab: 'packages'})">
+                      {{ $t("My Packages") }}
+                    </jet-dropdown-link>
+
+                    <jet-dropdown-link :href="route('users.show', {user: $page.props.user.id,tab: 'stars'})">
+                      {{ $t("My Stars") }}
+                    </jet-dropdown-link>
 
                     <jet-dropdown-link :href="route('profile.show')">
                       {{ $t("Profile") }}
@@ -232,6 +242,24 @@
             </div>
 
             <div v-if="$page.props.user" class="mt-3 space-y-1">
+                 <jet-responsive-nav-link
+                :href="route('users.show', {user: $page.props.user.id})"
+                :active="route().current('users.show', {user: $page.props.user.id})"
+              >
+                {{ $t("My Page") }}
+              </jet-responsive-nav-link>
+               <jet-responsive-nav-link
+                :href="route('users.show', {user: $page.props.user.id,tab: 'packages'})"
+                :active="route().current('users.show', {user: $page.props.user.id,tab: 'packages'})"
+              >
+                {{ $t("My Packages") }}
+              </jet-responsive-nav-link>
+               <jet-responsive-nav-link
+                :href="route('users.show', {user: $page.props.user.id,tab : 'stars'})"
+                :active="route().current('profile.show', {user: $page.props.user.id,tab:'stars'})"
+              >
+                {{ $t("My Stars") }}
+              </jet-responsive-nav-link>
               <jet-responsive-nav-link
                 :href="route('profile.show')"
                 :active="route().current('profile.show')"

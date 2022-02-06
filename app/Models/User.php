@@ -67,4 +67,22 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return  $this->hasMany(Package::class, 'author_id');
     }
+
+    public function clones(){
+        return $this->packages()->whereNotNull('parent_id');
+    }
+
+    public function hasCloned($package){
+        $hasCloned = false;
+        $this->clones->each(function($clone) use($package, &$hasCloned){
+            if($clone->parent_id === $package->id){
+                $hasCloned = true;
+            }
+        });
+        return $hasCloned;
+    }
+
+    public function hasClonedPackage($parent){
+
+    }
 }

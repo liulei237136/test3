@@ -127,7 +127,7 @@ class Package extends Model
         return $this->hasMany(Package::class, 'parent_id');
     }
 
-    public function isCloned($user_id = null)
+    public function clonedBy($user_id = null)
     {
         if (is_null($user_id)) {
             return false;

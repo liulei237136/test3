@@ -21,8 +21,11 @@ class CompareController extends Controller
 
     public function package(Package $parent, Package $child)
     {
-        $data = $this->commonInfo($parent);
+        // $data = $this->commonInfo($parent);
 
+        appendAttribute($parent);
+
+        $data = ['package' => $parent];
         $data['parent'] = $parent;
         $data['child'] = $child;
         $data['diff'] = $this->diffPackage($parent, $child);

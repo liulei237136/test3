@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AudioController;
+use App\Http\Controllers\ClonePackagesController;
 use App\Http\Controllers\CommitController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\IndexController;
@@ -53,7 +54,7 @@ Route::get('/packages/{package}/commits', [PackageCommitController::class, 'inde
 
 Route::get('/packages/{package}/commits/{commit}', [PackageCommitController::class, 'show'])->name('package.commit.show');
 
-Route::get('/users/{user}', [UserController::class,  'show'])->name('user.show');
+Route::get('/users/{user}', [UserController::class,  'show'])->name('users.show');
 
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
@@ -64,7 +65,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');
     Route::post('/media', [MediaController::class, 'store'])->name('media.store');
 
-    Route::post('/packages/{package}/clone', [PackageController::class, 'clone'])->name('package.clone');
+    Route::post('/packages/{package}/clones', [ClonePackagesController::class, 'store'])->name('clone-packages.store');
     Route::get('/package_create', [PackageController::class, 'create'])->name('package.create');
     Route::get('/packages/{package}/init', [PackageController::class, 'init'])->name('package.init');
     Route::post('/packages', [PackageController::class, 'store'])->name('package.store');

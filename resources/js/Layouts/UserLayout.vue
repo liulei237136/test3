@@ -2,7 +2,7 @@
   <app-layout>
     <div class="flex items-center space-x-2 mt-4 text-lg user-tab">
       <Link
-        :href="route('user.show', { user: this.targetUserId })"
+        :href="route('users.show', { user: this.targetUserId })"
         class="px-4 py-2 flex items-center"
         :class="{
           active: componentName === 'User/Overview',
@@ -12,7 +12,7 @@
         <span>概览</span></Link
       >
       <Link
-        :href="route('user.show', { user: this.targetUserId, tab: 'packages' })"
+        :href="route('users.show', { user: this.targetUserId, tab: 'packages' })"
         class="px-4 py-2 flex items-center"
         :class="{
           active: componentName === 'User/Packages',
@@ -22,7 +22,7 @@
         <span>我创建的点读包</span></Link
       >
       <Link
-        :href="route('user.show', { user: this.targetUserId, tab: 'stars' })"
+        :href="route('users.show', { user: this.targetUserId, tab: 'stars' })"
         class="px-4 py-2 flex items-center"
         :class="{
           active: componentName === 'User/Stars',

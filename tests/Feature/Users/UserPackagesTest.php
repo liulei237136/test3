@@ -61,7 +61,7 @@ class UserPackagesTest extends TestCase
 
     public function test_guest_can_not_see_private_packages()
     {
-        $this->get(route('user.show', ['user' => $this->user1, 'tab' => 'packages']))
+        $this->get(route('users.show', ['user' => $this->user1, 'tab' => 'packages']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -72,7 +72,7 @@ class UserPackagesTest extends TestCase
 
     public function test_user_not_the_author_can_not_see_private_package()
     {
-        $this->signIn()->get(route('user.show', ['user' => $this->user1, 'tab' => 'packages']))
+        $this->signIn()->get(route('users.show', ['user' => $this->user1, 'tab' => 'packages']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -83,7 +83,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_fitler_with_q()
     {
-        $this->signIn($this->user1)->get(route('user.show', ['user' => $this->user1, 'tab' => 'packages', 'q' => '2']))
+        $this->signIn($this->user1)->get(route('users.show', ['user' => $this->user1, 'tab' => 'packages', 'q' => '2']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -94,7 +94,7 @@ class UserPackagesTest extends TestCase
 
     public function test_author_can_filter_without_type()
     {
-        $this->signIn($this->user1)->get(route('user.show', ['user' => $this->user1, 'tab' => 'packages']))
+        $this->signIn($this->user1)->get(route('users.show', ['user' => $this->user1, 'tab' => 'packages']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -104,7 +104,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_filter_with_type_public()
     {
-        $this->signIn($this->user1)->get(route('user.show', ['user' => $this->user1, 'tab' => 'packages', 'type' => 'public']))
+        $this->signIn($this->user1)->get(route('users.show', ['user' => $this->user1, 'tab' => 'packages', 'type' => 'public']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -115,7 +115,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_filter_with_type_private()
     {
-        $this->signIn($this->user1)->get(route('user.show', ['user' => $this->user1, 'tab' => 'packages', 'type' => 'private']))
+        $this->signIn($this->user1)->get(route('users.show', ['user' => $this->user1, 'tab' => 'packages', 'type' => 'private']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -126,7 +126,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_filter_with_type_sources()
     {
-        $this->signIn($this->user2)->get(route('user.show', ['user' => $this->user2, 'tab' => 'packages', 'type' => 'sources']))
+        $this->signIn($this->user2)->get(route('users.show', ['user' => $this->user2, 'tab' => 'packages', 'type' => 'sources']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -138,7 +138,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_filter_with_type_clones()
     {
-        $this->signIn($this->user2)->get(route('user.show', ['user' => $this->user2, 'tab' => 'packages', 'type' => 'clones']))
+        $this->signIn($this->user2)->get(route('users.show', ['user' => $this->user2, 'tab' => 'packages', 'type' => 'clones']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -149,7 +149,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_sort_default_by_last_updated()
     {
-        $this->signIn($this->user2)->get(route('user.show', ['user' => $this->user2, 'tab' => 'packages']))
+        $this->signIn($this->user2)->get(route('users.show', ['user' => $this->user2, 'tab' => 'packages']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -162,7 +162,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_sort_by_last_updated()
     {
-        $this->signIn($this->user2)->get(route('user.show', ['user' => $this->user2, 'tab' => 'packages', 'sort' => 'last_updated']))
+        $this->signIn($this->user2)->get(route('users.show', ['user' => $this->user2, 'tab' => 'packages', 'sort' => 'last_updated']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')
@@ -175,7 +175,7 @@ class UserPackagesTest extends TestCase
 
     public function test_can_sort_by_title()
     {
-        $this->signIn($this->user2)->get(route('user.show', ['user' => $this->user2, 'tab' => 'packages', 'sort' => 'title']))
+        $this->signIn($this->user2)->get(route('users.show', ['user' => $this->user2, 'tab' => 'packages', 'sort' => 'title']))
             ->assertInertia(
                 fn (Assert $assert) => $assert
                     ->component('User/Packages')

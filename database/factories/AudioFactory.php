@@ -25,7 +25,7 @@ class AudioFactory extends Factory
     {
         return [
             'file_name' => $this->faker->numberBetween(1, 100000) . '.mp3',
-            'file_path' => "audio/2022/01/07/9Vcg82LaICeNdy4wsa3Uox8lA3US5FlvCNH8Momm.mp3",
+            'file_path' => "audio/2022/01/29/1",
             'book_name' => $this->faker->sentence(),
             'original_text' => $this->faker->paragraph(),
             'author_id' => User::factory()->create(),

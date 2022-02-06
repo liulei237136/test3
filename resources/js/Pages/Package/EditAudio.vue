@@ -67,7 +67,7 @@
           <template #default>
             <vxe-input
               v-model="demo.filterCommitTitle"
-              :placeholder="commit ? commit.title : '还没有保存过'"
+              :placeholder="package?.commit ? package?.commit?.title : '还没有保存过'"
               @focus="commitFocusEvent"
               @keyup="commitKeyupEvent"
             ></vxe-input>
@@ -80,14 +80,14 @@
                 :key="commit.id"
               >
                 <Link
-                  :to="
+                  :href="
                     route('package.audio', {
                       package: package.id,
                       commit: commit.id,
                     })
                   "
                   :title="commit.title"
-                  class="inline-block w-full"
+                  class=" whitespace-nowrap"
                   >{{ commit.title }}</Link
                 >
               </div>
@@ -95,9 +95,9 @@
           </template>
         </vxe-pulldown>
         <!-- 保存 -->
-        <vxe-button v-if="canEdit" content="保存" @click="onSave"></vxe-button>
+        <vxe-button  content="保存" @click="onSave"></vxe-button>
         <!-- 插入 -->
-        <vxe-button v-if="canEdit" content="插入空白行">
+        <vxe-button content="插入空白行">
           <template #dropdowns>
             <vxe-button
               type="text"
@@ -116,7 +116,7 @@
             ></vxe-button>
           </template>
         </vxe-button>
-        <vxe-button v-if="canEdit" content="插入音频">
+        <vxe-button  content="插入音频">
           <template #dropdowns>
             <vxe-button
               type="text"
@@ -137,7 +137,6 @@
         </vxe-button>
         <!-- 删除 -->
         <vxe-button
-          v-if="canEdit"
           content="删除"
           @click="xGrid.removeCheckboxRow"
         ></vxe-button>
@@ -150,7 +149,6 @@
           @play="onAudioPlayEvent($event, row)"
           controls
           preload="auto"
-          autobuffer
         ></audio>
       </template>
       <template #local_audio="{ row }">
@@ -182,8 +180,8 @@
   height: auto;
   max-height: 300px;
   min-width: 300px;
-  max-width: 600px;
-  overflow-y: auto;
+  max-width: 1200px;
+  overflow-y: hidden;
   border-radius: 4px;
   border: 1px solid #dcdfe6;
   background-color: #fff;
@@ -212,9 +210,6 @@ import AudioRecorder from "./AudioRecorder.vue";
 export default defineComponent({
   props: {
     package: Object,
-    canEdit: Boolean,
-    commit: Object,
-    commits: Array,
   },
   components: {
     Link,
@@ -232,7 +227,7 @@ export default defineComponent({
       filterAllString: "",
       audioList: [],
       filterCommitTitle: "",
-      filteredCommitsList: props.commits,
+      filteredCommitsList: props.package.commits,
       showSaveModal: false,
       saveFormLoading: false,
       saveFormData: {
@@ -265,7 +260,7 @@ export default defineComponent({
 
     const commitKeyupEvent = () => {
       demo.filteredCommitsList = demo.filterCommitTitle
-        ? props.commits.filter(
+        ? props.package.commits.filter(
             (commit) => commit.title.indexOf(demo.filterCommitTitle) > -1
           )
         : props.commits;
@@ -547,12 +542,12 @@ export default defineComponent({
     };
 
     const getCommitAudio = async () => {
-      if (!props.commit) {
+      if (!props.package?.commit) {
         return [];
       } else {
         const result = await axios(
           route("commit.audio", {
-            commit: props?.commit?.id,
+            commit: props.package?.commit?.id,
           })
         );
         return result.data.audio_list;

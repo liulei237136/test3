@@ -81,9 +81,9 @@ class PackageController extends Controller
 
     public function show(Package $package)
     {
-        $this->appendAttribute($package);
+        appendAttribute($package);
 
-        if ($package['canEdit']) {
+        if ($package->canEdit) {
             return Inertia::render('Package/EditBasicInfo', compact('package'));
         } else {
             return Inertia::render('Package/ShowBasicInfo', compact('package'));
@@ -92,7 +92,7 @@ class PackageController extends Controller
 
     public function audio(Package $package, Request $request)
     {
-        $this->appendAttribute($package);
+        appendAttribute($package);
 
         $package->commits = $package->commits()->latest('commits.created_at')->get(['id', 'title']);
 
@@ -115,7 +115,10 @@ class PackageController extends Controller
     {
         $package->load('parent');
 
-        $data = $this->commonInfo($package);
+        // $data = $this->commonInfo($package);
+        appendAttribute($package);
+
+        $data = compact('package');
 
         $data['status'] = $request->query('status') ?? 'open';
 
@@ -126,13 +129,6 @@ class PackageController extends Controller
         $data['pulls'] = $package->pulls()->where('status', $data['status'])->latest()->get();
 
         return Inertia::render('Package/ShowPulls', $data);
-    }
-
-    function clone(Package $package)
-    {
-        $child = $package->clone();
-
-        return Redirect::route('package.show', ['package' => $child]);
     }
 
     public function toggleFavorite(Package $package)
@@ -151,28 +147,5 @@ class PackageController extends Controller
     {
         $package->toggleFavorite();
         return Redirect::back();
-    }
-    // public function commonInfo($package)
-    // {
-    //     $favoritesCount = $package->favoritesCount;
-
-    //     $isFavorited = auth()->user() ? $package->isFavorited() : null;
-
-    //     $canEdit = auth()->user() && auth()->user()->id === $package->author->id;
-
-    //     $package->loadCount('children');
-
-    //     return compact('package', 'favoritesCount', 'isFavorited', 'canEdit');
-    // }
-    protected function appendAttribute($package)
-    {
-        $package->loadCount('stars');
-        $package->isStared = $package->isFavorited();
-        $package->loadCount('clones');
-        $package->isCloned = $package->isCloned(auth()->id());
-        $package->canEdit = auth()->check() && (int)auth()->id() === (int)$package->author->id;
-
-
-        return $package;
     }
 }

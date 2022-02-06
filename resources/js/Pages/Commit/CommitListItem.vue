@@ -6,7 +6,7 @@
       }}</Link>
     </h3>
     <div class="flex items-center">
-      <Link :href="route('user.show', { user: commit.author.id })">
+      <Link :href="route('users.show', { user: commit.author.id })">
         <button
           class="flex mt-1 mr-2 text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
         >

@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        $parentPackage = $parent->package()->create(Package::factory()->make(['title' => 'test'])->toArray());
+        $parentPackage = $parent->packages()->create(Package::factory()->make(['title' => 'test'])->toArray());
 
         $parentPackage->commits()->attach($parentCommit1 = Commit::factory()->create(['author_id' => $parent->id]));
 

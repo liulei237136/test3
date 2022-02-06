@@ -2,7 +2,7 @@
   <div class="inline-flex items-center space-x-1 text-blue-500" :class="classes">
     <Link
       :as="as ? as : 'a'"
-      :href="route('user.show', { user: package.author.id })"
+      :href="route('users.show', { user: package.author.id })"
       class="hover:underline"
       >{{ package.author.name }}</Link
     >

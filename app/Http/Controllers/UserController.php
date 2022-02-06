@@ -88,10 +88,29 @@ class UserController extends Controller
             $filters['sort'] = 'recently_starred';
         }
 
+        $queryBuilder->when($filters['q'] ?? null,  function ($query, $q) {
+            $query->where('favoriteable.title', 'like', '%' . $q . '%');
+        })->when($filters['type'] ?? null, function ($query, $type) {
+            if ($type === 'public') {
+                $query->whereNull('favoriteable.private');
+            } elseif ($type === 'private') {
+                $query->whereNotNull('favoriteable.private');
+            } elseif ($type === 'clones') {
+                $query->whereNotNull('favoriteable.parent_id');
+            } elseif ($type === 'sources') {
+                $query->whereNull('favoriteable.parent_id');
+            }
+        })->when($filters['sort'] ?? null, function ($query, $sort) {
+            if ($sort === 'recently_starred') {
+                $query->latest('created_at');
+            }
+        });
+
+
         return  [
             'filters' => request()->all('q', 'type', 'sort'),
             'packages' => $queryBuilder
-                ->filter($filters)
+                // ->filter($filters)
                 ->paginate(10)
                 ->withQueryString()
                 ->through(fn ($item) => [

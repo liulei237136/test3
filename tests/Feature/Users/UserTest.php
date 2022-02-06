@@ -32,7 +32,7 @@ class UserTest extends TestCase
 
     public function test_guest_can_see_user_package_page()
     {
-        $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages']));
+        $response = $this->get(route('users.show', ['user' => $this->userOne, 'tab' => 'packages']));
 
         $response->assertStatus(200);
     }
@@ -40,18 +40,18 @@ class UserTest extends TestCase
     public function test_user_package_page_with_none_queryparam()
     {
         //when as guest
-        $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages']));
+        $response = $this->get(route('users.show', ['user' => $this->userOne, 'tab' => 'packages']));
         $response->assertStatus(200);
         $response->assertSee($this->publicTitle, $this->cloneTitle);
         $response->assertDontSee($this->privateTitle);
         //when login as author
         $this->actingAs($this->userOne);
-        $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages']));
+        $response = $this->get(route('users.show', ['user' => $this->userOne, 'tab' => 'packages']));
         $response->assertStatus(200);
         $response->assertSee($this->publicTitle, $this->privateTitle, $this->cloneTitle);
         //when login as another man
         $this->actingAs($this->userTwo);
-        $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages']));
+        $response = $this->get(route('users.show', ['user' => $this->userOne, 'tab' => 'packages']));
         $response->assertStatus(200);
         $response->assertSee($this->publicTitle, $this->cloneTitle);
         $response->assertDontSee($this->privateTitle);
@@ -60,12 +60,12 @@ class UserTest extends TestCase
     // public function test_user_package_queryparam_q()
     // {
     //     //when q euqal publicTitle
-    //     $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->publicTitle]));
+    //     $response = $this->get(route('users.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->publicTitle]));
     //     $response->assertStatus(200);
     //     $response->assertSee($this->publicTitle);
     //     $response->assertDontSee($this->privateTitle, $this->cloneTitle);
     //     //when q euqal privateTitle
-    //     $response = $this->get(route('user.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->privateTitle]));
+    //     $response = $this->get(route('users.show', ['user' => $this->userOne, 'tab' => 'packages', 'q' => $this->privateTitle]));
     //     $response->assertStatus(200);
     //     $response->assertDontSee($this->privateTitle, $this->privateTitle, $this->cloneTitle);
     // }
@@ -81,7 +81,7 @@ class UserTest extends TestCase
     //         $clone = Package::factory()->make(['parent_id' => 1])->toArray(),
     //     );
     //     //when not login
-    //     $response = $this->get(route('user.show', ['user' => $user, 'tab' => 'packages']));
+    //     $response = $this->get(route('users.show', ['user' => $user, 'tab' => 'packages']));
     //     $response->assertSee($public['title'], $clone['title']);
     //     $response->assertDontSee($private['title']);
     // }

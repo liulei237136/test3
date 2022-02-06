@@ -136,7 +136,8 @@ export default defineComponent({
       starsCount: this.$page.props.package.stars_count,
       isStared: this.$page.props.package.stared,
       clonesCount: this.$page.props.package.clones_count,
-      isCloned: this.$page.props.package.isCloned,
+      hasCloned: this.$page.props.package.hasCloned,
+      hasClonedPackage: this.$page.props.package.hasClonedPackage,
       componentName: this.$page.component,
     };
   },
@@ -172,7 +173,11 @@ export default defineComponent({
       }
     },
     onClone() {
-      this.$inertia.post(route("package.clone", { package: this.package.id }));
+        if(this.hasCloned){
+            this.$inertia.get(route('package.show', {package: this.package.hasClonedPackage.id}));
+        }else{
+            this.$inertia.post(route("clone-packages", { package: this.package.id }));
+        }
     },
   },
   mounted() {
